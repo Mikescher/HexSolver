@@ -1,8 +1,10 @@
 ﻿using MSHC.Geometry;
 using MSHC.Helper;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using tessnet2;
 
 namespace HexSolver
 {
@@ -24,7 +26,7 @@ namespace HexSolver
 
 		public static readonly Color[] COLOR_CELLS = new Color[] { COLOR_CELL_HIDDEN, COLOR_CELL_ACTIVE, COLOR_CELL_INACTIVE, COLOR_CELL_NOCELL };
 
-		public static readonly int MAX_DISTANCE = 64;
+		public static readonly int MAX_DISTANCE = 96;
 
 		public Vec2d OCRCenter { get; private set; }
 		public double OCRRadius { get; private set; }
@@ -49,6 +51,11 @@ namespace HexSolver
 			this.OCRRadius = radius;
 			this.OCRImage = image;
 			this.BoundingBox = GetBoundingBox(center, radius);
+		}
+
+		private Rectangle GetBoundingBox()
+		{
+			return GetBoundingBox(OCRCenter, OCRRadius);
 		}
 
 		private static Rectangle GetBoundingBox(Vec2d center, double radius)
@@ -80,27 +87,20 @@ namespace HexSolver
 
 		private static Color GetAverageColor(Vec2d OCRCenter, double OCRRadius, Bitmap OCRImage, Rectangle BoundingBox)
 		{
-			Vec2d top = new Vec2d(0, OCRRadius);
-			top.Rotate(MathExt.ToRadians(30 + 3 * 60));
-
-			Vec2d right = new Vec2d(0, OCRRadius);
-			right.Rotate(MathExt.ToRadians(30 + 4 * 60));
-
 			double acR = 0;
 			double acG = 0;
 			double acB = 0;
 			double acS = 0;
 
-			double _hori = right.X - top.X;
-			double _vert = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
+			double hexheight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
 			for (int x = BoundingBox.Left; x < BoundingBox.Right; x++)
 			{
 				for (int y = BoundingBox.Top; y < BoundingBox.Bottom; y++)
 				{
-					double px = Math.Abs(x - OCRCenter.X / 2);
-					double py = Math.Abs(y - OCRCenter.Y / 2);
+					double px = Math.Abs(x - OCRCenter.X);
+					double py = Math.Abs(y - OCRCenter.Y);
 
-					if (px > _hori * 2 || py > _vert || _vert * 2 * _hori - _vert * px - 2 * _hori * py < 0)
+					if (py < hexheight && py + 2 * (px - OCRRadius) < 0)
 					{
 						acR += OCRImage.GetPixel(x, y).R;
 						acG += OCRImage.GetPixel(x, y).G;
@@ -130,6 +130,46 @@ namespace HexSolver
 		private static double GetColorDistance(Color a, Color b)
 		{
 			return Math.Sqrt(Math.Pow(a.R - b.R, 2) + Math.Pow(a.G - b.G, 2) + Math.Pow(a.B - b.B, 2));
+		}
+
+		private Bitmap GetOCRImage()
+		{
+			Bitmap img = OCRImage.Clone(GetBoundingBox(), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+			Color refColor = COLOR_CELLS[(int)Type];
+
+			double hexheight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
+			for (int x = 0; x < img.Width; x++)
+			{
+				for (int y = 0; y < img.Height; y++)
+				{
+					double px = Math.Abs(x - img.Width / 2);
+					double py = Math.Abs(y - img.Height / 2);
+
+					if (py < hexheight && py + 2 * (px - OCRRadius) < 0)
+					{
+						// --
+					}
+					else
+					{
+						img.SetPixel(x, y, Color.Transparent);
+					}
+				}
+			}
+
+			return img;
+		}
+
+		public string GetOCRString()
+		{
+			Bitmap img = GetOCRImage();
+
+			Tesseract ocr = new Tesseract();
+			ocr.Init(@"C:\OCRTest\tessdata", "eng", true);
+			ocr.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+			List<Word> result = ocr.DoOCR(img, Rectangle.Empty);
+
+			return string.Join("", result.Select(p => p.Text));
 		}
 	}
 }

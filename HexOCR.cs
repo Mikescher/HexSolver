@@ -67,9 +67,13 @@ namespace HexSolver
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+					var ocrString = hex.Value.GetOCRString();
 
 					g.FillPolygon(brushes[(int)hex.Value.Type], points, System.Drawing.Drawing2D.FillMode.Alternate);
 					g.DrawLines(pens[(int)hex.Value.Type], points);
+					g.DrawString(ocrString, new Font("Arial", 12), new SolidBrush(Color.DarkCyan), (float)hex.Value.GetEdge(0).X, (float)hex.Value.GetEdge(0).Y);
+
+					Console.Out.WriteLine(hex.Value.Type + ": " + ocrString);
 				}
 			}
 

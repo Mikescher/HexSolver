@@ -91,6 +91,15 @@ namespace HexSolver
 
 		private void OnOCRClicked(object sender, RoutedEventArgs e)
 		{
+			if (cam == null)
+				return;
+			if (ocr == null)
+				return;
+			if (skipUpdate)
+				return;
+			if (screenshot == null)
+				screenshot = cam.GetScreenShot();
+
 			imgDisplay.Source = LoadBitmap(ocr.DisplayTypes(screenshot));
 		}
 
