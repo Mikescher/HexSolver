@@ -12,7 +12,7 @@
 
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Button Content="Recapture" Margin="5 5" Padding="5 0" Click="onCaptureClicked" />
+                <Button Content="Recapture" Margin="5 5" Padding="5 0" Click="OnCaptureClicked" />
             </Border>
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                 <Grid Margin="5">
@@ -72,6 +72,9 @@
                     <Button Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Content="Update" Click="HexOCRValueUpdate"/>
                     <Button Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Content="Set" Click="HexOCRValueSet"/>
                 </Grid>
+            </Border>
+            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                <Button Content="OCR" Margin="5 5" Padding="5 0" Click="OnOCRClicked" />
             </Border>
         </StackPanel>
 

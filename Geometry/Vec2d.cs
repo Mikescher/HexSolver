@@ -2,7 +2,7 @@
 
 namespace MSHC.Geometry
 {
-	public class Vec2d
+	public class Vec2d : IEquatable<Vec2d>
 	{
 		public static Vec2d Zero { get { return new Vec2d(); } private set { } }
 
@@ -100,6 +100,13 @@ namespace MSHC.Geometry
 			if (obj is Vec2d)
 				return this == (Vec2d)obj;
 			return false;
+		}
+
+		public bool Equals(Vec2d obj)
+		{
+			if (obj == null)
+				return false;
+			return this == obj;
 		}
 
 		public override int GetHashCode()

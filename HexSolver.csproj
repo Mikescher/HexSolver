@@ -85,8 +85,9 @@
     <Compile Include="Geometry\Vec2d.cs" />
     <Compile Include="Geometry\Vec2i.cs" />
     <Compile Include="Helper\MathExt.cs" />
-    <Compile Include="Hexagon.cs" />
+    <Compile Include="HexagonCell.cs" />
     <Compile Include="HexCam.cs" />
+    <Compile Include="HexGrid.cs" />
     <Compile Include="HexOCR.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
