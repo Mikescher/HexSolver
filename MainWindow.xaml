@@ -55,7 +55,7 @@
                     <xctk:DoubleUpDown Grid.Row="6"  Grid.Column="1" FormatString="F2" Value="0.0"   Increment=".5"  Minimum="0" x:Name="dudVCorr"  ValueChanged="HexOCRValueChanged"/>
 
                     <Label Grid.Row="8" Grid.Column="0" Content="Padding X:"/>
-                    <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="305"   Increment=".5"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged"/>
+                    <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="56.5"   Increment=".5"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged"/>
 
                     <Label Grid.Row="10" Grid.Column="0" Content="Padding Y:"/>
                     <xctk:DoubleUpDown Grid.Row="10" Grid.Column="1" FormatString="F2" Value="96" Increment=".5"  Minimum="0" x:Name="dudPadY"   ValueChanged="HexOCRValueChanged"/>
@@ -77,7 +77,15 @@
                 <Button Content="Find Types" Margin="5 5" Padding="5 0" Click="OnTypifyClicked" />
             </Border>
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Button Content="OCR" Margin="5 5" Padding="5 0" Click="OnOCRClicked" />
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="20"/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Process" Grid.Row="0" Padding="5 0" Click="OnProcessClicked" />
+                    <Button Content="OCR" Grid.Row="2" Padding="5 0" Click="OnOCRClicked" />
+                </Grid>
             </Border>
         </StackPanel>
 

@@ -10,15 +10,8 @@ namespace HexSolver
 {
 	class HexCam
 	{
-		[DllImport("user32.dll")]
-		public static extern int SendMessage(int hWnd, uint Msg, int wParam, int lParam);
-
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern bool SetForegroundWindow(IntPtr hWnd);
-
-		[DllImport("user32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool GetWindowRect(HandleRef hWnd, out RECT lpRect);
 
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]

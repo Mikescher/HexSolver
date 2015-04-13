@@ -103,6 +103,20 @@ namespace HexSolver
 			imgDisplay.Source = LoadBitmap(ocr.DisplayTypes(screenshot));
 		}
 
+		private void OnProcessClicked(object sender, RoutedEventArgs e)
+		{
+			if (cam == null)
+				return;
+			if (ocr == null)
+				return;
+			if (skipUpdate)
+				return;
+			if (screenshot == null)
+				screenshot = cam.GetScreenShot();
+
+			imgDisplay.Source = LoadBitmap(ocr.DisplayOCRProcess(screenshot));
+		}
+
 		private void OnOCRClicked(object sender, RoutedEventArgs e)
 		{
 			if (cam == null)
