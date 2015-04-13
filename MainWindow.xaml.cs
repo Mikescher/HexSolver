@@ -103,6 +103,18 @@ namespace HexSolver
 			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(screenshot, ocr));
 		}
 
+		private void OnBinPattern(object sender, RoutedEventArgs e)
+		{
+			if (cam == null || ocr == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+			if (screenshot == null)
+				screenshot = cam.GetScreenShot();
+
+			imgDisplay.Source = LoadBitmap(renderer.GetPatternImage(screenshot, ocr));
+		}
+
 		private void HexOCRValueUpdate(object sender, RoutedEventArgs e)
 		{
 			updateOCRValues();

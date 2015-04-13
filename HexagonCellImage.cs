@@ -123,7 +123,7 @@ namespace HexSolver
 		{
 			Color avg = GetAverageColor(OCRCenter, OCRRadius, OCRImage, BoundingBox);
 
-			double[] distance = COLOR_CELLS.Select(p => GetColorDistance(p.R, p.G, p.B, avg)).ToArray();
+			double[] distance = COLOR_CELLS.Select(p => RGBHelper.GetColorDistance(p.R, p.G, p.B, avg)).ToArray();
 
 			double min_distance = distance.Min();
 
@@ -131,44 +131,6 @@ namespace HexSolver
 				return HexagonType.UNKNOWN;
 
 			return (HexagonType)Enum.GetValues(typeof(HexagonType)).GetValue(distance.ToList().IndexOf(min_distance));
-		}
-
-		private int GetHue(int red, int green, int blue)
-		{
-			float min = Math.Min(Math.Min(red, green), blue);
-			float max = Math.Max(Math.Max(red, green), blue);
-
-			float hue = 0f;
-			if (max == red)
-			{
-				hue = (green - blue) / (max - min);
-
-			}
-			else if (max == green)
-			{
-				hue = 2f + (blue - red) / (max - min);
-
-			}
-			else
-			{
-				hue = 4f + (red - green) / (max - min);
-			}
-
-			hue = hue * 60;
-			if (hue < 0)
-				hue = hue + 360;
-
-			return (int)Math.Round(hue);
-		}
-
-		private double GetColorDistance(byte aR, byte aG, byte aB, Color b)
-		{
-			return Math.Sqrt(Math.Pow(aR - b.R, 2) + Math.Pow(aG - b.G, 2) + Math.Pow(aB - b.B, 2));
-		}
-
-		private double GetHueDistance(byte aR, byte aG, byte aB, Color b)
-		{
-			return Math.Abs(GetHue(aR, aG, aB) - b.GetHue());
 		}
 
 		public Bitmap GetOCRImage(bool useTransparency)
@@ -209,7 +171,7 @@ namespace HexSolver
 
 								case HexagonType.ACTIVE:
 									{
-										double h_distance = GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_ACTIVE);
+										double h_distance = RGBHelper.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_ACTIVE);
 										if (h_distance < 32 || pd > (OCRHeight - 1))
 										{
 											// TRANSPARENT
@@ -244,7 +206,7 @@ namespace HexSolver
 
 								case HexagonType.NOCELL:
 									{
-										double c_distance = GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
+										double c_distance = RGBHelper.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
 										if (c_distance < 32)
 										{
 											// TRANSPARENT

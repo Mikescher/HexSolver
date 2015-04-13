@@ -46,6 +46,9 @@
                         <RowDefinition Height="5"/>
                         <RowDefinition Height="26"/>
                         <RowDefinition Height="15"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="5"/>
                         <RowDefinition Height="24"/>
                         <RowDefinition Height="5"/>
                         <RowDefinition Height="20"/>
@@ -80,12 +83,11 @@
                     <Label Grid.Row="14" Grid.Column="0" Content="Bar Right:"/>
                     <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="125" Increment="5"  Minimum="0" x:Name="dudBarRight" ValueChanged="HexOCRValueChanged"/>
 
-                    <Button Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
-                    <Button Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Content="Update" Click="HexOCRValueUpdate"/>
-                    <Button Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="2" Content="Set" Click="HexOCRValueSet"/>
+                    <Button Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Content="Binary Pattern" Click="OnBinPattern"/>
+                    <Button Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
+                    <Button Grid.Row="21" Grid.Column="0" Grid.ColumnSpan="2" Content="Update" Click="HexOCRValueUpdate"/>
+                    <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="2" Content="Set" Click="HexOCRValueSet"/>
                 </Grid>
-            </Border>
-            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
             </Border>
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                 <Grid Margin="5">

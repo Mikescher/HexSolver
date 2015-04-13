@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using Tesseract;
 
@@ -137,5 +139,40 @@ namespace HexSolver
 			return shot;
 		}
 
+		public Bitmap GetPatternImage(Bitmap shot, HexOCR ocr)
+		{
+			shot = new Bitmap(shot);
+
+			bool[,] pattern = ocr.GetPattern(shot);
+
+			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+			IntPtr Scan0 = srcData.Scan0;
+			int stride = srcData.Stride;
+
+			int width = shot.Width;
+			int height = shot.Height;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)Scan0;
+
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						int idx = (y * stride) + x * 4;
+
+						p[idx + 0] = (byte)(pattern[x, y] ? 0 : 255);
+						p[idx + 1] = (byte)(pattern[x, y] ? 0 : 255);
+						p[idx + 2] = (byte)(pattern[x, y] ? 0 : 255);
+						p[idx + 3] = 255;
+					}
+				}
+			}
+
+			shot.UnlockBits(srcData);
+
+			return shot;
+		}
 	}
 }
