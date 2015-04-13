@@ -74,6 +74,9 @@
                 </Grid>
             </Border>
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                <Button Content="Find Types" Margin="5 5" Padding="5 0" Click="OnTypifyClicked" />
+            </Border>
+            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                 <Button Content="OCR" Margin="5 5" Padding="5 0" Click="OnOCRClicked" />
             </Border>
         </StackPanel>

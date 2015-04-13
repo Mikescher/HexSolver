@@ -89,7 +89,7 @@ namespace HexSolver
 			return bs;
 		}
 
-		private void OnOCRClicked(object sender, RoutedEventArgs e)
+		private void OnTypifyClicked(object sender, RoutedEventArgs e)
 		{
 			if (cam == null)
 				return;
@@ -101,6 +101,20 @@ namespace HexSolver
 				screenshot = cam.GetScreenShot();
 
 			imgDisplay.Source = LoadBitmap(ocr.DisplayTypes(screenshot));
+		}
+
+		private void OnOCRClicked(object sender, RoutedEventArgs e)
+		{
+			if (cam == null)
+				return;
+			if (ocr == null)
+				return;
+			if (skipUpdate)
+				return;
+			if (screenshot == null)
+				screenshot = cam.GetScreenShot();
+
+			imgDisplay.Source = LoadBitmap(ocr.DisplayOCR(screenshot));
 		}
 
 		private void updateOCRProperties()
