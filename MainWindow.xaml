@@ -12,7 +12,16 @@
 
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Button Content="Recapture" Margin="5 5" Padding="5 0" Click="OnCaptureClicked" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Content="Recapture" Grid.Column="0" Margin="5 5" Padding="5 0" Click="OnCaptureClicked" />
+                    <Button Content="Example" Grid.Column="2" Margin="5 5" Padding="5 0" Click="OnExampleClicked" />
+                </Grid>
             </Border>
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                 <Grid Margin="5">

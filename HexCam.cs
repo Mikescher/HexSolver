@@ -44,6 +44,8 @@ namespace HexSolver
 
 			SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
+			shot.Save(@"E:\Eigene Dateien\Dropbox\Programming\Visual Studio\Projects\HexSolver\example\shot001.png");
+
 			return shot;
 		}
 

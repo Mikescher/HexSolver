@@ -17,14 +17,18 @@ The idea is to automatically parse the game state, find the next (valid) step an
 
 ![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
 
-###Step 4 - Text Recognition
+###Step 4 - Image Processing
+
+![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
+
+###Step 5 - Text Recognition
 
 > **NOT IMPLEMENTED**
 
-###Step 5 - Puzzle Solving
+###Step 6 - Puzzle Solving
 
 > **NOT IMPLEMENTED**
 
-###Step 6 - Solution Executing
+###Step 7 - Solution Executing
 
 > **NOT IMPLEMENTED**

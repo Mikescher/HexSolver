@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Image = System.Drawing.Image;
 
 namespace HexSolver
 {
@@ -36,8 +38,25 @@ namespace HexSolver
 				return;
 			if (ocr == null)
 				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
+
+			screenshot = cam.GetScreenShot();
+
+			imgDisplay.Source = LoadBitmap(ocr.DisplayCells(screenshot));
+		}
+
+		private void OnExampleClicked(object sender, RoutedEventArgs e)
+		{
+			if (cam == null)
+				return;
+			if (ocr == null)
+				return;
+
+			Image file = Image.FromFile("./example/shot001.png");
+			screenshot = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
+			using (Graphics g = Graphics.FromImage(screenshot))
+			{
+				g.DrawImageUnscaled(file, 0, 0);
+			}
 
 			imgDisplay.Source = LoadBitmap(ocr.DisplayCells(screenshot));
 		}

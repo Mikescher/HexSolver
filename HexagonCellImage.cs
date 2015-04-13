@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using Tesseract;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace HexSolver
 {
@@ -289,11 +290,15 @@ namespace HexSolver
 			return img;
 		}
 
+		static int iddd;
 		public string GetOCRString(TesseractEngine engine)
 		{
 			Bitmap img = GetOCRImage(false);
-			img = new Bitmap(img, new Size(img.Width * 16, img.Height * 16));
-			//img.Save(@"E:\Eigene Dateien\Dropbox\Programming\Visual Studio\Projects\HexSolver\imgsave\" + OCRCenter.X + "-" + OCRCenter.Y + ".png", ImageFormat.Png);
+			img = new Bitmap(img, new Size(img.Width * 2, img.Height * 2));
+
+
+			if (Type == HexagonType.INACTIVE)
+				img.Save(@"E:\Eigene Dateien\Dropbox\Programming\Visual Studio\Projects\HexSolver\imgsave\" + (iddd++) + ".png", ImageFormat.Png);
 
 			using (var page = engine.Process(img))
 			{
