@@ -20,6 +20,7 @@ namespace HexSolver
 
 		private HexCam cam = null;
 		private HexOCR ocr = null;
+		private HexRenderer renderer = null;
 		private Bitmap screenshot = null;
 
 		private bool skipUpdate = false;
@@ -30,25 +31,22 @@ namespace HexSolver
 
 			cam = new HexCam();
 			ocr = new HexOCR();
+			renderer = new HexRenderer();
 		}
 
 		private void OnCaptureClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 
 			screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayCells(screenshot));
+			imgDisplay.Source = LoadBitmap(screenshot);
 		}
 
 		private void OnExampleClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 
 			Image file = Image.FromFile("./example/shot001.png");
@@ -58,24 +56,42 @@ namespace HexSolver
 				g.DrawImageUnscaled(file, 0, 0);
 			}
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayCells(screenshot));
+			imgDisplay.Source = LoadBitmap(screenshot);
 		}
 
 		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
+			if (cam == null || ocr == null || renderer == null)
+				return;
+
 			HexOCRValueSet(sender, null);
 		}
 
 		private void cbSwap_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			if (cam == null || ocr == null || renderer == null)
+				return;
+
 			HexOCRValueSet(sender, null);
+		}
+
+		private void HexOCRValueAuto(object sender, RoutedEventArgs e)
+		{
+			if (cam == null || ocr == null || renderer == null)
+				return;
+			if (screenshot == null)
+				screenshot = cam.GetScreenShot();
+
+			ocr.FindHexPattern(screenshot);
+
+			updateOCRValues();
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(screenshot, ocr));
 		}
 
 		private void HexOCRValueSet(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
@@ -84,7 +100,7 @@ namespace HexSolver
 
 			updateOCRProperties();
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayCells(screenshot));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(screenshot, ocr));
 		}
 
 		private void HexOCRValueUpdate(object sender, RoutedEventArgs e)
@@ -110,44 +126,38 @@ namespace HexSolver
 
 		private void OnTypifyClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
 			if (screenshot == null)
 				screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayTypes(screenshot));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayTypes(screenshot, ocr.GetHexagons(screenshot)));
 		}
 
 		private void OnProcessClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
 			if (screenshot == null)
 				screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayOCRProcess(screenshot));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRProcess(screenshot, ocr));
 		}
 
 		private void OnOCRClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null)
-				return;
-			if (ocr == null)
+			if (cam == null || ocr == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
 			if (screenshot == null)
 				screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(ocr.DisplayOCR(screenshot));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(screenshot, ocr));
 		}
 
 		private void updateOCRProperties()

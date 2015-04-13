@@ -94,6 +94,7 @@
     <Compile Include="HexCam.cs" />
     <Compile Include="HexGrid.cs" />
     <Compile Include="HexOCR.cs" />
+    <Compile Include="HexRenderer.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
