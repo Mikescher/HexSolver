@@ -286,6 +286,8 @@ namespace HexSolver
 			{
 				PaddingX -= hexHeight * 2 + CellGap + CorrectionVertical;
 				offsetX++;
+
+				InitialSwap = !InitialSwap;
 			}
 			double calculatedPosX = PaddingX + ((hexHeight + CellGap + hexHeight) * (Math.Cos(MathExt.ToRadians(30))) + CorrectionHorizontal) * offsetX;
 			PaddingX += anchor.X - calculatedPosX;
@@ -295,8 +297,6 @@ namespace HexSolver
 			{
 				PaddingY -= (2 * hexHeight + CellGap) * Math.Cos(MathExt.ToRadians(30)) + CorrectionHorizontal;
 				offsetY++;
-
-				InitialSwap = !InitialSwap;
 			}
 			double calculatedPosY = PaddingY + (hexHeight + CellGap + hexHeight + CorrectionVertical) * offsetY;
 			PaddingY += anchor.Y - calculatedPosY;

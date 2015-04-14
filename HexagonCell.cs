@@ -1,6 +1,5 @@
 ﻿using MSHC.Geometry;
 using System.Drawing;
-using Tesseract;
 
 namespace HexSolver
 {
@@ -18,6 +17,7 @@ namespace HexSolver
 		public Vec2i Position { get; private set; }
 		public HexagonCellImage Image { get; private set; }
 		public HexagonType Type { get { return Image.Type; } }
+		public CellHint Hint { get { return Image.Hint; } }
 
 		public HexagonCell(Vec2i position, Vec2d center, double radius, Bitmap image)
 		{
@@ -33,11 +33,6 @@ namespace HexSolver
 		public Bitmap GetOCRImage(bool useTransparent)
 		{
 			return Image.GetOCRImage(useTransparent);
-		}
-
-		public string GetOCRString(TesseractEngine engine)
-		{
-			return Image.GetOCRString(engine);
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Tesseract;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
@@ -35,6 +36,18 @@ namespace HexSolver
 					_Type = GetHexagonType();
 
 				return _Type.Value;
+			}
+		}
+
+		public CellHint _Hint = null;
+		public CellHint Hint
+		{
+			get
+			{
+				if (_Hint == null)
+					_Hint = GetHexagonHint();
+
+				return _Hint;
 			}
 		}
 
@@ -135,8 +148,15 @@ namespace HexSolver
 
 		public Bitmap GetOCRImage(bool useTransparency)
 		{
+			int temp;
+			return GetOCRImage(useTransparency, out temp);
+		}
+
+		public Bitmap GetOCRImage(bool useTransparency, out int activePixel)
+		{
 			Bitmap img = OCRImage.Clone(GetBoundingBox(), PixelFormat.Format32bppArgb);
 			double hexheight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
+			activePixel = 0;
 
 			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -161,7 +181,7 @@ namespace HexSolver
 							byte repl_R = 255;
 							byte repl_G = 255;
 							byte repl_B = 255;
-							byte repl_A = 0;
+							byte repl_A = (byte)(useTransparency ? 0 : 255);
 
 							switch (Type)
 							{
@@ -178,6 +198,8 @@ namespace HexSolver
 										}
 										else
 										{
+											activePixel++;
+
 											repl_R = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_G = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_B = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
@@ -196,6 +218,8 @@ namespace HexSolver
 										}
 										else
 										{
+											activePixel++;
+
 											repl_R = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_G = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_B = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
@@ -213,6 +237,8 @@ namespace HexSolver
 										}
 										else
 										{
+											activePixel++;
+
 											repl_R = (byte)((p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_G = (byte)((p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
 											repl_B = (byte)((p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
@@ -238,7 +264,7 @@ namespace HexSolver
 							p[idx + 0] = 255;
 							p[idx + 1] = 255;
 							p[idx + 2] = 255;
-							p[idx + 3] = 0;
+							p[idx + 3] = (byte)(useTransparency ? 0 : 255);
 						}
 					}
 				}
@@ -252,21 +278,84 @@ namespace HexSolver
 			return img;
 		}
 
-		static int iddd;
-		public string GetOCRString(TesseractEngine engine)
+		private static int ocrctr;
+		private CellHint GetHexagonHint()
 		{
-			Bitmap img = GetOCRImage(false);
-			img = new Bitmap(img, new Size(img.Width * 2, img.Height * 2));
-
+			if (Type == HexagonType.HIDDEN || Type == HexagonType.UNKNOWN)
+				return new CellHint();
 
 			if (Type == HexagonType.INACTIVE)
-				img.Save(@"E:\Eigene Dateien\Dropbox\Programming\Visual Studio\Projects\HexSolver\imgsave\" + (iddd++) + ".png", ImageFormat.Png);
-
-			using (var page = engine.Process(img))
 			{
-				Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
-				return page.GetText();
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				{
+					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+
+					int activePixel;
+					Bitmap img = GetOCRImage(false, out activePixel);
+					img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+
+					if (activePixel == 0)
+						return new CellHint();
+
+					using (var page = engine.Process(img))
+					{
+						string txt = page.GetText();
+						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
+						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
+
+						if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
+							return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)));
+						if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
+							return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)));
+						if (Regex.IsMatch(txt, @"^[0-9]+$"))
+							return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, int.Parse(txt));
+						if (txt == "?")
+							return new CellHint();
+
+
+						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
+						return new CellHint();
+					}
+				}
 			}
+
+			if (Type == HexagonType.ACTIVE)
+			{
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				{
+					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+
+					int activePixel;
+					Bitmap img = GetOCRImage(false, out activePixel);
+					img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+
+					if (activePixel == 0)
+						return new CellHint();
+
+					using (var page = engine.Process(img))
+					{
+						string txt = page.GetText();
+						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
+						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
+
+						if (Regex.IsMatch(txt, @"^[0-9]+$"))
+							return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt));
+
+
+						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
+						return new CellHint();
+					}
+				}
+			}
+
+			if (Type == HexagonType.NOCELL)
+			{
+				return new CellHint();
+			}
+
+			throw new Exception("WTF - Type ==" + Type);
+
+
 		}
 	}
 }

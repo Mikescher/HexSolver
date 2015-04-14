@@ -90,18 +90,15 @@ namespace HexSolver
 			shot = new Bitmap(shot);
 
 			using (Graphics g = Graphics.FromImage(shot))
-			using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
 			{
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
-
-				engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
 
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 					g.FillPolygon(new SolidBrush(Color.Wheat), points);
 
-					g.DrawImageUnscaled(hex.Value.GetOCRImage(false), hex.Value.Image.BoundingBox.Left, hex.Value.Image.BoundingBox.Top);
+					g.DrawImageUnscaled(hex.Value.GetOCRImage(true), hex.Value.Image.BoundingBox.Left, hex.Value.Image.BoundingBox.Top);
 				}
 			}
 
@@ -118,23 +115,26 @@ namespace HexSolver
 			shot = new Bitmap(shot);
 
 			using (Graphics g = Graphics.FromImage(shot))
-			using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
 			{
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
-				engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
-
-				Font fnt = new Font("Arial", 12);
-				Brush fntBush = new SolidBrush(Color.DarkRed);
+				Font fnt = new Font("Arial", 12, FontStyle.Bold);
+				Brush fntBush1 = new SolidBrush(Color.Black);
+				Brush fntBush2 = new SolidBrush(Color.LightGray);
+				StringFormat fmt = new StringFormat();
+				fmt.LineAlignment = StringAlignment.Center;
+				fmt.Alignment = StringAlignment.Center;
 
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
-					var ocrString = hex.Value.GetOCRString(engine);
 
 					g.FillPolygon(new SolidBrush(Color.Wheat), points);
 
-					g.DrawString(ocrString, fnt, fntBush, points[1].X, points[1].Y);
+					if (hex.Value.Hint.Type != CellHintType.NONE)
+						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+					else
+						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush2, hex.Value.Image.BoundingBox, fmt);
 				}
 			}
 
