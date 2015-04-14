@@ -278,6 +278,78 @@ namespace HexSolver
 			return img;
 		}
 
+		private CellHintArea GetHintColumn(Bitmap img)
+		{
+			int[] pixelcount = { 0, 0, 0 };
+
+			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+			IntPtr Scan0 = srcData.Scan0;
+			int stride = srcData.Stride;
+
+			Vec2d p0 = GetEdge(0) - OCRCenter;
+			Vec2d p1 = GetEdge(1) - OCRCenter;
+			Vec2d p2 = GetEdge(2) - OCRCenter;
+			Vec2d p3 = GetEdge(3) - OCRCenter;
+			Vec2d p4 = GetEdge(4) - OCRCenter;
+			Vec2d p5 = GetEdge(5) - OCRCenter;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)Scan0;
+
+				for (int x = 0; x < img.Width; x++)
+				{
+					for (int y = 0; y < img.Height; y++)
+					{
+						int idx = (y * stride) + x * 4;
+
+						if (p[idx + 0] + p[idx + 1] + p[idx + 2] == 255 * 3)
+							continue;
+
+
+						Vec2d rpos = new Vec2d((x - img.Width / 2), (y - img.Height / 2));
+
+						if (isRight(p2, p5, rpos) && (isRight(p1, p3, rpos) && isRight(p4, p0, rpos)))
+							pixelcount[0]++;
+
+						if (isRight(p1, p4, rpos) && (isRight(p0, p2, rpos) && isRight(p3, p5, rpos)))
+							pixelcount[1]++;
+
+						if (isRight(p0, p3, rpos) && (isRight(p5, p1, rpos) && isRight(p2, p4, rpos)))
+							pixelcount[2]++;
+					}
+				}
+			}
+
+			img.UnlockBits(srcData);
+
+			if (pixelcount[0] > 16 && pixelcount[0] == pixelcount.Max())
+				return CellHintArea.COLUMN_LEFT;
+			if (pixelcount[1] > 16 && pixelcount[1] == pixelcount.Max())
+				return CellHintArea.COLUMN_DOWN;
+			if (pixelcount[2] > 16 && pixelcount[2] == pixelcount.Max())
+				return CellHintArea.COLUMN_RIGHT;
+
+			return CellHintArea.NONE;
+		}
+
+		private bool isRight(Vec2d a, Vec2d b, Vec2d c)
+		{
+			return ((b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X)) > 0;
+		}
+
+		private Bitmap RotateImage(Bitmap bitmap, float angle, Color bg)
+		{
+			Bitmap returnBitmap = new Bitmap(bitmap.Width, bitmap.Height);
+			Graphics graphics = Graphics.FromImage(returnBitmap);
+			graphics.TranslateTransform((float)bitmap.Width / 2, (float)bitmap.Height / 2);
+			graphics.RotateTransform(angle);
+			graphics.TranslateTransform(-(float)bitmap.Width / 2, -(float)bitmap.Height / 2);
+			graphics.Clear(bg);
+			graphics.DrawImage(bitmap, new Point(0, 0));
+			return returnBitmap;
+		}
+
 		private static int ocrctr;
 		private CellHint GetHexagonHint()
 		{
@@ -292,10 +364,10 @@ namespace HexSolver
 
 					int activePixel;
 					Bitmap img = GetOCRImage(false, out activePixel);
-					img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
-
 					if (activePixel == 0)
 						return new CellHint();
+
+					img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
 
 					using (var page = engine.Process(img))
 					{
@@ -314,7 +386,7 @@ namespace HexSolver
 
 
 						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-						return new CellHint();
+						return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
 					}
 				}
 			}
@@ -327,10 +399,10 @@ namespace HexSolver
 
 					int activePixel;
 					Bitmap img = GetOCRImage(false, out activePixel);
-					img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
-
 					if (activePixel == 0)
 						return new CellHint();
+
+					img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
 
 					using (var page = engine.Process(img))
 					{
@@ -343,19 +415,58 @@ namespace HexSolver
 
 
 						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-						return new CellHint();
+						return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, 0);
 					}
 				}
 			}
 
 			if (Type == HexagonType.NOCELL)
 			{
-				return new CellHint();
+				int activePixel;
+				Bitmap img = GetOCRImage(false, out activePixel);
+				if (activePixel == 0)
+					return new CellHint();
+
+				CellHintArea col = GetHintColumn(img);
+
+				if (col == CellHintArea.NONE)
+				{
+					Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
+					return new CellHint(CellHintType.COUNT, col, 0);
+				}
+
+				if (col == CellHintArea.COLUMN_LEFT)
+					img = RotateImage(img, -60, Color.White);
+				else if (col == CellHintArea.COLUMN_RIGHT)
+					img = RotateImage(img, +60, Color.White);
+
+				img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
+
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				{
+					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+
+					using (var page = engine.Process(img))
+					{
+						string txt = page.GetText();
+						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
+						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
+
+						if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
+							return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)));
+						if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
+							return new CellHint(CellHintType.NONCONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)));
+						if (Regex.IsMatch(txt, @"^[0-9]+$"))
+							return new CellHint(CellHintType.COUNT, col, int.Parse(txt));
+
+
+						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
+						return new CellHint(CellHintType.COUNT, col, 0);
+					}
+				}
 			}
 
 			throw new Exception("WTF - Type ==" + Type);
-
-
 		}
 	}
 }

@@ -112,7 +112,7 @@ namespace HexSolver
 			if (screenshot == null)
 				screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(renderer.GetPatternImage(screenshot, ocr));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(screenshot, ocr));
 		}
 
 		private void HexOCRValueUpdate(object sender, RoutedEventArgs e)

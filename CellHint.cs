@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace HexSolver
+﻿namespace HexSolver
 {
 	enum CellHintType
 	{
@@ -57,27 +54,6 @@ namespace HexSolver
 					break;
 				case CellHintType.NONCONSECUTIVE:
 					result += "-" + Number + "-";
-					break;
-			}
-
-			result += " ";
-
-			switch (Area)
-			{
-				case CellHintArea.DIRECT:
-					//
-					break;
-				case CellHintArea.CIRCLE:
-					result += "C";
-					break;
-				case CellHintArea.COLUMN_LEFT:
-					result += "L";
-					break;
-				case CellHintArea.COLUMN_DOWN:
-					result += "D";
-					break;
-				case CellHintArea.COLUMN_RIGHT:
-					result += "R";
 					break;
 			}
 

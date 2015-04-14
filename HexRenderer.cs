@@ -1,14 +1,15 @@
-﻿using System;
+﻿using MSHC.Geometry;
+using MSHC.Helper;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using Tesseract;
 
 namespace HexSolver
 {
 	class HexRenderer
 	{
-		private static readonly Pen[] hexpens = new Pen[]
+		private static readonly Pen[] hexpens = new[]
 		{
 			new Pen(new SolidBrush(Color.Orange)),
 			new Pen(new SolidBrush(Color.Blue)),
@@ -17,7 +18,7 @@ namespace HexSolver
 			new Pen(new SolidBrush(Color.Red)),
 		};
 
-		private static readonly SolidBrush[] hexbrushes_full = new SolidBrush[]
+		private static readonly SolidBrush[] hexbrushes_full = new[]
 		{
 			new SolidBrush(HexagonCellImage.COLOR_CELL_HIDDEN),
 			new SolidBrush(HexagonCellImage.COLOR_CELL_ACTIVE),
@@ -120,7 +121,9 @@ namespace HexSolver
 
 				Font fnt = new Font("Arial", 12, FontStyle.Bold);
 				Brush fntBush1 = new SolidBrush(Color.Black);
-				Brush fntBush2 = new SolidBrush(Color.LightGray);
+				Brush fntBush2 = new SolidBrush(Color.FromArgb(32, Color.Black));
+				Pen bluepen = new Pen(Color.FromArgb(0, 164, 235));
+				Brush bluebrush = new SolidBrush(Color.FromArgb(128, 0, 164, 235));
 				StringFormat fmt = new StringFormat();
 				fmt.LineAlignment = StringAlignment.Center;
 				fmt.Alignment = StringAlignment.Center;
@@ -129,19 +132,74 @@ namespace HexSolver
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
-					g.FillPolygon(new SolidBrush(Color.Wheat), points);
+					if (hex.Value.Type == HexagonType.NOCELL)
+						g.FillPolygon(new SolidBrush(Color.Gainsboro), points);
+					else
+						g.FillPolygon(new SolidBrush(Color.SlateGray), points);
 
 					if (hex.Value.Hint.Type != CellHintType.NONE)
+					{
+						if (hex.Value.Hint.Area == CellHintArea.CIRCLE)
+						{
+							Vec2d center = hex.Value.Image.OCRCenter;
+							double hexheight = hex.Value.Image.OCRHeight * 0.8;
+
+							g.FillEllipse(bluebrush, (int)(center.X - hexheight), (int)(center.Y - hexheight), (int)(2 * hexheight), (int)(2 * hexheight));
+							g.DrawEllipse(bluepen, (int)(center.X - hexheight), (int)(center.Y - hexheight), (int)(2 * hexheight), (int)(2 * hexheight));
+						}
+						else if (hex.Value.Hint.Area == CellHintArea.COLUMN_LEFT)
+						{
+							Vec2d p1 = hex.Value.Image.GetEdge(0);
+							Vec2d p2 = hex.Value.Image.GetEdge(1);
+							Vec2d pm = p1 - p2;
+							pm.Rotate(MathExt.ToRadians(-90));
+							pm.SetLength(hex.Value.Image.OCRHeight / 4);
+
+							Point[] polypoints = new[] { p1, p2, p2 + pm, p1 + pm, p1 }.Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+
+							g.FillPolygon(bluebrush, polypoints);
+							g.DrawPolygon(bluepen, polypoints);
+						}
+						else if (hex.Value.Hint.Area == CellHintArea.COLUMN_DOWN)
+						{
+							Vec2d p1 = hex.Value.Image.GetEdge(5);
+							Vec2d p2 = hex.Value.Image.GetEdge(0);
+							Vec2d pm = p1 - p2;
+							pm.Rotate(MathExt.ToRadians(-90));
+							pm.SetLength(hex.Value.Image.OCRHeight / 4);
+
+							Point[] polypoints = new[] { p1, p2, p2 + pm, p1 + pm, p1 }.Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+
+							g.FillPolygon(bluebrush, polypoints);
+							g.DrawPolygon(bluepen, polypoints);
+						}
+						else if (hex.Value.Hint.Area == CellHintArea.COLUMN_RIGHT)
+						{
+							Vec2d p1 = hex.Value.Image.GetEdge(4);
+							Vec2d p2 = hex.Value.Image.GetEdge(5);
+							Vec2d pm = p1 - p2;
+							pm.Rotate(MathExt.ToRadians(-90));
+							pm.SetLength(hex.Value.Image.OCRHeight / 4);
+
+							Point[] polypoints = new[] { p1, p2, p2 + pm, p1 + pm, p1 }.Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+
+							g.FillPolygon(bluebrush, polypoints);
+							g.DrawPolygon(bluepen, polypoints);
+						}
+
 						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+					}
 					else
+					{
 						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush2, hex.Value.Image.BoundingBox, fmt);
+					}
 				}
 			}
 
 			return shot;
 		}
 
-		public Bitmap GetPatternImage(Bitmap shot, HexOCR ocr)
+		public Bitmap DisplayBinPattern(Bitmap shot, HexOCR ocr)
 		{
 			shot = new Bitmap(shot);
 
