@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,12 +45,17 @@ namespace HexSolver
 			imgDisplay.Source = LoadBitmap(screenshot);
 		}
 
-		private void OnExampleClicked(object sender, RoutedEventArgs e)
+		private void OnExampleLoadClicked(object sender, RoutedEventArgs e)
 		{
 			if (cam == null || ocr == null || renderer == null)
 				return;
 
-			Image file = Image.FromFile("./example/shot001.png");
+			int shotid = iudExample.Value.Value;
+
+			if (!File.Exists(String.Format("./example/shot{0:000}.png", shotid)))
+				return;
+
+			Image file = Image.FromFile(String.Format("./example/shot{0:000}.png", shotid));
 			screenshot = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
 			using (Graphics g = Graphics.FromImage(screenshot))
 			{
@@ -57,6 +63,25 @@ namespace HexSolver
 			}
 
 			imgDisplay.Source = LoadBitmap(screenshot);
+		}
+
+		private void OnExampleSaveClicked(object sender, RoutedEventArgs e)
+		{
+			if (cam == null || ocr == null || renderer == null)
+				return;
+
+			if (screenshot == null)
+			{
+				screenshot = cam.GetScreenShot();
+				imgDisplay.Source = LoadBitmap(screenshot);
+			}
+
+			int i = 1;
+			while (File.Exists(String.Format(@"..\..\example\shot{0:000}.png", i)))
+				i++;
+			screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
+
+			Console.Out.WriteLine("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
 		}
 
 		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
