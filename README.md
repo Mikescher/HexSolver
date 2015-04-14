@@ -12,14 +12,15 @@ The idea is to automatically parse the game state, find the next (valid) step an
 ###Step 2 - Find Hexagons
 
 ![Step2](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot2.png)
+![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
 
 ###Step 3 - Recognize Types
 
-![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
+![Step4](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
 
 ###Step 4 - Image Processing
 
-![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
+![Step5](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot5.png)
 
 ###Step 5 - Text Recognition
 
