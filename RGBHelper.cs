@@ -37,6 +37,17 @@ namespace HexSolver
 			return (int)Math.Round(hue);
 		}
 
+		public static double GetSaturation(int red, int green, int blue)
+		{
+			double min = Math.Min(Math.Min(red, green), blue);
+			double max = Math.Max(Math.Max(red, green), blue);
+
+			if (max == 0)
+				return 0;
+
+			return 100 * (max - min) / max;
+		}
+
 		public static double GetColorDistance(byte aR, byte aG, byte aB, Color b)
 		{
 			return Math.Sqrt(Math.Pow(aR - b.R, 2) + Math.Pow(aG - b.G, 2) + Math.Pow(aB - b.B, 2));
@@ -47,6 +58,13 @@ namespace HexSolver
 			float dist = Math.Abs(GetHue(aR, aG, aB) - b.GetHue());
 
 			return Math.Min(dist, 360 - dist);
+		}
+
+		public static double GetSaturationDistance(byte aR, byte aG, byte aB, Color b)
+		{
+			double dist = Math.Abs(GetSaturation(aR, aG, aB) - b.GetSaturation());
+
+			return Math.Min(dist, 100 - dist);
 		}
 
 	}

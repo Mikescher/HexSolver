@@ -191,8 +191,8 @@ namespace HexSolver
 
 								case HexagonType.ACTIVE:
 									{
-										double h_distance = RGBHelper.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_ACTIVE);
-										if (h_distance < 32 || pd > (OCRHeight - 1))
+										double s_value = RGBHelper.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]);
+										if (s_value >= 80 || pd > (OCRHeight - 1))
 										{
 											// TRANSPARENT
 										}
@@ -358,7 +358,7 @@ namespace HexSolver
 
 			if (Type == HexagonType.INACTIVE)
 			{
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
 				{
 					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
 
@@ -393,7 +393,7 @@ namespace HexSolver
 
 			if (Type == HexagonType.ACTIVE)
 			{
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
 				{
 					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
 
@@ -442,7 +442,7 @@ namespace HexSolver
 
 				img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
 				{
 					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
 
