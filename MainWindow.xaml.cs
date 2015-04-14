@@ -181,7 +181,8 @@ namespace HexSolver
 			ocr.PaddingX = dudPadX.Value.Value;
 			ocr.PaddingY = dudPadY.Value.Value;
 			ocr.InitialSwap = cbSwap.SelectedIndex == 0;
-			ocr.NoCellBarRight = dudBarRight.Value.Value;
+			ocr.NoCellBar_TR_X = dudBarTopRightX.Value.Value;
+			ocr.NoCellBar_TR_Y = dudBarTopRightY.Value.Value;
 		}
 
 		private void updateOCRValues()
@@ -195,7 +196,8 @@ namespace HexSolver
 			dudPadX.Value = ocr.PaddingX;
 			dudPadY.Value = ocr.PaddingY;
 			cbSwap.SelectedIndex = ocr.InitialSwap ? 0 : 1;
-			dudBarRight.Value = ocr.NoCellBarRight;
+			dudBarTopRightX.Value = ocr.NoCellBar_TR_X;
+			dudBarTopRightY.Value = ocr.NoCellBar_TR_Y;
 
 			skipUpdate = false;
 		}

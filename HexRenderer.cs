@@ -28,10 +28,10 @@ namespace HexSolver
 
 		public Bitmap DisplayCells(Bitmap shot, HexOCR ocr)
 		{
-			return DisplayCells(shot, ocr.GetAllHexagons(shot));
+			return DisplayCells(shot, ocr.GetAllHexagons(shot), (int)ocr.NoCellBar_TR_X, (int)ocr.NoCellBar_TR_Y);
 		}
 
-		public Bitmap DisplayCells(Bitmap shot, HexGrid hexagons)
+		public Bitmap DisplayCells(Bitmap shot, HexGrid hexagons, int ncb_x, int ncb_y)
 		{
 			shot = new Bitmap(shot);
 
@@ -47,6 +47,8 @@ namespace HexSolver
 					g.FillPolygon(brush, points, System.Drawing.Drawing2D.FillMode.Alternate);
 					g.DrawLines(pen, points);
 				}
+
+				g.FillRectangle(new SolidBrush(Color.FromArgb(64, 255, 64, 0)), shot.Width - ncb_x, 0, ncb_x, ncb_y);
 			}
 
 			return shot;
@@ -144,6 +146,8 @@ namespace HexSolver
 			shot = new Bitmap(shot);
 
 			bool[,] pattern = ocr.GetPattern(shot);
+			var centers = ocr.GetHexPatternCenters(pattern, shot.Width, shot.Height);
+			var grid = ocr.GetHexPatternGrid(centers);
 
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -171,6 +175,24 @@ namespace HexSolver
 			}
 
 			shot.UnlockBits(srcData);
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+				Pen pen = new Pen(Color.Magenta);
+
+				foreach (var center in centers)
+				{
+					g.DrawLine(pen, (int)(center.X - 5), (int)(center.Y - 5), (int)(center.X + 5), (int)(center.Y + 5));
+					g.DrawLine(pen, (int)(center.X + 5), (int)(center.Y - 5), (int)(center.X - 5), (int)(center.Y + 5));
+				}
+
+
+				foreach (var row in grid.Item1)
+					g.DrawLine(pen, row, 0, row, shot.Height);
+
+				foreach (var col in grid.Item2)
+					g.DrawLine(pen, 0, col, shot.Width, col);
+			}
 
 			return shot;
 		}
