@@ -79,7 +79,7 @@
     <Compile Include="CellHint.cs" />
     <Compile Include="HexcellsSolver.cs" />
     <Compile Include="HexGridProperties.cs" />
-    <Compile Include="RGBHelper.cs" />
+    <Compile Include="Helper\ColorHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -102,7 +102,7 @@ namespace HexSolver
 					{
 						int idx = (y * stride) + x * 4;
 
-						double distance = RGBHelper.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.COLOR_CELL_HIDDEN);
+						double distance = ColorHelper.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.COLOR_CELL_HIDDEN);
 
 						result[x, y] = (distance < 16.875);
 					}

@@ -127,7 +127,7 @@ namespace HexSolver
 		{
 			Color avg = GetAverageColor(OCRCenter, OCRRadius, OCRImage, BoundingBox);
 
-			double[] distance = COLOR_CELLS.Select(p => RGBHelper.GetColorDistance(p.R, p.G, p.B, avg)).ToArray();
+			double[] distance = COLOR_CELLS.Select(p => ColorExt.GetColorDistance(p.R, p.G, p.B, avg)).ToArray();
 
 			double min_distance = distance.Min();
 
@@ -182,7 +182,7 @@ namespace HexSolver
 
 								case HexagonType.ACTIVE:
 									{
-										double s_value = RGBHelper.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]);
+										double s_value = ColorExt.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]);
 										if (s_value >= 80 || pd > (OCRHeight - 1))
 										{
 											// TRANSPARENT
@@ -221,7 +221,7 @@ namespace HexSolver
 
 								case HexagonType.NOCELL:
 									{
-										double c_distance = RGBHelper.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
+										double c_distance = ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
 										if (c_distance < 32)
 										{
 											// TRANSPARENT
