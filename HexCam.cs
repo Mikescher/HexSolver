@@ -31,20 +31,27 @@ namespace HexSolver
 
 		public Bitmap GetScreenShot()
 		{
-			Process hcprocess = GetHexCellsProcess();
-			if (hcprocess == null)
+			try
+			{
+				Process hcprocess = GetHexCellsProcess();
+				if (hcprocess == null)
+					return null;
+
+				SetForegroundWindow(hcprocess.MainWindowHandle);
+				Thread.Sleep(0);
+
+				RECT hcbounds = GetClientRect(hcprocess.MainWindowHandle);
+				Bitmap shot = GrabScreen(hcbounds);
+				Thread.Sleep(0);
+
+				SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
+
+				return shot;
+			}
+			catch (Exception)
+			{
 				return null;
-
-			SetForegroundWindow(hcprocess.MainWindowHandle);
-			Thread.Sleep(0);
-
-			RECT hcbounds = GetClientRect(hcprocess.MainWindowHandle);
-			Bitmap shot = GrabScreen(hcbounds);
-			Thread.Sleep(0);
-
-			SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
-
-			return shot;
+			}
 		}
 
 		private Process GetHexCellsProcess()

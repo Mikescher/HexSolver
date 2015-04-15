@@ -17,64 +17,52 @@ namespace HexSolver
 
 		private const int MINIMUM_PATTERN_SIZE = 24;
 
-		public double CellRadius = 20;
-		public double CellGap = 5;
-		public double CorrectionHorizontal = 0;
-		public double CorrectionVertical = 0;
-		public double PaddingY = 0;
-		public double PaddingX = 0;
-		public double NoCellBar_TR_X = 0;
-		public double NoCellBar_TR_Y = 0;
-		public bool InitialSwap = true;
-
-		public HexGrid GetHexagons(Bitmap shot)
+		public HexGrid GetHexagons(HexGrid allHexagons)
 		{
-			HexGrid grid = GetAllHexagons(shot);
-
-			var remove = grid.Where(p => p.Value.Type == HexagonType.NOCELL || p.Value.Type == HexagonType.UNKNOWN)
-				.Where(p => grid.GetSurrounding(p.Key).All(q => q.Value.Type == HexagonType.NOCELL || q.Value.Type == HexagonType.UNKNOWN))
+			var remove = allHexagons.Where(p => p.Value.Type == HexagonType.NOCELL || p.Value.Type == HexagonType.UNKNOWN)
+				.Where(p => allHexagons.GetSurrounding(p.Key).All(q => q.Value.Type == HexagonType.NOCELL || q.Value.Type == HexagonType.UNKNOWN))
 				.ToList();
 
 			foreach (var rem in remove)
 			{
-				grid.Remove(rem.Key.X, rem.Key.Y);
+				allHexagons.Remove(rem.Key.X, rem.Key.Y);
 			}
 
-			return grid;
+			return allHexagons;
 		}
 
-		public HexGrid GetAllHexagons(Bitmap shot)
+		public HexGrid GetAllHexagons(Bitmap shot, HexGridProperties prop)
 		{
 			HexGrid result = new HexGrid();
 
-			double CellHeight = CellRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90))); // Mittelpunkt zu Kante
+			double CellHeight = prop.CellRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90))); // Mittelpunkt zu Kante
 
-			double horzDistance = (CellHeight + CellGap + CellHeight) * (Math.Cos(MathExt.ToRadians(30)));
-			double vertDistance = CellHeight + CellGap + CellHeight;
+			double horzDistance = (CellHeight + prop.CellGap + CellHeight) * (Math.Cos(MathExt.ToRadians(30)));
+			double vertDistance = CellHeight + prop.CellGap + CellHeight;
 
-			horzDistance += CorrectionHorizontal;
-			vertDistance += CorrectionVertical;
+			horzDistance += prop.CorrectionHorizontal;
+			vertDistance += prop.CorrectionVertical;
 
-			double posx = PaddingX;
-			double posy = PaddingY;
+			double posx = prop.PaddingX;
+			double posy = prop.PaddingY;
 
-			bool shiftY = InitialSwap;
+			bool shiftY = prop.InitialSwap;
 			if (shiftY)
-				posy += CellHeight + CellGap / 2;
+				posy += CellHeight + prop.CellGap / 2;
 
 			int rx = 0;
 			int ry = 0;
 
-			while (posx + CellRadius + CellGap < shot.Width)
+			while (posx + prop.CellRadius + prop.CellGap < shot.Width)
 			{
-				while (posy + CellRadius + CellGap < shot.Height)
+				while (posy + prop.CellRadius + prop.CellGap < shot.Height)
 				{
-					bool inCellBar = shot.Width - (posx + CellRadius) < NoCellBar_TR_X && (posy - CellRadius) < NoCellBar_TR_Y;
-					bool validPos = posy - CellHeight > 0 && posx - CellRadius > 0 && posy + CellHeight + 1 < shot.Height && posx + CellRadius + 1 < shot.Width;
+					bool inCellBar = shot.Width - (posx + prop.CellRadius) < prop.NoCellBar_TR_X && (posy - prop.CellRadius) < prop.NoCellBar_TR_Y;
+					bool validPos = posy - CellHeight > 0 && posx - prop.CellRadius > 0 && posy + CellHeight + 1 < shot.Height && posx + prop.CellRadius + 1 < shot.Width;
 
 					if (!inCellBar && validPos)
 					{
-						result.SetOffsetCoordinates(rx, ry, shiftY, new HexagonCell(new Vec2i(rx, ry), new Vec2d(posx, posy), CellRadius, shot));
+						result.SetOffsetCoordinates(rx, ry, shiftY, new HexagonCell(new Vec2i(rx, ry), new Vec2d(posx, posy), prop.CellRadius, shot));
 					}
 
 					posy += vertDistance;
@@ -84,10 +72,10 @@ namespace HexSolver
 				posx += horzDistance;
 				rx++;
 				ry = 0;
-				posy = PaddingY;
+				posy = prop.PaddingY;
 				shiftY = !shiftY;
 				if (shiftY)
-					posy += CellHeight + CellGap / 2;
+					posy += CellHeight + prop.CellGap / 2;
 			}
 
 			return result;
@@ -262,8 +250,20 @@ namespace HexSolver
 			return Tuple.Create(distances_x.Average(), distances_y.Average());
 		}
 
-		public void FindHexPattern(Bitmap shot)
+		public HexGridProperties FindHexPattern(Bitmap shot)
 		{
+			double CellRadius;
+			double CellGap;
+			double CorrectionHorizontal;
+			double CorrectionVertical;
+			double PaddingX;
+			double PaddingY;
+			double NoCellBar_TR_X;
+			double NoCellBar_TR_Y;
+			bool InitialSwap;
+
+			//##################################
+
 			bool[,] pattern = GetPattern(shot);
 			var centers = GetHexPatternCenters(pattern, shot.Width, shot.Height);
 			var grid = GetHexPatternGrid(centers);
@@ -303,6 +303,20 @@ namespace HexSolver
 
 			NoCellBar_TR_X = 200;
 			NoCellBar_TR_Y = 190;
+
+			//##################################
+
+			return new HexGridPropertiesBuilder()
+				.SetCellRadius(CellRadius)
+				.SetCellGap(CellGap)
+				.SetCorrectionHorizontal(CorrectionHorizontal)
+				.SetCorrectionVertical(CorrectionVertical)
+				.SetPaddingX(PaddingX)
+				.SetPaddingY(PaddingY)
+				.SetNoCellBar_TR_X(NoCellBar_TR_X)
+				.SetNoCellBar_TR_Y(NoCellBar_TR_Y)
+				.SetInitialSwap(InitialSwap)
+				.build();
 		}
 	}
 }

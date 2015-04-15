@@ -19,10 +19,8 @@ namespace HexSolver
 		[DllImport("gdi32")]
 		static extern int DeleteObject(IntPtr o);
 
-		private HexCam cam = null;
-		private HexOCR ocr = null;
-		private HexRenderer renderer = null;
-		private Bitmap screenshot = null;
+		private readonly HexcellsSolver solver = null;
+		private readonly HexRenderer renderer = null;
 
 		private bool skipUpdate = false;
 
@@ -30,24 +28,21 @@ namespace HexSolver
 		{
 			InitializeComponent();
 
-			cam = new HexCam();
-			ocr = new HexOCR();
+			solver = new HexcellsSolver();
 			renderer = new HexRenderer();
 		}
 
 		private void OnCaptureClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 
-			screenshot = cam.GetScreenShot();
-
-			imgDisplay.Source = LoadBitmap(screenshot);
+			imgDisplay.Source = LoadBitmap(solver.GrabScreenshot());
 		}
 
 		private void OnExampleLoadClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 
 			int shotid = iudExample.Value.Value;
@@ -56,37 +51,35 @@ namespace HexSolver
 				return;
 
 			Image file = Image.FromFile(String.Format("./example/shot{0:000}.png", shotid));
-			screenshot = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
-			using (Graphics g = Graphics.FromImage(screenshot))
+			Bitmap bmp = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
+			using (Graphics g = Graphics.FromImage(bmp))
 			{
 				g.DrawImageUnscaled(file, 0, 0);
 			}
 
-			imgDisplay.Source = LoadBitmap(screenshot);
+			imgDisplay.Source = LoadBitmap(solver.LoadScreenshot(bmp));
 		}
 
 		private void OnExampleSaveClicked(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 
-			if (screenshot == null)
-			{
-				screenshot = cam.GetScreenShot();
-				imgDisplay.Source = LoadBitmap(screenshot);
-			}
+			if (!solver.IsScreenshotLoaded())
+				return;
 
 			int i = 1;
 			while (File.Exists(String.Format(@"..\..\example\shot{0:000}.png", i)))
 				i++;
-			screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
 
-			Console.Out.WriteLine("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
+			solver.Screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
+
+			MessageBox.Show("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
 		}
 
 		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 
 			HexOCRValueSet(sender, null);
@@ -94,7 +87,7 @@ namespace HexSolver
 
 		private void cbSwap_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 
 			HexOCRValueSet(sender, null);
@@ -102,47 +95,103 @@ namespace HexSolver
 
 		private void HexOCRValueAuto(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
 
-			ocr.FindHexPattern(screenshot);
+			HexGridProperties props = solver.HexProperties;
+			HexGrid all = solver.AllHexagons;
 
-			updateOCRValues();
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(screenshot, ocr));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, props, all));
 		}
 
 		private void HexOCRValueSet(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
 
-			updateOCRProperties();
+			solver.HexProperties = GetUIHexGridProperties();
+			HexGrid all = solver.AllHexagons;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(screenshot, ocr));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, all));
 		}
 
 		private void OnBinPattern(object sender, RoutedEventArgs e)
 		{
-			if (cam == null || ocr == null || renderer == null)
+			if (solver == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(screenshot, ocr));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR));
 		}
 
 		private void HexOCRValueUpdate(object sender, RoutedEventArgs e)
 		{
-			updateOCRValues();
+			SetUIHexGridProperties(solver.HexProperties);
+		}
+
+		private void OnTypifyClicked(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayTypes(solver.Screenshot, solver.FilteredHexagons));
+		}
+
+		private void OnProcessClicked(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRProcess(solver.Screenshot, solver.FilteredHexagons));
+		}
+
+		private void OnOCRClicked(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
+		}
+
+		private HexGridProperties GetUIHexGridProperties()
+		{
+			return new HexGridPropertiesBuilder()
+				.SetCellRadius(dudRadius.Value.Value)
+				.SetCellGap(dudGap.Value.Value)
+				.SetCorrectionHorizontal(dudHCorr.Value.Value)
+				.SetCorrectionVertical(dudVCorr.Value.Value)
+				.SetPaddingX(dudPadX.Value.Value)
+				.SetPaddingY(dudPadY.Value.Value)
+				.SetNoCellBar_TR_X(dudBarTopRightX.Value.Value)
+				.SetNoCellBar_TR_Y(dudBarTopRightY.Value.Value)
+				.SetInitialSwap(cbSwap.SelectedIndex == 0)
+				.build();
+		}
+
+		private void SetUIHexGridProperties(HexGridProperties p)
+		{
+			skipUpdate = true;
+
+			dudRadius.Value = p.CellRadius;
+			dudGap.Value = p.CellGap;
+			dudHCorr.Value = p.CorrectionHorizontal;
+			dudVCorr.Value = p.CorrectionVertical;
+			dudPadX.Value = p.PaddingX;
+			dudPadY.Value = p.PaddingY;
+			cbSwap.SelectedIndex = p.InitialSwap ? 0 : 1;
+			dudBarTopRightX.Value = p.NoCellBar_TR_X;
+			dudBarTopRightY.Value = p.NoCellBar_TR_Y;
+
+			skipUpdate = false;
 		}
 
 		private static BitmapSource LoadBitmap(Bitmap source)
@@ -159,72 +208,6 @@ namespace HexSolver
 			}
 
 			return bs;
-		}
-
-		private void OnTypifyClicked(object sender, RoutedEventArgs e)
-		{
-			if (cam == null || ocr == null || renderer == null)
-				return;
-			if (skipUpdate)
-				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayTypes(screenshot, ocr.GetHexagons(screenshot)));
-		}
-
-		private void OnProcessClicked(object sender, RoutedEventArgs e)
-		{
-			if (cam == null || ocr == null || renderer == null)
-				return;
-			if (skipUpdate)
-				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRProcess(screenshot, ocr));
-		}
-
-		private void OnOCRClicked(object sender, RoutedEventArgs e)
-		{
-			if (cam == null || ocr == null || renderer == null)
-				return;
-			if (skipUpdate)
-				return;
-			if (screenshot == null)
-				screenshot = cam.GetScreenShot();
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(screenshot, ocr));
-		}
-
-		private void updateOCRProperties()
-		{
-			ocr.CellRadius = dudRadius.Value.Value;
-			ocr.CellGap = dudGap.Value.Value;
-			ocr.CorrectionHorizontal = dudHCorr.Value.Value;
-			ocr.CorrectionVertical = dudVCorr.Value.Value;
-			ocr.PaddingX = dudPadX.Value.Value;
-			ocr.PaddingY = dudPadY.Value.Value;
-			ocr.InitialSwap = cbSwap.SelectedIndex == 0;
-			ocr.NoCellBar_TR_X = dudBarTopRightX.Value.Value;
-			ocr.NoCellBar_TR_Y = dudBarTopRightY.Value.Value;
-		}
-
-		private void updateOCRValues()
-		{
-			skipUpdate = true;
-
-			dudRadius.Value = ocr.CellRadius;
-			dudGap.Value = ocr.CellGap;
-			dudHCorr.Value = ocr.CorrectionHorizontal;
-			dudVCorr.Value = ocr.CorrectionVertical;
-			dudPadX.Value = ocr.PaddingX;
-			dudPadY.Value = ocr.PaddingY;
-			cbSwap.SelectedIndex = ocr.InitialSwap ? 0 : 1;
-			dudBarTopRightX.Value = ocr.NoCellBar_TR_X;
-			dudBarTopRightY.Value = ocr.NoCellBar_TR_Y;
-
-			skipUpdate = false;
 		}
 	}
 }

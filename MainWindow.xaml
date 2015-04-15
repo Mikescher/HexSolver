@@ -106,15 +106,15 @@
             <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="20"/>
                         <RowDefinition Height="5"/>
-                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="20"/>
                         <RowDefinition Height="5"/>
                         <RowDefinition Height="24"/>
                     </Grid.RowDefinitions>
-                    <Button Content="[3] Find Types" Grid.Row="0" Click="OnTypifyClicked" FontWeight="Bold" />
-                    <Button Content="[4] Process" Grid.Row="2" Click="OnProcessClicked" FontWeight="Bold" />
-                    <Button Content="[5] OCR" Grid.Row="4" Click="OnOCRClicked" FontWeight="Bold" />
+                    <Button Content="Find Types" Grid.Row="0" Click="OnTypifyClicked" />
+                    <Button Content="Process" Grid.Row="2" Click="OnProcessClicked" />
+                    <Button Content="[3] OCR" Grid.Row="4" Click="OnOCRClicked" FontWeight="Bold" />
                 </Grid>
             </Border>
         </StackPanel>

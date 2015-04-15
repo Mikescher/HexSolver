@@ -27,12 +27,7 @@ namespace HexSolver
 			new SolidBrush(Color.Red),
 		};
 
-		public Bitmap DisplayCells(Bitmap shot, HexOCR ocr)
-		{
-			return DisplayCells(shot, ocr.GetAllHexagons(shot), (int)ocr.NoCellBar_TR_X, (int)ocr.NoCellBar_TR_Y);
-		}
-
-		public Bitmap DisplayCells(Bitmap shot, HexGrid hexagons, int ncb_x, int ncb_y)
+		public Bitmap DisplayCells(Bitmap shot, HexGridProperties prop, HexGrid allHexagons)
 		{
 			shot = new Bitmap(shot);
 
@@ -41,7 +36,7 @@ namespace HexSolver
 
 			using (Graphics g = Graphics.FromImage(shot))
 			{
-				foreach (var hex in hexagons)
+				foreach (var hex in allHexagons)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
@@ -49,15 +44,10 @@ namespace HexSolver
 					g.DrawLines(pen, points);
 				}
 
-				g.FillRectangle(new SolidBrush(Color.FromArgb(64, 255, 64, 0)), shot.Width - ncb_x, 0, ncb_x, ncb_y);
+				g.FillRectangle(new SolidBrush(Color.FromArgb(64, 255, 64, 0)), shot.Width - (int)prop.NoCellBar_TR_X, 0, (int)prop.NoCellBar_TR_X, (int)prop.NoCellBar_TR_Y);
 			}
 
 			return shot;
-		}
-
-		public Bitmap DisplayTypes(Bitmap shot, HexOCR ocr)
-		{
-			return DisplayTypes(shot, ocr.GetHexagons(shot));
 		}
 
 		public Bitmap DisplayTypes(Bitmap shot, HexGrid grid)
@@ -81,11 +71,6 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplayOCRProcess(Bitmap shot, HexOCR ocr)
-		{
-			return DisplayOCRProcess(shot, ocr.GetHexagons(shot));
-		}
-
 		public Bitmap DisplayOCRProcess(Bitmap shot, HexGrid grid)
 		{
 			shot = new Bitmap(shot);
@@ -104,11 +89,6 @@ namespace HexSolver
 			}
 
 			return shot;
-		}
-
-		public Bitmap DisplayOCR(Bitmap shot, HexOCR ocr)
-		{
-			return DisplayOCR(shot, ocr.GetHexagons(shot));
 		}
 
 		public Bitmap DisplayOCR(Bitmap shot, HexGrid grid)
