@@ -11,7 +11,7 @@ namespace HexSolver
 		public Bitmap Screenshot
 		{
 			get { return _Screenshot ?? (_Screenshot = Cam.GetScreenShot()); }
-			private set
+			set
 			{
 				_Screenshot = value;
 				HexProperties = null;

@@ -37,7 +37,18 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(solver.GrabScreenshot());
+			solver.Screenshot = null;
+
+			imgDisplay.Source = LoadBitmap(solver.Screenshot);
+		}
+
+
+		private void OnShowPlainClicked(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(solver.Screenshot);
 		}
 
 		private void OnExampleLoadClicked(object sender, RoutedEventArgs e)
@@ -98,10 +109,9 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			HexGridProperties props = solver.HexProperties;
-			HexGrid all = solver.AllHexagons;
+			solver.HexProperties = null;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, props, all));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, solver.AllHexagons));
 		}
 
 		private void HexOCRValueSet(object sender, RoutedEventArgs e)

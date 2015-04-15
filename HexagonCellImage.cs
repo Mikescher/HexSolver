@@ -32,23 +32,14 @@ namespace HexSolver
 		{
 			get
 			{
-				if (_Type == null)
-					_Type = GetHexagonType();
-
-				return _Type.Value;
+				return (_Type ?? (_Type = GetHexagonType())).Value;
 			}
 		}
 
 		public CellHint _Hint = null;
 		public CellHint Hint
 		{
-			get
-			{
-				if (_Hint == null)
-					_Hint = GetHexagonHint();
-
-				return _Hint;
-			}
+			get { return _Hint ?? (_Hint = GetHexagonHint()); }
 		}
 
 		public HexagonCellImage(Vec2d center, double radius, Bitmap image)

@@ -104,9 +104,11 @@ namespace HexSolver
 				Brush fntBush2 = new SolidBrush(Color.FromArgb(32, Color.Black));
 				Pen bluepen = new Pen(Color.FromArgb(0, 164, 235));
 				Brush bluebrush = new SolidBrush(Color.FromArgb(128, 0, 164, 235));
-				StringFormat fmt = new StringFormat();
-				fmt.LineAlignment = StringAlignment.Center;
-				fmt.Alignment = StringAlignment.Center;
+				StringFormat fmt = new StringFormat
+				{
+					LineAlignment = StringAlignment.Center,
+					Alignment = StringAlignment.Center
+				};
 
 				foreach (var hex in grid)
 				{
