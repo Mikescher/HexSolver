@@ -4,18 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D1882A7A-C01D-4CA6-89E8-0D6A7A2B7891}</ProjectGuid>
+    <ProjectGuid>{4B8224F9-69FC-449F-8156-71FA16B2B996}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HexSolver</RootNamespace>
-    <AssemblyName>HexSolver</AssemblyName>
+    <RootNamespace>NumberRecognition</RootNamespace>
+    <AssemblyName>NumberRecognition</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -49,34 +49,12 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.AvalonDock">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CellHint.cs" />
-    <Compile Include="HexcellsSolver.cs" />
-    <Compile Include="HexGridProperties.cs" />
-    <Compile Include="Helper\ColorExt.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,13 +67,12 @@
     <Compile Include="Geometry\Rect2i.cs" />
     <Compile Include="Geometry\Vec2d.cs" />
     <Compile Include="Geometry\Vec2i.cs" />
+    <Compile Include="Helper\AvgDurationWatch.cs" />
+    <Compile Include="Helper\ColorExt.cs" />
+    <Compile Include="Helper\CommandLineArguments.cs" />
+    <Compile Include="Helper\FrequencyCounter.cs" />
     <Compile Include="Helper\MathExt.cs" />
-    <Compile Include="HexagonCell.cs" />
-    <Compile Include="HexagonCellImage.cs" />
-    <Compile Include="HexCam.cs" />
-    <Compile Include="HexGrid.cs" />
-    <Compile Include="HexOCR.cs" />
-    <Compile Include="HexRenderer.cs" />
+    <Compile Include="Helper\TimeFormatHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -119,7 +96,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -130,29 +106,40 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="example\shot001.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="example\shot002.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="example\shot003.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="example\shot004.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="example\shot005.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="example\shot006.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Resource Include="processed\img_active_2.png" />
+    <Resource Include="processed\img_active_3.png" />
+    <Resource Include="processed\img_active_4.png" />
+    <Resource Include="processed\img_active_5.png" />
+    <Resource Include="processed\img_active_7.png" />
+    <Resource Include="processed\img_inactive_0.png" />
+    <Resource Include="processed\img_inactive_1.png" />
+    <Resource Include="processed\img_inactive_2.png" />
+    <Resource Include="processed\img_inactive_2_cons.png" />
+    <Resource Include="processed\img_inactive_2_dist.png" />
+    <Resource Include="processed\img_inactive_3.png" />
+    <Resource Include="processed\img_inactive_3_cons.png" />
+    <Resource Include="processed\img_inactive_3_dist.png" />
+    <Resource Include="processed\img_inactive_4.png" />
+    <Resource Include="processed\img_inactive_4_dist.png" />
+    <Resource Include="processed\img_inactive_Q.png" />
+    <Resource Include="processed\img_nocell_0.png" />
+    <Resource Include="processed\img_nocell_1.png" />
+    <Resource Include="processed\img_nocell_10.png" />
+    <Resource Include="processed\img_nocell_2_cons.png" />
+    <Resource Include="processed\img_nocell_2_dist.png" />
+    <Resource Include="processed\img_nocell_3.png" />
+    <Resource Include="processed\img_nocell_3_dist.png" />
+    <Resource Include="processed\img_nocell_4.png" />
+    <Resource Include="processed\img_nocell_4_cons.png" />
+    <Resource Include="processed\img_nocell_5.png" />
+    <Resource Include="processed\img_nocell_6.png" />
+    <Resource Include="processed\img_nocell_7.png" />
+    <Resource Include="processed\img_nocell_8.png" />
+    <Resource Include="processed\img_nocell_9.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="example\shot007.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Resource Include="processed\img_active_15.png" />
+    <Resource Include="processed\img_inactive_5_cons.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
