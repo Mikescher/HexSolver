@@ -174,6 +174,16 @@ namespace HexSolver
 			imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
 		}
 
+		private void OnOCRDistanceClicked(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRDistance(solver.Screenshot, solver.FilteredHexagons));
+		}
+
 		private HexGridProperties GetUIHexGridProperties()
 		{
 			return new HexGridPropertiesBuilder()

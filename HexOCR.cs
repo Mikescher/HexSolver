@@ -1,5 +1,6 @@
 ﻿using MSHC.Geometry;
 using MSHC.Helper;
+using SimplePatternOCR;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,6 +17,13 @@ namespace HexSolver
 		}
 
 		private const int MINIMUM_PATTERN_SIZE = 24;
+
+		private readonly PatternOCR patternOCR;
+
+		public HexOCR(PatternOCR pocr)
+		{
+			patternOCR = pocr;
+		}
 
 		public HexGrid GetHexagons(HexGrid allHexagons)
 		{
@@ -62,7 +70,7 @@ namespace HexSolver
 
 					if (!inCellBar && validPos)
 					{
-						result.SetOffsetCoordinates(rx, ry, shiftY, new HexagonCell(new Vec2i(rx, ry), new Vec2d(posx, posy), prop.CellRadius, shot));
+						result.SetOffsetCoordinates(rx, ry, shiftY, new HexagonCell(new Vec2i(rx, ry), new Vec2d(posx, posy), prop.CellRadius, shot, patternOCR));
 					}
 
 					posy += vertDistance;

@@ -1,10 +1,11 @@
 ﻿using MSHC.Geometry;
 using MSHC.Helper;
+using SimplePatternOCR;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using System.Text.RegularExpressions;
 
 namespace HexSolver
 {
@@ -40,13 +41,16 @@ namespace HexSolver
 			get { return _Hint ?? (_Hint = GetHexagonHint()); }
 		}
 
-		public HexagonCellImage(Vec2d center, double radius, Bitmap image)
+		private readonly PatternOCR patternOCR;
+
+		public HexagonCellImage(Vec2d center, double radius, Bitmap image, PatternOCR pocr)
 		{
 			this.OCRCenter = center;
 			this.OCRRadius = radius;
 			this.OCRImage = image;
 			this.OCRHeight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
 			this.BoundingBox = GetBoundingBox(center, radius);
+			this.patternOCR = pocr;
 		}
 
 		private Rectangle GetBoundingBox()
@@ -350,24 +354,42 @@ namespace HexSolver
 			{
 				int activePixel;
 				Bitmap img = GetOCRImage(false, out activePixel);
+				img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+
 				if (activePixel == 0)
 					return new CellHint();
 
-				img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+				double errDistance;
+				var txt = patternOCR.Recognize(img, out errDistance);
 
-				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
+				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
+					return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
+				if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
+					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
+				if (Regex.IsMatch(txt, @"^[0-9]+$"))
+					return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, int.Parse(txt), errDistance);
+				if (txt == "?")
+					return new CellHint();
+
+				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
 			}
 
 			if (Type == HexagonType.ACTIVE)
 			{
 				int activePixel;
 				Bitmap img = GetOCRImage(false, out activePixel);
+				img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+
 				if (activePixel == 0)
 					return new CellHint();
 
-				img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+				double errDistance;
+				var txt = patternOCR.Recognize(img, out errDistance);
 
-				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
+				if (Regex.IsMatch(txt, @"^[0-9]+$"))
+					return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt), errDistance);
+
+				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
 			}
 
 			if (Type == HexagonType.NOCELL)
@@ -381,18 +403,26 @@ namespace HexSolver
 
 				if (col == CellHintArea.NONE)
 				{
-					Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-					return new CellHint(CellHintType.COUNT, col, 0);
+					throw new Exception("OCR failed (Can't find column)");
 				}
 
 				if (col == CellHintArea.COLUMN_LEFT)
 					img = RotateImage(img, -60, Color.White);
 				else if (col == CellHintArea.COLUMN_RIGHT)
 					img = RotateImage(img, +60, Color.White);
-
 				img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
-				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
+				double errDistance;
+				var txt = patternOCR.Recognize(img, out errDistance);
+
+				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
+					return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
+				if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
+					return new CellHint(CellHintType.NONCONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
+				if (Regex.IsMatch(txt, @"^[0-9]+$"))
+					return new CellHint(CellHintType.COUNT, col, int.Parse(txt), errDistance);
+
+				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
 			}
 
 			throw new Exception("WTF - Type ==" + Type);

@@ -23,18 +23,20 @@
 		public CellHintType Type { get; private set; }
 		public CellHintArea Area { get; private set; }
 		public int Number { get; private set; }
+		public double OCRDistance { get; private set; }
 
 		public CellHint()
-			: this(CellHintType.NONE, CellHintArea.NONE, 0)
+			: this(CellHintType.NONE, CellHintArea.NONE, 0, 0)
 		{
 			// NOP
 		}
 
-		public CellHint(CellHintType t, CellHintArea a, int n)
+		public CellHint(CellHintType t, CellHintArea a, int n, double ocrd)
 		{
 			Number = n;
 			Area = a;
 			Type = t;
+			OCRDistance = ocrd;
 		}
 
 		public override string ToString()

@@ -185,6 +185,46 @@ namespace HexSolver
 			return shot;
 		}
 
+		public Bitmap DisplayOCRDistance(Bitmap shot, HexGrid grid)
+		{
+			shot = new Bitmap(shot);
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
+
+				Font fnt = new Font("Arial", 12, FontStyle.Bold);
+				Brush fntBush1 = new SolidBrush(Color.Black);
+				StringFormat fmt = new StringFormat
+				{
+					LineAlignment = StringAlignment.Center,
+					Alignment = StringAlignment.Center
+				};
+
+				foreach (var hex in grid)
+				{
+					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+
+
+					if (hex.Value.Hint.Type != CellHintType.NONE)
+					{
+						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 50.0);
+						int col = (int)(perc * 255);
+
+						g.FillPolygon(new SolidBrush(Color.FromArgb(col, 255 - col, 0)), points);
+
+						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+					}
+					else
+					{
+						g.FillPolygon(new SolidBrush(Color.FloralWhite), points);
+					}
+				}
+			}
+
+			return shot;
+		}
+
 		public Bitmap DisplayBinPattern(Bitmap shot, HexOCR ocr)
 		{
 			shot = new Bitmap(shot);

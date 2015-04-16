@@ -49,21 +49,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.AvalonDock">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid">
-      <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
-    </Reference>
     <Reference Include="Xceed.Wpf.Toolkit">
       <HintPath>packages\Extended.Wpf.Toolkit.2.4\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
@@ -153,6 +138,37 @@
     <None Include="example\shot007.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="SimplePatternOCR\SimplePatternOCR.csproj">
+      <Project>{8b35509e-da67-4877-8e4b-84a65ce657e4}</Project>
+      <Name>SimplePatternOCR</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ocr_pattern\pattern_-.png" />
+    <None Include="ocr_pattern\pattern_0.png" />
+    <None Include="ocr_pattern\pattern_1.png" />
+    <None Include="ocr_pattern\pattern_10.png" />
+    <None Include="ocr_pattern\pattern_12.png" />
+    <None Include="ocr_pattern\pattern_13.png" />
+    <None Include="ocr_pattern\pattern_14.png" />
+    <None Include="ocr_pattern\pattern_15.png" />
+    <None Include="ocr_pattern\pattern_16.png" />
+    <None Include="ocr_pattern\pattern_17.png" />
+    <None Include="ocr_pattern\pattern_18.png" />
+    <None Include="ocr_pattern\pattern_19.png" />
+    <None Include="ocr_pattern\pattern_2.png" />
+    <None Include="ocr_pattern\pattern_3.png" />
+    <None Include="ocr_pattern\pattern_4.png" />
+    <None Include="ocr_pattern\pattern_5.png" />
+    <None Include="ocr_pattern\pattern_6.png" />
+    <None Include="ocr_pattern\pattern_7.png" />
+    <None Include="ocr_pattern\pattern_8.png" />
+    <None Include="ocr_pattern\pattern_9.png" />
+    <None Include="ocr_pattern\pattern_Q.png" />
+    <None Include="ocr_pattern\pattern_{.png" />
+    <None Include="ocr_pattern\pattern_}.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
