@@ -210,8 +210,14 @@ namespace MSHC.Geometry
 
 		public bool Includes(Vec2i vec)
 		{
-			return (vec.X > position.X && vec.Y > position.Y && vec.X < tl.X && vec.Y < tl.Y);
+			return (vec.X > position.X && vec.Y > position.Y && vec.X < tr.X && vec.Y < tr.Y);
 		}
+
+		public bool Includes(int vecX, int vecY)
+		{
+			return (vecX > position.X && vecY > position.Y && vecX < tr.X && vecY < tr.Y);
+		}
+
 
 		public Vec2i GetDistanceTo(Vec2i vec)
 		{

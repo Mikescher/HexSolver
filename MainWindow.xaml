@@ -10,121 +10,137 @@
         </Grid.ColumnDefinitions>
         <Image Grid.Row="0" Grid.Column="1" Margin="5" Name="imgDisplay" Grid.ColumnSpan="2"/>
 
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="50"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                    </Grid.RowDefinitions>
+        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel  Orientation="Vertical">
+                <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
 
-                    <Button Content="[1] Recapture" Grid.Row="0" Padding="8 0" Click="OnCaptureClicked" FontWeight="Bold" Grid.ColumnSpan="3" />
-                    <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked" />
-                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="2" Value="1" Minimum="0" x:Name="iudExample"/>
-                    <Button Content="Show Plain" Grid.Row="4" Padding="8 0" Click="OnShowPlainClicked" Grid.ColumnSpan="3" />
-                    <Button Content="Save Example" Grid.Row="6" Padding="8 0" Click="OnExampleSaveClicked" Grid.ColumnSpan="3" />
-                </Grid>
-            </Border>
-            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="15"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="24"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                    </Grid.RowDefinitions>
+                        <Button Content="[1] Recapture" Grid.Row="0" Padding="8 0" Click="OnCaptureClicked" FontWeight="Bold" Grid.ColumnSpan="3" />
+                        <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked" />
+                        <xctk:IntegerUpDown Grid.Row="2" Grid.Column="2" Value="1" Minimum="0" x:Name="iudExample"/>
+                        <Button Content="Show Plain" Grid.Row="4" Padding="8 0" Click="OnShowPlainClicked" Grid.ColumnSpan="3" />
+                        <Button Content="Save Example" Grid.Row="6" Padding="8 0" Click="OnExampleSaveClicked" Grid.ColumnSpan="3" />
+                    </Grid>
+                </Border>
+                <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="15"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Content="Radius:"/>
-                    <xctk:DoubleUpDown Grid.Row="0"  Grid.Column="1" FormatString="F2" Value="23"    Increment=".5"  Minimum="0" x:Name="dudRadius" ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Radius:"/>
+                        <xctk:DoubleUpDown Grid.Row="0"  Grid.Column="1" FormatString="F2" Value="23"    Increment=".5"  Minimum="0" x:Name="dudRadius" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="2" Grid.Column="0" Content="Gap:"/>
-                    <xctk:DoubleUpDown Grid.Row="2"  Grid.Column="1" FormatString="F2" Value="7.4"  Increment=".5"  Minimum="0" x:Name="dudGap"    ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Gap:"/>
+                        <xctk:DoubleUpDown Grid.Row="2"  Grid.Column="1" FormatString="F2" Value="7.4"  Increment=".5"  Minimum="0" x:Name="dudGap"    ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="4" Grid.Column="0" Content="H Correction:"/>
-                    <xctk:DoubleUpDown Grid.Row="4"  Grid.Column="1" FormatString="F2" Value="0.6"   Increment=".5"  Minimum="0" x:Name="dudHCorr"  ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="4" Grid.Column="0" Content="H Correction:"/>
+                        <xctk:DoubleUpDown Grid.Row="4"  Grid.Column="1" FormatString="F2" Value="0.6"   Increment=".5"  Minimum="0" x:Name="dudHCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="6" Grid.Column="0" Content="V Correction:"/>
-                    <xctk:DoubleUpDown Grid.Row="6"  Grid.Column="1" FormatString="F2" Value="0.0"   Increment=".5"  Minimum="0" x:Name="dudVCorr"  ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="6" Grid.Column="0" Content="V Correction:"/>
+                        <xctk:DoubleUpDown Grid.Row="6"  Grid.Column="1" FormatString="F2" Value="0.0"   Increment=".5"  Minimum="0" x:Name="dudVCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="8" Grid.Column="0" Content="Padding X:"/>
-                    <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="56.5"   Increment=".5"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="8" Grid.Column="0" Content="Padding X:"/>
+                        <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="56.5"   Increment=".5"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="10" Grid.Column="0" Content="Padding Y:"/>
-                    <xctk:DoubleUpDown Grid.Row="10" Grid.Column="1" FormatString="F2" Value="48.5" Increment=".5"  Minimum="0" x:Name="dudPadY"   ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="10" Grid.Column="0" Content="Padding Y:"/>
+                        <xctk:DoubleUpDown Grid.Row="10" Grid.Column="1" FormatString="F2" Value="48.5" Increment=".5"  Minimum="0" x:Name="dudPadY"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="12" Grid.Column="0" Content="Swap:"/>
-                    <ComboBox Grid.Row="12" Grid.Column="1" x:Name="cbSwap" SelectedIndex="1" SelectionChanged="cbSwap_SelectionChanged">
-                        <ComboBoxItem>Top</ComboBoxItem>
-                        <ComboBoxItem>Bottom</ComboBoxItem>
-                    </ComboBox>
+                        <Label Grid.Row="12" Grid.Column="0" Content="Swap:"/>
+                        <ComboBox Grid.Row="12" Grid.Column="1" x:Name="cbSwap" SelectedIndex="1" SelectionChanged="cbSwap_SelectionChanged" Grid.ColumnSpan="3">
+                            <ComboBoxItem>Top</ComboBoxItem>
+                            <ComboBoxItem>Bottom</ComboBoxItem>
+                        </ComboBox>
 
-                    <Label Grid.Row="14" Grid.Column="0" Content="Bar TopRight X:"/>
-                    <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="200" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="14" Grid.Column="0" Content="Bar TopRight X:"/>
+                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="200" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Label Grid.Row="16" Grid.Column="0" Content="Bar TopRight Y:"/>
-                    <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="190" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="16" Grid.Column="0" Content="Bar TopRight Y:"/>
+                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="190" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
-                    <Button Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2" Content="Binary Pattern" Click="OnBinPattern"/>
-                    <Button Grid.Row="21" Grid.Column="0" Grid.ColumnSpan="2" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
-                    <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="2" Content="Update" Click="HexOCRValueUpdate"/>
-                    <Button Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="2" Content="Set" Click="HexOCRValueSet"/>
-                </Grid>
-            </Border>
-            <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="24"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="20"/>
-                    </Grid.RowDefinitions>
-                    <Button Content="Find Types" Grid.Row="0" Click="OnTypifyClicked" />
-                    <Button Content="Process" Grid.Row="2" Click="OnProcessClicked" />
-                    <Button Content="[3] OCR" Grid.Row="4" Click="OnOCRClicked" FontWeight="Bold" />
-                    <Button Content="OCR Distance" Grid.Row="6" Click="OnOCRDistanceClicked" />
-                </Grid>
-            </Border>
-        </StackPanel>
+                        <Label Grid.Row="18" Grid.Column="0" Content="Counter Pos:"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="1" FormatString="F2" Value="1270" Increment="5"  Minimum="0" x:Name="dudCounterX" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="3" FormatString="F2" Value="38" Increment="5"  Minimum="0" x:Name="dudCounterY" ValueChanged="HexOCRValueChanged"/>
 
+                        <Label Grid.Row="20" Grid.Column="0" Content="Counter Size:"/>
+                        <xctk:DoubleUpDown Grid.Row="20" Grid.Column="1" FormatString="F2" Value="154" Increment="1"  Minimum="0" x:Name="dudCounterW" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="20" Grid.Column="3" FormatString="F2" Value="38" Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
+
+
+                        <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="4" Content="Binary Pattern" Click="OnBinPattern"/>
+                        <Button Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="4" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
+                        <Button Grid.Row="27" Grid.Column="0" Grid.ColumnSpan="4" Content="Update" Click="HexOCRValueUpdate"/>
+                        <Button Grid.Row="29" Grid.Column="0" Grid.ColumnSpan="4" Content="Set" Click="HexOCRValueSet"/>
+                    </Grid>
+                </Border>
+                <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Button Content="Find Types" Grid.Row="0" Click="OnTypifyClicked" />
+                        <Button Content="Process" Grid.Row="2" Click="OnProcessClicked" />
+                        <Button Content="[3] OCR" Grid.Row="4" Click="OnOCRClicked" FontWeight="Bold" />
+                        <Button Content="OCR Distance" Grid.Row="6" Click="OnOCRDistanceClicked" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
 
     </Grid>
 </Window>

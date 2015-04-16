@@ -196,6 +196,14 @@ namespace HexSolver
 				.SetNoCellBar_TR_X(dudBarTopRightX.Value.Value)
 				.SetNoCellBar_TR_Y(dudBarTopRightY.Value.Value)
 				.SetInitialSwap(cbSwap.SelectedIndex == 0)
+				.SetCounter_X(dudCounterX.Value.Value)
+				.SetCounter_Y(dudCounterY.Value.Value)
+				.SetCounter_Width(dudCounterW.Value.Value)
+				.SetCounter_Height(dudCounterH.Value.Value)
+				.SetCounterInner_X(dudCounterX.Value.Value)
+				.SetCounterInner_Y(dudCounterY.Value.Value)
+				.SetCounterInner_Width(dudCounterW.Value.Value)
+				.SetCounterInner_Height(dudCounterH.Value.Value)
 				.build();
 		}
 
@@ -212,6 +220,10 @@ namespace HexSolver
 			cbSwap.SelectedIndex = p.InitialSwap ? 0 : 1;
 			dudBarTopRightX.Value = p.NoCellBar_TR_X;
 			dudBarTopRightY.Value = p.NoCellBar_TR_Y;
+			dudCounterX.Value = p.Counter_X;
+			dudCounterY.Value = p.Counter_Y;
+			dudCounterW.Value = p.Counter_W;
+			dudCounterH.Value = p.Counter_H;
 
 			skipUpdate = false;
 		}

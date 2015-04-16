@@ -26,7 +26,7 @@ namespace HexSolver
 		public Bitmap OCRImage { get; private set; }
 		public Rectangle BoundingBox { get; private set; }
 
-		public HexagonType? _Type = null;
+		private HexagonType? _Type = null;
 		public HexagonType Type
 		{
 			get
@@ -35,7 +35,7 @@ namespace HexSolver
 			}
 		}
 
-		public CellHint _Hint = null;
+		private CellHint _Hint = null;
 		public CellHint Hint
 		{
 			get { return _Hint ?? (_Hint = GetHexagonHint()); }
@@ -139,13 +139,13 @@ namespace HexSolver
 			return (HexagonType)Enum.GetValues(typeof(HexagonType)).GetValue(distance.ToList().IndexOf(min_distance));
 		}
 
-		public Bitmap GetOCRImage(bool useTransparency)
+		public Bitmap GetProcessedImage(bool useTransparency)
 		{
 			int temp;
-			return GetOCRImage(useTransparency, out temp);
+			return GetProcessedImage(useTransparency, out temp);
 		}
 
-		public Bitmap GetOCRImage(bool useTransparency, out int activePixel)
+		public Bitmap GetProcessedImage(bool useTransparency, out int activePixel)
 		{
 			Bitmap img = OCRImage.Clone(GetBoundingBox(), PixelFormat.Format32bppArgb);
 			double hexheight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
@@ -262,9 +262,6 @@ namespace HexSolver
 						}
 					}
 				}
-
-				//
-
 			}
 
 			img.UnlockBits(srcData);
@@ -344,7 +341,7 @@ namespace HexSolver
 			return returnBitmap;
 		}
 
-		private static int ocrctr;
+		//private static int ocrctr;
 		private CellHint GetHexagonHint()
 		{
 			if (Type == HexagonType.HIDDEN || Type == HexagonType.UNKNOWN)
@@ -353,8 +350,8 @@ namespace HexSolver
 			if (Type == HexagonType.INACTIVE)
 			{
 				int activePixel;
-				Bitmap img = GetOCRImage(false, out activePixel);
-				img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+				Bitmap img = GetProcessedImage(false, out activePixel);
+				//img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				if (activePixel == 0)
 					return new CellHint();
@@ -377,8 +374,8 @@ namespace HexSolver
 			if (Type == HexagonType.ACTIVE)
 			{
 				int activePixel;
-				Bitmap img = GetOCRImage(false, out activePixel);
-				img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+				Bitmap img = GetProcessedImage(false, out activePixel);
+				//img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				if (activePixel == 0)
 					return new CellHint();
@@ -395,7 +392,7 @@ namespace HexSolver
 			if (Type == HexagonType.NOCELL)
 			{
 				int activePixel;
-				Bitmap img = GetOCRImage(false, out activePixel);
+				Bitmap img = GetProcessedImage(false, out activePixel);
 				if (activePixel == 0)
 					return new CellHint();
 
@@ -410,7 +407,7 @@ namespace HexSolver
 					img = RotateImage(img, -60, Color.White);
 				else if (col == CellHintArea.COLUMN_RIGHT)
 					img = RotateImage(img, +60, Color.White);
-				img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
+				//img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				double errDistance;
 				var txt = patternOCR.Recognize(img, out errDistance);

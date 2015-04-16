@@ -45,6 +45,9 @@ namespace HexSolver
 				}
 
 				g.FillRectangle(new SolidBrush(Color.FromArgb(64, 255, 64, 0)), shot.Width - (int)prop.NoCellBar_TR_X, 0, (int)prop.NoCellBar_TR_X, (int)prop.NoCellBar_TR_Y);
+
+				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.Orange)), allHexagons.CounterArea.BoundingBox);
+				g.DrawRectangle(pen, allHexagons.CounterArea.InnerBox);
 			}
 
 			return shot;
@@ -66,6 +69,9 @@ namespace HexSolver
 					g.DrawLines(hexpens[(int)hex.Value.Type], points);
 
 				}
+
+				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.Wheat)), grid.CounterArea.BoundingBox);
+				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.Orange)), grid.CounterArea.InnerBox);
 			}
 
 			return shot;
@@ -77,19 +83,24 @@ namespace HexSolver
 
 			using (Graphics g = Graphics.FromImage(shot))
 			{
+				int apixel;
+
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
-					int apixel;
-					var img = hex.Value.GetOCRImage(true, out apixel);
+					var img = hex.Value.GetProcessedImage(true, out apixel);
 
 					g.FillPolygon(new SolidBrush((apixel > 0) ? Color.Wheat : Color.LemonChiffon), points);
 
 					g.DrawImageUnscaled(img, hex.Value.Image.BoundingBox.Left, hex.Value.Image.BoundingBox.Top);
 				}
+
+				g.FillRectangle(new SolidBrush(Color.LemonChiffon), grid.CounterArea.BoundingBox);
+				g.FillRectangle(new SolidBrush(Color.Wheat), grid.CounterArea.InnerBox);
+				g.DrawImageUnscaled(grid.CounterArea.GetProcessedImage(true, out apixel), grid.CounterArea.BoundingBox.X, grid.CounterArea.BoundingBox.Y);
 			}
 
 			return shot;
@@ -104,6 +115,7 @@ namespace HexSolver
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
 				Font fnt = new Font("Arial", 12, FontStyle.Bold);
+				Font fnt_big = new Font("Arial", 22, FontStyle.Bold);
 				Brush fntBush1 = new SolidBrush(Color.Black);
 				Brush fntBush2 = new SolidBrush(Color.FromArgb(32, Color.Black));
 				Pen bluepen = new Pen(Color.FromArgb(0, 164, 235));
@@ -180,6 +192,9 @@ namespace HexSolver
 						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush2, hex.Value.Image.BoundingBox, fmt);
 					}
 				}
+
+				g.FillRectangle(new SolidBrush(Color.SlateGray), grid.CounterArea.BoundingBox);
+				g.DrawString(grid.CounterArea.Value.Value.ToString(), fnt_big, fntBush1, grid.CounterArea.BoundingBox, fmt);
 			}
 
 			return shot;
@@ -194,6 +209,7 @@ namespace HexSolver
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
 				Font fnt = new Font("Arial", 12, FontStyle.Bold);
+				Font fnt_big = new Font("Arial", 22, FontStyle.Bold);
 				Brush fntBush1 = new SolidBrush(Color.Black);
 				StringFormat fmt = new StringFormat
 				{
@@ -220,6 +236,14 @@ namespace HexSolver
 						g.FillPolygon(new SolidBrush(Color.FloralWhite), points);
 					}
 				}
+
+				{
+					double perc = Math.Min(1.0, grid.CounterArea.Value.OCRDistance / 50.0);
+					int col = (int)(perc * 255);
+
+					g.FillRectangle(new SolidBrush(Color.FromArgb(col, 255 - col, 0)), grid.CounterArea.BoundingBox);
+					g.DrawString(grid.CounterArea.Value.Value.ToString(), fnt_big, fntBush1, grid.CounterArea.BoundingBox, fmt);
+				}
 			}
 
 			return shot;
@@ -232,6 +256,7 @@ namespace HexSolver
 			bool[,] pattern = ocr.GetPattern(shot);
 			var centers = ocr.GetHexPatternCenters(pattern, shot.Width, shot.Height);
 			var grid = ocr.GetHexPatternGrid(centers);
+			var counter = ocr.GetCounterArea(shot);
 
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -250,9 +275,11 @@ namespace HexSolver
 					{
 						int idx = (y * stride) + x * 4;
 
-						p[idx + 0] = (byte)(pattern[x, y] ? 0 : 255);
-						p[idx + 1] = (byte)(pattern[x, y] ? 0 : 255);
-						p[idx + 2] = (byte)(pattern[x, y] ? 0 : 255);
+						bool on = pattern[x, y] || counter.Item1.Includes(x, y);
+
+						p[idx + 0] = (byte)(on ? 0 : 255);
+						p[idx + 1] = (byte)(on ? 0 : 255);
+						p[idx + 2] = (byte)(on ? 0 : 255);
 						p[idx + 3] = 255;
 					}
 				}
@@ -270,12 +297,15 @@ namespace HexSolver
 					g.DrawLine(pen, (int)(center.X + 5), (int)(center.Y - 5), (int)(center.X - 5), (int)(center.Y + 5));
 				}
 
-
 				foreach (var row in grid.Item1)
 					g.DrawLine(pen, row, 0, row, shot.Height);
 
 				foreach (var col in grid.Item2)
 					g.DrawLine(pen, 0, col, shot.Width, col);
+
+				g.DrawRectangle(pen, counter.Item2.bl.X, counter.Item2.bl.Y, counter.Item2.Width, counter.Item2.Height);
+
+				g.DrawRectangle(pen, counter.Item3.bl.X, counter.Item3.bl.Y, counter.Item3.Width, counter.Item3.Height);
 			}
 
 			return shot;

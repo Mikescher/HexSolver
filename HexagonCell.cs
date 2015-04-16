@@ -31,14 +31,14 @@ namespace HexSolver
 			return Image.GetEdge(edge);
 		}
 
-		public Bitmap GetOCRImage(bool useTransparent)
+		public Bitmap GetProcessedImage(bool useTransparent)
 		{
-			return Image.GetOCRImage(useTransparent);
+			return Image.GetProcessedImage(useTransparent);
 		}
 
-		public Bitmap GetOCRImage(bool useTransparent, out int activePixel)
+		public Bitmap GetProcessedImage(bool useTransparent, out int activePixel)
 		{
-			return Image.GetOCRImage(useTransparent, out activePixel);
+			return Image.GetProcessedImage(useTransparent, out activePixel);
 		}
 	}
 }

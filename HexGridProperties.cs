@@ -1,4 +1,7 @@
 ﻿
+using System;
+using System.Drawing;
+
 namespace HexSolver
 {
 	class HexGridPropertiesBuilder
@@ -12,6 +15,14 @@ namespace HexSolver
 		private double NoCellBar_TR_X = 0;
 		private double NoCellBar_TR_Y = 0;
 		private bool InitialSwap = true;
+		private double Counter_X = 190;
+		private double Counter_Y = 190;
+		private double Counter_W = 20;
+		private double Counter_H = 10;
+		private double Counter_Inner_X = 190;
+		private double Counter_Inner_Y = 190;
+		private double Counter_Inner_W = 20;
+		private double Counter_Inner_H = 10;
 
 		public HexGridPropertiesBuilder SetCellRadius(double v)
 		{
@@ -67,10 +78,64 @@ namespace HexSolver
 			return this;
 		}
 
+		public HexGridPropertiesBuilder SetCounter_X(double v)
+		{
+			Counter_X = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounter_Y(double v)
+		{
+			Counter_Y = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounter_Width(double v)
+		{
+			Counter_W = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounter_Height(double v)
+		{
+			Counter_H = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounterInner_X(double v)
+		{
+			Counter_Inner_X = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounterInner_Y(double v)
+		{
+			Counter_Inner_Y = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounterInner_Width(double v)
+		{
+			Counter_Inner_W = v;
+			return this;
+		}
+
+		public HexGridPropertiesBuilder SetCounterInner_Height(double v)
+		{
+			Counter_Inner_H = v;
+			return this;
+		}
+
 		public HexGridProperties build()
 		{
-			return new HexGridProperties(CellRadius, CellGap, CorrectionHorizontal, CorrectionVertical, PaddingX, PaddingY,
-				NoCellBar_TR_X, NoCellBar_TR_Y, InitialSwap);
+			return new HexGridProperties(
+				CellRadius, CellGap,
+				CorrectionHorizontal, CorrectionVertical,
+				PaddingX, PaddingY,
+				NoCellBar_TR_X, NoCellBar_TR_Y,
+				InitialSwap,
+				Counter_X, Counter_Y, Counter_W, Counter_H,
+				Counter_Inner_X, Counter_Inner_Y, Counter_Inner_W, Counter_Inner_H);
 		}
 	}
 
@@ -85,9 +150,27 @@ namespace HexSolver
 		public readonly double NoCellBar_TR_X;
 		public readonly double NoCellBar_TR_Y;
 		public readonly bool InitialSwap;
+		public readonly double Counter_X;
+		public readonly double Counter_Y;
+		public readonly double Counter_W;
+		public readonly double Counter_H;
+		public readonly double Counter_Inner_X;
+		public readonly double Counter_Inner_Y;
+		public readonly double Counter_Inner_W;
+		public readonly double Counter_Inner_H;
+
+		public Rectangle CounterArea
+		{
+			get { return new Rectangle((int)Math.Round(Counter_X), (int)Math.Round(Counter_Y), (int)Math.Round(Counter_W), (int)Math.Round(Counter_H)); }
+		}
+
+		public Rectangle CounterArea_Inner
+		{
+			get { return new Rectangle((int)Math.Round(Counter_Inner_X), (int)Math.Round(Counter_Inner_Y), (int)Math.Round(Counter_Inner_W), (int)Math.Round(Counter_Inner_H)); }
+		}
 
 		public HexGridProperties(double rad, double gap, double ch, double cv, double padx, double pady, double ncbx,
-			double ncby, bool sw)
+			double ncby, bool sw, double ctrx, double ctry, double ctrw, double ctrh, double ictrx, double ictry, double ictrw, double ictrh)
 		{
 			CellRadius = rad;
 			CellGap = gap;
@@ -98,6 +181,15 @@ namespace HexSolver
 			NoCellBar_TR_X = ncbx;
 			NoCellBar_TR_Y = ncby;
 			InitialSwap = sw;
+			Counter_X = ctrx;
+			Counter_Y = ctry;
+			Counter_W = ctrw;
+			Counter_H = ctrh;
+			Counter_Inner_X = ictrx;
+			Counter_Inner_Y = ictry;
+			Counter_Inner_W = ictrw;
+			Counter_Inner_H = ictrh;
 		}
+
 	}
 }

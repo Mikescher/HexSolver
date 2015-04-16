@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Geometry\Rect2i.cs" />
     <Compile Include="PatternOCR.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -18,6 +18,8 @@ namespace HexSolver
 
 		private const int MINIMUM_PATTERN_SIZE = 24;
 
+		public static readonly Color COLOR_COUNTER = Color.FromArgb(5, 164, 235);
+
 		private readonly PatternOCR patternOCR;
 
 		public HexOCR(PatternOCR pocr)
@@ -42,6 +44,7 @@ namespace HexSolver
 		public HexGrid GetAllHexagons(Bitmap shot, HexGridProperties prop)
 		{
 			HexGrid result = new HexGrid();
+			result.SetCounterArea(new CounterArea(prop.CounterArea, prop.CounterArea_Inner, shot, patternOCR));
 
 			double CellHeight = prop.CellRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90))); // Mittelpunkt zu Kante
 
@@ -258,6 +261,168 @@ namespace HexSolver
 			return Tuple.Create(distances_x.Average(), distances_y.Average());
 		}
 
+		public Tuple<Rect2i, Rect2i, Rect2i> GetCounterArea(Bitmap shot)
+		{
+			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+			IntPtr Scan0 = srcData.Scan0;
+			int stride = srcData.Stride;
+
+			int width = shot.Width;
+			int height = shot.Height;
+
+			Rect2i resultAll;
+			Rect2i resultNumber;
+			Rect2i resultInner;
+
+			unsafe
+			{
+				byte* p = (byte*)(void*)Scan0;
+
+				int topx = width - 1;
+				int topy = height - 1;
+
+				#region Find Top
+
+				bool fin = false;
+				for (int x = width - 1; x >= 0 && !fin; x--)
+				{
+					for (int y = 0; y < height && !fin; y++)
+					{
+						int idx = (y * stride) + x * 4;
+
+						if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						{
+							topx = x;
+							topy = y;
+							fin = true;
+						}
+					}
+				}
+
+				for (int y = topy; y > 0; y--)
+				{
+					int idx = (y * stride) + topx * 4;
+
+					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
+
+					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						topy = y;
+
+					if (hdistance > 50)
+						break;
+				}
+
+				for (int x = topx; x < width; x++)
+				{
+					int idx = (topy * stride) + x * 4;
+
+					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
+
+					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						topx = x;
+
+					if (hdistance > 50)
+						break;
+				}
+
+				#endregion
+
+				int boty = topy;
+				int botx = topx;
+
+				#region Find Bottom
+
+				for (int y = boty; y < height; y++)
+				{
+					int idx = (y * stride) + topx * 4;
+
+					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
+
+					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						boty = y;
+
+					if (hdistance > 50)
+						break;
+				}
+
+				for (int x = topx; x < width; x--)
+				{
+					int idx = (topy * stride) + x * 4;
+
+					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
+
+					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						botx = x;
+
+					if (hdistance > 50)
+						break;
+				}
+
+				#endregion
+
+				resultAll = new Rect2i(botx, topy, topx - botx, boty - topy);
+
+				int midy = topy;
+
+				#region Find Middle
+
+				bool firstHill = false;
+				for (int y = topy; y < boty; y++)
+				{
+					bool clear = true;
+					for (int x = botx; x < topx; x++)
+					{
+						int idx = (y * stride) + x * 4;
+
+						clear &= p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B;
+					}
+
+					firstHill |= !clear;
+
+					if (firstHill && clear)
+					{
+						midy = y;
+						break;
+					}
+				}
+
+				#endregion
+
+				resultNumber = new Rect2i(botx, midy, topx - botx, boty - midy);
+
+				#region Find Inner Area
+
+				int minX = topx;
+				int maxX = botx;
+				int minY = boty;
+				int maxY = midy;
+
+				for (int x = botx; x <= topx; x++)
+				{
+					for (int y = midy; y < boty; y++)
+					{
+						int idx = (y * stride) + x * 4;
+
+						if (ColorExt.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]) < 5)
+						{
+							minX = Math.Min(minX, x);
+							maxX = Math.Max(maxX, x);
+							minY = Math.Min(minY, y);
+							maxY = Math.Max(maxY, y);
+						}
+					}
+				}
+
+				#endregion
+
+				resultInner = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
+			}
+
+			shot.UnlockBits(srcData);
+
+			return Tuple.Create(resultAll, resultNumber, resultInner);
+		}
+
 		public HexGridProperties FindHexPattern(Bitmap shot)
 		{
 			double CellRadius;
@@ -269,6 +434,8 @@ namespace HexSolver
 			double NoCellBar_TR_X;
 			double NoCellBar_TR_Y;
 			bool InitialSwap;
+			Rect2i CounterArea;
+			Rect2i CounterAreaInner;
 
 			//##################################
 
@@ -312,6 +479,11 @@ namespace HexSolver
 			NoCellBar_TR_X = 200;
 			NoCellBar_TR_Y = 190;
 
+			var CounterArea_All = GetCounterArea(shot);
+
+			CounterArea = CounterArea_All.Item2;
+			CounterAreaInner = CounterArea_All.Item3;
+
 			//##################################
 
 			return new HexGridPropertiesBuilder()
@@ -324,6 +496,14 @@ namespace HexSolver
 				.SetNoCellBar_TR_X(NoCellBar_TR_X)
 				.SetNoCellBar_TR_Y(NoCellBar_TR_Y)
 				.SetInitialSwap(InitialSwap)
+				.SetCounter_X(CounterArea.bl.X)
+				.SetCounter_Y(CounterArea.bl.Y)
+				.SetCounter_Width(CounterArea.Width)
+				.SetCounter_Height(CounterArea.Height)
+				.SetCounterInner_X(CounterAreaInner.bl.X)
+				.SetCounterInner_Y(CounterAreaInner.bl.Y)
+				.SetCounterInner_Width(CounterAreaInner.Width)
+				.SetCounterInner_Height(CounterAreaInner.Height)
 				.build();
 		}
 	}

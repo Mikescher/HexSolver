@@ -14,6 +14,13 @@ namespace HexSolver
 
 		private Dictionary<Vec2i, HexagonCell> map = new Dictionary<Vec2i, HexagonCell>();
 
+		public CounterArea CounterArea { get; private set; }
+
+		public void SetCounterArea(CounterArea area)
+		{
+			CounterArea = area;
+		}
+
 		public void SetOffsetCoordinates(int x, int y, bool odd, HexagonCell value)
 		{
 			if (odd)
