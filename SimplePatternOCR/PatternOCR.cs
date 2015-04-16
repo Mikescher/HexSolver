@@ -1,5 +1,4 @@
-﻿using MSHC.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -13,6 +12,23 @@ namespace SimplePatternOCR
 		private struct PointI
 		{
 			public int X, Y;
+		}
+
+		public struct RectangleI
+		{
+			public readonly int X, Y;
+			public readonly int Width, Height;
+
+			public int X_Max { get { return X + Width; } }
+			public int Y_Max { get { return Y + Height; } }
+
+			public RectangleI(int x, int y, int w, int h)
+			{
+				X = x;
+				Y = y;
+				Width = w;
+				Height = h;
+			}
 		}
 
 		private const double FCB_TRESHOLD_INIT = 180;
@@ -198,17 +214,15 @@ namespace SimplePatternOCR
 
 				double scale = Math.Min((PATTERN_WIDTH * 1.0) / box.Item2.Width, (PATTERN_HEIGHT * 1.0) / box.Item2.Height);
 
-				var bmin = box.Item2.bl;
-				var bmax = box.Item2.tr;
 
 				for (int x = 0; x < PATTERN_WIDTH; x++)
 				{
 					for (int y = 0; y < PATTERN_HEIGHT; y++)
 					{
-						double rx = bmin.X + x / scale;
-						double ry = bmin.Y + y / scale;
+						double rx = box.Item2.X + x / scale;
+						double ry = box.Item2.Y + y / scale;
 
-						if (rx >= bmax.X || ry >= bmax.Y)
+						if (rx >= box.Item2.X_Max || ry >= box.Item2.Y_Max)
 							continue;
 
 
@@ -251,7 +265,7 @@ namespace SimplePatternOCR
 			return Tuple.Create(result.ToString(), distances);
 		}
 
-		public Tuple<int[,], List<Tuple<int, Rect2i>>> FindCharacterBoxes(Bitmap img)
+		public Tuple<int[,], List<Tuple<int, RectangleI>>> FindCharacterBoxes(Bitmap img)
 		{
 			img = Force32bppArgb(img);
 			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -259,7 +273,7 @@ namespace SimplePatternOCR
 			int stride = srcData.Stride;
 
 			int[,] grid = new int[img.Width, img.Height];
-			var boxes = new List<Tuple<int, Rect2i>>();
+			var boxes = new List<Tuple<int, RectangleI>>();
 			int shapecount = 0;
 
 			unsafe
@@ -327,27 +341,27 @@ namespace SimplePatternOCR
 								}
 							}
 
-							var boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
+							var boxrect = new RectangleI(minX, minY, maxX - minX + 1, maxY - minY + 1);
 
 							var box = boxes.FirstOrDefault(q =>
-								boxrect.tl.X < q.Item2.tr.X && boxrect.tl.X > q.Item2.tl.X ||
-								boxrect.tr.X < q.Item2.tr.X && boxrect.tr.X > q.Item2.tl.X ||
-								q.Item2.tl.X < boxrect.tr.X && q.Item2.tl.X > boxrect.tl.X ||
-								q.Item2.tr.X < boxrect.tr.X && q.Item2.tr.X > boxrect.tl.X
+								boxrect.X < q.Item2.X_Max && boxrect.X > q.Item2.X ||
+								boxrect.X_Max < q.Item2.X_Max && boxrect.X_Max > q.Item2.X ||
+								q.Item2.X < boxrect.X_Max && q.Item2.X > boxrect.X ||
+								q.Item2.X_Max < boxrect.X_Max && q.Item2.X_Max > boxrect.X
 								);
 
 							if (box != null)
 							{
 								allPoints.ForEach(pp => grid[pp.X, pp.Y] = box.Item1);
 
-								minX = Math.Min(minX, box.Item2.bl.X);
-								maxX = Math.Max(maxX, box.Item2.tr.X - 1);
-								minY = Math.Min(minY, box.Item2.bl.Y);
-								maxY = Math.Max(maxY, box.Item2.tr.Y - 1);
+								minX = Math.Min(minX, box.Item2.X);
+								maxX = Math.Max(maxX, box.Item2.X_Max - 1);
+								minY = Math.Min(minY, box.Item2.Y);
+								maxY = Math.Max(maxY, box.Item2.Y_Max - 1);
 
 								boxes.Remove(box);
 
-								boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
+								boxrect = new RectangleI(minX, minY, maxX - minX + 1, maxY - minY + 1);
 
 								boxes.Add(Tuple.Create(box.Item1, boxrect));
 							}
