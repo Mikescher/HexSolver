@@ -24,6 +24,10 @@ namespace NumberRecognition
 	{
 		private readonly Tuple<String, Bitmap>[] standard_trainingdata =
 		{
+			Tuple.Create("-3-", Load32bppArgbBitmap(Properties.Resources.img_nocell_3_dist_err_1)),
+			Tuple.Create("-3-", Load32bppArgbBitmap(Properties.Resources.img_nocell_3_dist_err_2)),
+			Tuple.Create("-2-", Load32bppArgbBitmap(Properties.Resources.img_nocell_2_dist_err_1)),
+
 			Tuple.Create("10", Load32bppArgbBitmap(Properties.Resources.img_nocell_10)),
 			Tuple.Create("{5}", Load32bppArgbBitmap(Properties.Resources.img_inactive_5_cons)),
 			Tuple.Create("15", Load32bppArgbBitmap(Properties.Resources.img_active_15)),
@@ -321,6 +325,8 @@ namespace NumberRecognition
 						pchar = characters_final[opos];
 					if (ochars.Count == tdata.Item1.Length)
 						pchar = (tdata.Item1[opos] + "");
+					else
+						continue;
 
 					var pattern = pocr.GetPattern(pchar);
 					var diff = pocr.GetPatternDiff(ochar, pattern, ocr.Item2[opos].Item1, ocr.Item2[opos].Item2);
@@ -333,7 +339,7 @@ namespace NumberRecognition
 				pos += 2;
 			}
 
-			MessageBox.Show(errors + "  false detections");
+			MessageBox.Show(errors + "/" + data.Count + "  false detections");
 		}
 	}
 }

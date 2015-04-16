@@ -16,13 +16,16 @@ namespace SimplePatternOCR
 		}
 
 		private const double FCB_TRESHOLD_INIT = 180;
+		private const double FCB_TRESHOLD_FLOOD = 170;
 		private const double FCB_TRESHOLD_X = 35;
 		private const double FCB_TRESHOLD_Y = 200;
+		private const int FCB_MIN_SIZE = 4;
 
 		private const int PATTERN_WIDTH = 32;
 		private const int PATTERN_HEIGHT = 32;
 
 		private const int MAX_IMGDISTANCE_OFFSET = 4;
+
 
 		private readonly string[] OCR_CHARACTERS =
 		{
@@ -140,7 +143,6 @@ namespace SimplePatternOCR
 
 			return img;
 		}
-
 
 		private Tuple<int, int, double> GetImageDistance(bool[,] imgA, byte[,] imgPattern)
 		{
@@ -315,7 +317,7 @@ namespace SimplePatternOCR
 
 									double treshold = (nx == 0) ? FCB_TRESHOLD_Y : FCB_TRESHOLD_X;
 
-									if (valid && grid[nx, ny] == 0 && ((pget(nx, ny) - cme) < treshold || allPoints.Count == 1) && pget(nx, ny) > FCB_TRESHOLD_INIT)
+									if (valid && grid[nx, ny] == 0 && ((pget(nx, ny) - cme) < treshold || allPoints.Count == 1) && pget(nx, ny) > FCB_TRESHOLD_FLOOD)
 									{
 										PointI nPoint = new PointI() { X = nx, Y = ny };
 
@@ -349,7 +351,7 @@ namespace SimplePatternOCR
 
 								boxes.Add(Tuple.Create(box.Item1, boxrect));
 							}
-							else if (allPoints.Count < 4)
+							else if (allPoints.Count < FCB_MIN_SIZE)
 							{
 								shapecount--;
 								allPoints.ForEach(pp => grid[pp.X, pp.Y] = 0);
@@ -410,7 +412,7 @@ namespace SimplePatternOCR
 			return references[text];
 		}
 
-		public Dictionary<string, byte[,]> TrainPatterns(List<Tuple<string, bool[,]>> trainingdata)
+		private Dictionary<string, byte[,]> TrainPatterns(List<Tuple<string, bool[,]>> trainingdata)
 		{
 			int[] count = new int[OCR_CHARACTERS.Length];
 			int[][,] characterdata = new int[OCR_CHARACTERS.Length][,];
@@ -463,11 +465,11 @@ namespace SimplePatternOCR
 			return TrainPatterns(trainingdata).ToDictionary(p => p.Key, p => ByteArrToGrayscaleBitmap(p.Value));
 		}
 
-		public string Recognize(Bitmap bmp, out double confidence)
+		public string Recognize(Bitmap bmp, out double errorDistance)
 		{
 			var ocr = RecognizeOCR(bmp);
 
-			confidence = 1000.0 / ocr.Item2.Max(p => p.Item3);
+			errorDistance = ocr.Item2.Max(p => p.Item3);
 
 			return ocr.Item1;
 		}

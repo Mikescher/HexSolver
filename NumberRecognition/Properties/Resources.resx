@@ -187,11 +187,20 @@
   <data name="img_nocell_2_dist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\processed\img_nocell_2_dist.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="img_nocell_2_dist_err_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\processed\img_nocell_2_dist_err_1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="img_nocell_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\processed\img_nocell_3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="img_nocell_3_dist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\processed\img_nocell_3_dist.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="img_nocell_3_dist_err_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\processed\img_nocell_3_dist_err_1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="img_nocell_3_dist_err_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\processed\img_nocell_3_dist_err_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="img_nocell_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\processed\img_nocell_4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

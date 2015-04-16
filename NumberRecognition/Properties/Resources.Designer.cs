@@ -293,6 +293,16 @@ namespace NumberRecognition.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap img_nocell_2_dist_err_1 {
+            get {
+                object obj = ResourceManager.GetObject("img_nocell_2_dist_err_1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap img_nocell_3 {
             get {
                 object obj = ResourceManager.GetObject("img_nocell_3", resourceCulture);
@@ -306,6 +316,26 @@ namespace NumberRecognition.Properties {
         internal static System.Drawing.Bitmap img_nocell_3_dist {
             get {
                 object obj = ResourceManager.GetObject("img_nocell_3_dist", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap img_nocell_3_dist_err_1 {
+            get {
+                object obj = ResourceManager.GetObject("img_nocell_3_dist_err_1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap img_nocell_3_dist_err_2 {
+            get {
+                object obj = ResourceManager.GetObject("img_nocell_3_dist_err_2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

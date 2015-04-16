@@ -147,6 +147,11 @@
       <Name>SimplePatternOCR</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="processed\img_nocell_2_dist_err_1.png" />
+    <Resource Include="processed\img_nocell_3_dist_err_1.png" />
+    <Resource Include="processed\img_nocell_3_dist_err_2.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
