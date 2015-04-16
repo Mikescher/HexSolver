@@ -4,8 +4,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Tesseract;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace HexSolver
@@ -222,7 +220,8 @@ namespace HexSolver
 								case HexagonType.NOCELL:
 									{
 										double c_distance = ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
-										if (c_distance < 32)
+										double hsv_value = ColorExt.GetValue(p[idx + 2], p[idx + 1], p[idx + 0]);
+										if (c_distance < 32 || hsv_value > 75)
 										{
 											// TRANSPARENT
 										}
@@ -349,66 +348,26 @@ namespace HexSolver
 
 			if (Type == HexagonType.INACTIVE)
 			{
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
-				{
-					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+				int activePixel;
+				Bitmap img = GetOCRImage(false, out activePixel);
+				if (activePixel == 0)
+					return new CellHint();
 
-					int activePixel;
-					Bitmap img = GetOCRImage(false, out activePixel);
-					if (activePixel == 0)
-						return new CellHint();
+				img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
 
-					img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
-
-					using (var page = engine.Process(img))
-					{
-						string txt = page.GetText();
-						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
-						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
-
-						if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
-							return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)));
-						if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
-							return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)));
-						if (Regex.IsMatch(txt, @"^[0-9]+$"))
-							return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, int.Parse(txt));
-						if (txt == "?")
-							return new CellHint();
-
-
-						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-						return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
-					}
-				}
+				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
 			}
 
 			if (Type == HexagonType.ACTIVE)
 			{
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
-				{
-					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
+				int activePixel;
+				Bitmap img = GetOCRImage(false, out activePixel);
+				if (activePixel == 0)
+					return new CellHint();
 
-					int activePixel;
-					Bitmap img = GetOCRImage(false, out activePixel);
-					if (activePixel == 0)
-						return new CellHint();
+				img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
 
-					img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
-
-					using (var page = engine.Process(img))
-					{
-						string txt = page.GetText();
-						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
-						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
-
-						if (Regex.IsMatch(txt, @"^[0-9]+$"))
-							return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt));
-
-
-						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-						return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, 0);
-					}
-				}
+				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
 			}
 
 			if (Type == HexagonType.NOCELL)
@@ -433,28 +392,7 @@ namespace HexSolver
 
 				img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
-				using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.TesseractOnly))
-				{
-					engine.SetVariable("tessedit_char_whitelist", "0123456789-{}?");
-
-					using (var page = engine.Process(img))
-					{
-						string txt = page.GetText();
-						txt = Regex.Replace(txt, @"[^0123456789-\{\}\?]", "");
-						Console.Out.WriteLine(page.GetText() + ": " + page.GetMeanConfidence());
-
-						if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
-							return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)));
-						if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
-							return new CellHint(CellHintType.NONCONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)));
-						if (Regex.IsMatch(txt, @"^[0-9]+$"))
-							return new CellHint(CellHintType.COUNT, col, int.Parse(txt));
-
-
-						Console.Out.WriteLine("THROW EXCEPTION PLS"); //TODO THROW EXCEPTION PLS
-						return new CellHint(CellHintType.COUNT, col, 0);
-					}
-				}
+				return new CellHint(CellHintType.COUNT, CellHintArea.DIRECT, 0);
 			}
 
 			throw new Exception("WTF - Type ==" + Type);

@@ -34,5 +34,10 @@ namespace HexSolver
 		{
 			return Image.GetOCRImage(useTransparent);
 		}
+
+		public Bitmap GetOCRImage(bool useTransparent, out int activePixel)
+		{
+			return Image.GetOCRImage(useTransparent, out activePixel);
+		}
 	}
 }

@@ -112,6 +112,8 @@ namespace HexSolver
 			solver.HexProperties = null;
 
 			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, solver.AllHexagons));
+
+			SetUIHexGridProperties(solver.HexProperties);
 		}
 
 		private void HexOCRValueSet(object sender, RoutedEventArgs e)

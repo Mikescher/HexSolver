@@ -173,4 +173,7 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 
+##################################
+
 imgsave/*
+sixcells/*

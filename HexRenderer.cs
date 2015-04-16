@@ -82,9 +82,13 @@ namespace HexSolver
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
-					g.FillPolygon(new SolidBrush(Color.Wheat), points);
 
-					g.DrawImageUnscaled(hex.Value.GetOCRImage(true), hex.Value.Image.BoundingBox.Left, hex.Value.Image.BoundingBox.Top);
+					int apixel;
+					var img = hex.Value.GetOCRImage(true, out apixel);
+
+					g.FillPolygon(new SolidBrush((apixel > 0) ? Color.Wheat : Color.LemonChiffon), points);
+
+					g.DrawImageUnscaled(img, hex.Value.Image.BoundingBox.Left, hex.Value.Image.BoundingBox.Top);
 				}
 			}
 
