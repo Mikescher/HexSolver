@@ -1,8 +1,7 @@
-﻿using MSHC.Geometry;
+﻿using SimplePatternOCR;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,25 +22,6 @@ namespace NumberRecognition
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private struct PointI
-		{
-			public int X, Y;
-		}
-
-		private readonly string[] chars =
-		{
-			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
-			"{", "}", "-", "?", "10", "11", "12", "13", "14", "15", 
-			"16", "17", "18", "19", "20", "21", "22", "23", "24"
-		};
-
-		private readonly string[] chars_fn =
-		{
-			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
-			"{", "}", "-", "Q", "10", "11", "12", "13", "14", "15", 
-			"16", "17", "18", "19", "20", "21", "22", "23", "24"
-		};
-
 		private readonly Tuple<String, Bitmap>[] standard_trainingdata =
 		{
 			Tuple.Create("10", Load32bppArgbBitmap(Properties.Resources.img_nocell_10)),
@@ -78,7 +58,7 @@ namespace NumberRecognition
 			Tuple.Create("9", Load32bppArgbBitmap(Properties.Resources.img_nocell_9)),
 		};
 
-		private List<Tuple<String, Bitmap>> data = new List<Tuple<String, Bitmap>>();
+		private readonly List<Tuple<String, Bitmap>> data = new List<Tuple<String, Bitmap>>();
 
 		[DllImport("gdi32")]
 		private static extern int DeleteObject(IntPtr o);
@@ -116,6 +96,9 @@ namespace NumberRecognition
 
 		private void Load_Click(object sender, RoutedEventArgs e)
 		{
+			ContentGrid.Children.Clear();
+			ContentGrid.RowDefinitions.Clear();
+
 			int pos = 1;
 			foreach (var tdata in standard_trainingdata)
 			{
@@ -132,6 +115,9 @@ namespace NumberRecognition
 
 		private void LoadAll_Click(object sender, RoutedEventArgs e)
 		{
+			ContentGrid.Children.Clear();
+			ContentGrid.RowDefinitions.Clear();
+
 			int pos = 1;
 			foreach (var file in Directory.EnumerateFileSystemEntries(@"..\..\testdata", "*.png", SearchOption.AllDirectories))
 			{
@@ -203,11 +189,13 @@ namespace NumberRecognition
 
 		private void Boxing_Click(object sender, RoutedEventArgs e)
 		{
+			PatternOCR pocr = new PatternOCR();
+
 			{
 				int pos = 1;
 				foreach (var tdata in data)
 				{
-					var result = FindBoxes(tdata.Item2);
+					var result = pocr.FindCharacterBoxes(tdata.Item2);
 					var grid = result.Item1;
 
 					Bitmap img = new Bitmap(tdata.Item2.Width, tdata.Item2.Height);
@@ -238,7 +226,7 @@ namespace NumberRecognition
 				int pos = 1;
 				foreach (var tdata in data)
 				{
-					var characters = GetSingleCharacter(tdata.Item2);
+					var characters = pocr.RecognizeSingleCharacter(tdata.Item2);
 
 					int cpos = 0;
 					foreach (var ochar in characters)
@@ -268,14 +256,13 @@ namespace NumberRecognition
 
 		private void Train_Click(object sender, RoutedEventArgs e)
 		{
-			int[] count = new int[chars.Length];
-			int[][,] pattern = new int[chars.Length][,];
-			for (int i = 0; i < chars.Length; i++)
-				pattern[i] = new int[32, 32];
+			PatternOCR pocr = new PatternOCR();
+
+			List<Tuple<string, bool[,]>> trainingdata = new List<Tuple<string, bool[,]>>();
 
 			foreach (var tdata in data)
 			{
-				var characters = GetSingleCharacter(tdata.Item2);
+				var characters = pocr.RecognizeSingleCharacter(tdata.Item2);
 
 				List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select match.Value).ToList();
 
@@ -288,53 +275,34 @@ namespace NumberRecognition
 					if (characters.Count == tdata.Item1.Length)
 						pchar = tdata.Item1[cpos] + "";
 
-					int pindex = chars.ToList().IndexOf(pchar);
-
-					count[pindex]++;
-
-					for (int x = 0; x < 32; x++)
-					{
-						for (int y = 0; y < 32; y++)
-						{
-							pattern[pindex][x, y] += ochar[x, y] ? 1 : 0;
-						}
-					}
+					trainingdata.Add(Tuple.Create(pchar, ochar));
 
 					cpos++;
 				}
 			}
 
-			for (int i = 0; i < chars.Length; i++)
+			foreach (var pattern in pocr.TrainPatternsToImage(trainingdata))
 			{
-				if (count[i] == 0)
-					continue;
-
-				Bitmap patternimage = new Bitmap(32, 32, PixelFormat.Format32bppArgb);
-
-				for (int x = 0; x < 32; x++)
-				{
-					for (int y = 0; y < 32; y++)
-					{
-						double bytevalue = pattern[i][x, y] * 255.0 / count[i];
-
-						byte bv = (byte)(255 - bytevalue);
-
-						patternimage.SetPixel(x, y, Color.FromArgb(bv, bv, bv));
-					}
-				}
-
-				patternimage.Save(@"..\..\pattern\pattern_" + chars_fn[i] + ".png");
+				pattern.Value.Save(@"..\..\pattern\pattern_" + pattern.Key.Replace("?", "Q") + ".png");
 			}
 		}
 
 		private void Recognize_Click(object sender, RoutedEventArgs e)
 		{
+			var references = Directory
+				.EnumerateFiles(@"..\..\pattern\")
+				.Select(p => new { Path = p, File = Path.GetFileName(p) })
+				.Where(p => Regex.IsMatch(p.File, @"^pattern_(.*)\.png$"))
+				.ToDictionary(p => Regex.Match(p.File, @"^pattern_(.*)\.png$").Groups[1].Value.Replace("Q", "?"), q => new Bitmap(System.Drawing.Image.FromFile(q.Path)));
+
+			PatternOCR pocr = new PatternOCR(references);
+
 			int errors = 0;
 
 			int pos = 1;
 			foreach (var tdata in data)
 			{
-				var ocr = RecognizeOCR(tdata.Item2);
+				var ocr = pocr.RecognizeOCR(tdata.Item2);
 
 				SetContentGridCell(ocr.Item1 + "        {" + string.Join(", ", ocr.Item2.Select(p => p.Item3.ToString("F0"))) + "}", 13, pos, ocr.Item1 == tdata.Item1);
 
@@ -342,60 +310,22 @@ namespace NumberRecognition
 
 				//############################################
 
-				var ochars = GetSingleCharacter(tdata.Item2);
+				var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
 				List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select match.Value).ToList();
 
 				int opos = 0;
 				foreach (var ochar in ochars)
 				{
-					Bitmap diff = new Bitmap(32, 32, PixelFormat.Format32bppArgb);
-
-					BitmapData srcData = diff.LockBits(new Rectangle(0, 0, diff.Width, diff.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-					IntPtr Scan0 = srcData.Scan0;
-					int stride = srcData.Stride;
-
 					string pchar = null;
 					if (ochars.Count == characters_final.Count)
-						pchar = characters_final[opos].Replace("?", "Q");
+						pchar = characters_final[opos];
 					if (ochars.Count == tdata.Item1.Length)
-						pchar = (tdata.Item1[opos] + "").Replace("?", "Q");
+						pchar = (tdata.Item1[opos] + "");
 
-					var imgPattern =
-						new Bitmap(
-							System.Drawing.Image.FromFile(@"..\..\pattern\pattern_" + pchar + ".png"));
-
-					int offsetX = ocr.Item2[opos].Item1;
-					int offsetY = ocr.Item2[opos].Item2;
-
-					unsafe
-					{
-						byte* p = (byte*)(void*)Scan0;
-
-						for (int x = 0; x < 32; x++)
-						{
-							for (int y = 0; y < 32; y++)
-							{
-								int patternValue;
-								if (x + offsetX < 0 || x + offsetX > 31 || y + offsetY < 0 || y + offsetY > 31)
-									patternValue = 255;
-								else
-									patternValue = imgPattern.GetPixel(x + offsetX, y + offsetY).R;
-
-								int diffv = 255 - (Math.Abs((ochar[x, y] ? 0 : 255) - patternValue));
-
-								p[((y) * stride) + (x) * 4 + 0] = (byte)diffv;
-								p[((y) * stride) + (x) * 4 + 1] = (byte)diffv;
-								p[((y) * stride) + (x) * 4 + 2] = (byte)diffv;
-								p[((y) * stride) + (x) * 4 + 3] = 255;
-							}
-						}
-
-					}
-					diff.UnlockBits(srcData);
+					var pattern = pocr.GetPattern(pchar);
+					var diff = pocr.GetPatternDiff(ochar, pattern, ocr.Item2[opos].Item1, ocr.Item2[opos].Item2);
 
 					SetContentGridCell(diff, 15 + 2 * opos, pos);
-
-					//diff.Save("c:/asd.png");
 
 					opos++;
 				}
@@ -403,245 +333,7 @@ namespace NumberRecognition
 				pos += 2;
 			}
 
-			MessageBox.Show(errors + "false detections");
-		}
-
-		private Tuple<string, List<Tuple<int, int, double>>> RecognizeOCR(Bitmap img)
-		{
-			var ochars = GetSingleCharacter(img);
-
-			var references = chars
-				.Select(p => new { Char = p, File = (@"..\..\pattern\pattern_" + p + ".png").Replace("?", "Q") })
-				.Where(p => File.Exists(p.File))
-				.Select(p => new { Char = p.Char, File = p.File, Image = new Bitmap(System.Drawing.Image.FromFile(p.File)) });
-
-			var distances = new List<Tuple<int, int, double>>();
-			string result = "";
-
-			foreach (var ochar in ochars)
-			{
-				var match = references.Select(p => new { Reference = p, Value = GetImageDistance(ochar, p.Image) }).OrderBy(p => p.Value.Item3).First();
-
-				result += match.Reference.Char;
-				distances.Add(match.Value);
-			}
-
-			return Tuple.Create(result, distances);
-		}
-
-		private Tuple<int, int, double> GetImageDistance(bool[,] imgA, Bitmap imgPattern)
-		{
-			var result = Enumerable.Range(-4, 9)
-				.SelectMany(
-					ox =>
-						Enumerable.Range(-4, 9).Select(oy => new { ofx = ox, ofy = oy, val = GetImageDistance(imgA, imgPattern, ox, oy) }))
-				.OrderBy(p => p.val)
-				.First();
-
-			return Tuple.Create(result.ofx, result.ofy, result.val);
-		}
-
-		private double GetImageDistance(bool[,] imgA, Bitmap imgPattern, int offsetX, int offsetY)
-		{
-			BitmapData srcData = imgPattern.LockBits(new Rectangle(0, 0, imgPattern.Width, imgPattern.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-			IntPtr Scan0 = srcData.Scan0;
-			int stride = srcData.Stride;
-
-			double d = 0;
-			int c = 0;
-
-			unsafe
-			{
-				byte* p = (byte*)(void*)Scan0;
-
-
-				for (int x = 0; x < 32; x++)
-				{
-					for (int y = 0; y < 32; y++)
-					{
-						int patternValue;
-						if (x + offsetX < 0 || x + offsetX > 31 || y + offsetY < 0 || y + offsetY > 31)
-							patternValue = 255;
-						else
-							patternValue = p[((y + offsetY) * stride) + (x + offsetX) * 4];
-
-						int diff = (Math.Abs((imgA[x, y] ? 0 : 255) - patternValue));
-
-						d += (diff / 255.0) * (diff / 255.0);
-						c += imgA[x, y] ? 1 : 0;
-					}
-				}
-			}
-
-			imgPattern.UnlockBits(srcData);
-
-			return (d / c) * 100;
-		}
-
-		private List<bool[,]> GetSingleCharacter(Bitmap img)
-		{
-			var wfresult = FindBoxes(img);
-			var grid = wfresult.Item1;
-			var boxes = wfresult.Item2;
-
-			List<bool[,]> result = new List<bool[,]>();
-
-			foreach (var box in boxes)
-			{
-				bool[,] arr = new bool[32, 32];
-
-				double scale = Math.Min(32.0 / box.Item2.Width, 32.0 / box.Item2.Height);
-
-				var bmin = box.Item2.bl;
-				var bmax = box.Item2.tr;
-
-				for (int x = 0; x < 32; x++)
-				{
-					for (int y = 0; y < 32; y++)
-					{
-						double rx = bmin.X + x / scale;
-						double ry = bmin.Y + y / scale;
-
-						if (rx >= bmax.X || ry >= bmax.Y)
-							continue;
-
-
-						arr[x, y] = grid[(int)rx, (int)ry] == box.Item1;
-					}
-				}
-
-				result.Add(arr);
-			}
-
-			return result;
-		}
-
-		// Waterflooding
-		private Tuple<int[,], List<Tuple<int, Rect2i>>> FindBoxes(Bitmap img)
-		{
-			const double TRESHOLD_INIT = 180;
-			const double TRESHOLD_X = 35;
-			const double TRESHOLD_Y = 200;
-
-			PointI[] directions =
-			{
-				new PointI() {X = -1, Y = 0},
-				new PointI() {X = +1, Y = 0},
-				new PointI() {X = 0, Y = -1},
-				new PointI() {X = 0, Y = +1},
-			};
-
-			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-			IntPtr Scan0 = srcData.Scan0;
-			int stride = srcData.Stride;
-
-			int[,] grid = new int[img.Width, img.Height];
-			var boxes = new List<Tuple<int, Rect2i>>();
-			int shapecount = 0;
-
-			unsafe
-			{
-				byte* p = (byte*)(void*)Scan0;
-
-				Func<int, int, byte> pget_r = (x, y) => p[(y * stride) + x * 4];
-
-				double col_black = Enumerable.Range(0, img.Width).Select(px => Enumerable.Range(0, img.Height).Select(py => pget_r(px, py)).Min()).Min();
-
-				Func<int, int, double> pget = (x, y) => (255 - pget_r(x, y)) / ((255 - col_black) / 255.0);
-
-				for (int x = 1; x < img.Width - 1; x++)
-				{
-					for (int y = 1; y < img.Height - 1; y++)
-					{
-						if (grid[x, y] == 0 && pget(x, y) > TRESHOLD_INIT)
-						{
-							shapecount++;
-
-							List<PointI> allPoints = new List<PointI>();
-							Stack<PointI> walkStack = new Stack<PointI>();
-
-							walkStack.Push(new PointI() { X = x, Y = y });
-							grid[x, y] = shapecount;
-
-							int minX = x;
-							int maxX = x;
-							int minY = y;
-							int maxY = y;
-
-							int maxCVal = 0;
-							while (walkStack.Count > 0)
-							{
-								PointI point = walkStack.Pop();
-								allPoints.Add(point);
-
-								double cme = pget(point.X, point.Y);
-								maxCVal = Math.Max(maxCVal, (int)cme);
-
-								minX = Math.Min(minX, point.X);
-								maxX = Math.Max(maxX, point.X);
-								minY = Math.Min(minY, point.Y);
-								maxY = Math.Max(maxY, point.Y);
-
-								foreach (var off in directions)
-								{
-									int nx = point.X + off.X;
-									int ny = point.Y + off.Y;
-
-									bool valid = nx < img.Width - 1 && nx > 0 && ny > 0 && ny < img.Height - 1;
-
-									double treshold = (nx == 0) ? TRESHOLD_Y : TRESHOLD_X;
-
-									if (valid && grid[nx, ny] == 0 && ((pget(nx, ny) - cme) < treshold || allPoints.Count == 1) && pget(nx, ny) > TRESHOLD_INIT)
-									{
-										PointI nPoint = new PointI() { X = nx, Y = ny };
-
-										grid[nPoint.X, nPoint.Y] = shapecount;
-										walkStack.Push(nPoint);
-									}
-								}
-							}
-
-							var boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
-
-							var box = boxes.FirstOrDefault(q =>
-								boxrect.tl.X < q.Item2.tr.X && boxrect.tl.X > q.Item2.tl.X ||
-								boxrect.tr.X < q.Item2.tr.X && boxrect.tr.X > q.Item2.tl.X ||
-								q.Item2.tl.X < boxrect.tr.X && q.Item2.tl.X > boxrect.tl.X ||
-								q.Item2.tr.X < boxrect.tr.X && q.Item2.tr.X > boxrect.tl.X
-								);
-
-							if (box != null)
-							{
-								allPoints.ForEach(pp => grid[pp.X, pp.Y] = box.Item1);
-
-								minX = Math.Min(minX, box.Item2.bl.X);
-								maxX = Math.Max(maxX, box.Item2.tr.X - 1);
-								minY = Math.Min(minY, box.Item2.bl.Y);
-								maxY = Math.Max(maxY, box.Item2.tr.Y - 1);
-
-								boxes.Remove(box);
-
-								boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
-
-								boxes.Add(Tuple.Create(box.Item1, boxrect));
-							}
-							else if (allPoints.Count < 4)
-							{
-								shapecount--;
-								allPoints.ForEach(pp => grid[pp.X, pp.Y] = 0);
-							}
-							else
-							{
-								boxes.Add(Tuple.Create(shapecount, boxrect));
-							}
-						}
-					}
-				}
-			}
-
-			img.UnlockBits(srcData);
-
-			return Tuple.Create(grid, boxes);
+			MessageBox.Show(errors + "  false detections");
 		}
 	}
 }
