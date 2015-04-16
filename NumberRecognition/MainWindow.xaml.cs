@@ -323,18 +323,22 @@ namespace NumberRecognition
 					}
 				}
 
-				//patternimage.Save(@"..\..\pattern\pattern_" + chars_fn[i] + ".png");
+				patternimage.Save(@"..\..\pattern\pattern_" + chars_fn[i] + ".png");
 			}
 		}
 
 		private void Recognize_Click(object sender, RoutedEventArgs e)
 		{
+			int errors = 0;
+
 			int pos = 1;
 			foreach (var tdata in data)
 			{
 				var ocr = RecognizeOCR(tdata.Item2);
 
-				SetContentGridCell(ocr.Item1 + "        {" + string.Join(", ", ocr.Item2.Select(p => p.Item3.ToString("F0"))) + "}", 11, pos, ocr.Item1 == tdata.Item1);
+				SetContentGridCell(ocr.Item1 + "        {" + string.Join(", ", ocr.Item2.Select(p => p.Item3.ToString("F0"))) + "}", 13, pos, ocr.Item1 == tdata.Item1);
+
+				errors += ocr.Item1 == tdata.Item1 ? 0 : 1;
 
 				//############################################
 
@@ -350,9 +354,15 @@ namespace NumberRecognition
 					IntPtr Scan0 = srcData.Scan0;
 					int stride = srcData.Stride;
 
+					string pchar = null;
+					if (ochars.Count == characters_final.Count)
+						pchar = characters_final[opos].Replace("?", "Q");
+					if (ochars.Count == tdata.Item1.Length)
+						pchar = (tdata.Item1[opos] + "").Replace("?", "Q");
+
 					var imgPattern =
 						new Bitmap(
-							System.Drawing.Image.FromFile(@"..\..\pattern\pattern_" + characters_final[opos].Replace("?", "Q") + ".png"));
+							System.Drawing.Image.FromFile(@"..\..\pattern\pattern_" + pchar + ".png"));
 
 					int offsetX = ocr.Item2[opos].Item1;
 					int offsetY = ocr.Item2[opos].Item2;
@@ -383,7 +393,7 @@ namespace NumberRecognition
 					}
 					diff.UnlockBits(srcData);
 
-					SetContentGridCell(diff, 13 + 2 * opos, pos);
+					SetContentGridCell(diff, 15 + 2 * opos, pos);
 
 					//diff.Save("c:/asd.png");
 
@@ -392,6 +402,8 @@ namespace NumberRecognition
 
 				pos += 2;
 			}
+
+			MessageBox.Show(errors + "false detections");
 		}
 
 		private Tuple<string, List<Tuple<int, int, double>>> RecognizeOCR(Bitmap img)
@@ -507,11 +519,19 @@ namespace NumberRecognition
 		// Waterflooding
 		private Tuple<int[,], List<Tuple<int, Rect2i>>> FindBoxes(Bitmap img)
 		{
-			const double TRESHOLD_FACTOR_X = 0.70;
-			const double TRESHOLD_FACTOR_Y = 0.70;
+			const double TRESHOLD_INIT = 180;
+			const double TRESHOLD_X = 35;
+			const double TRESHOLD_Y = 200;
 
-			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite,
-				PixelFormat.Format32bppArgb);
+			PointI[] directions =
+			{
+				new PointI() {X = -1, Y = 0},
+				new PointI() {X = +1, Y = 0},
+				new PointI() {X = 0, Y = -1},
+				new PointI() {X = 0, Y = +1},
+			};
+
+			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
 			int stride = srcData.Stride;
 
@@ -523,18 +543,17 @@ namespace NumberRecognition
 			{
 				byte* p = (byte*)(void*)Scan0;
 
-				Func<int, int, byte> pget = (x, y) => p[(y * stride) + x * 4];
+				Func<int, int, byte> pget_r = (x, y) => p[(y * stride) + x * 4];
 
-				double col_black = Enumerable.Range(0, img.Width).Select(px => Enumerable.Range(0, img.Height).Select(py => pget(px, py)).Min()).Min();
+				double col_black = Enumerable.Range(0, img.Width).Select(px => Enumerable.Range(0, img.Height).Select(py => pget_r(px, py)).Min()).Min();
 
-				int treshold_x = 255 - (int)((255 - col_black) * TRESHOLD_FACTOR_X);
-				int treshold_y = 255 - (int)((255 - col_black) * TRESHOLD_FACTOR_Y);
+				Func<int, int, double> pget = (x, y) => (255 - pget_r(x, y)) / ((255 - col_black) / 255.0);
 
 				for (int x = 1; x < img.Width - 1; x++)
 				{
 					for (int y = 1; y < img.Height - 1; y++)
 					{
-						if (grid[x, y] == 0 && pget(x, y) < Math.Min(treshold_x, treshold_y))
+						if (grid[x, y] == 0 && pget(x, y) > TRESHOLD_INIT)
 						{
 							shapecount++;
 
@@ -555,50 +574,60 @@ namespace NumberRecognition
 								PointI point = walkStack.Pop();
 								allPoints.Add(point);
 
-								maxCVal = Math.Max(maxCVal, pget(point.X, point.Y));
+								double cme = pget(point.X, point.Y);
+								maxCVal = Math.Max(maxCVal, (int)cme);
 
 								minX = Math.Min(minX, point.X);
 								maxX = Math.Max(maxX, point.X);
 								minY = Math.Min(minY, point.Y);
 								maxY = Math.Max(maxY, point.Y);
 
-								if (point.X < img.Width - 1 && grid[point.X + 1, point.Y] == 0 && pget(point.X + 1, point.Y) < treshold_x)
+								foreach (var off in directions)
 								{
-									PointI nPoint = new PointI() { X = point.X + 1, Y = point.Y };
+									int nx = point.X + off.X;
+									int ny = point.Y + off.Y;
 
-									grid[nPoint.X, nPoint.Y] = shapecount;
-									walkStack.Push(nPoint);
-								}
+									bool valid = nx < img.Width - 1 && nx > 0 && ny > 0 && ny < img.Height - 1;
 
-								if (point.X > 0 && grid[point.X - 1, point.Y] == 0 && pget(point.X - 1, point.Y) < treshold_x)
-								{
-									PointI nPoint = new PointI() { X = point.X - 1, Y = point.Y };
+									double treshold = (nx == 0) ? TRESHOLD_Y : TRESHOLD_X;
 
-									grid[nPoint.X, nPoint.Y] = shapecount;
-									walkStack.Push(nPoint);
-								}
+									if (valid && grid[nx, ny] == 0 && ((pget(nx, ny) - cme) < treshold || allPoints.Count == 1) && pget(nx, ny) > TRESHOLD_INIT)
+									{
+										PointI nPoint = new PointI() { X = nx, Y = ny };
 
-								if (point.Y < img.Height - 1 && grid[point.X, point.Y + 1] == 0 && pget(point.X, point.Y + 1) < treshold_y)
-								{
-									PointI nPoint = new PointI() { X = point.X, Y = point.Y + 1 };
-
-									grid[nPoint.X, nPoint.Y] = shapecount;
-									walkStack.Push(nPoint);
-								}
-
-								if (point.Y > 0 && grid[point.X, point.Y - 1] == 0 && pget(point.X, point.Y - 1) < treshold_y)
-								{
-									PointI nPoint = new PointI() { X = point.X, Y = point.Y - 1 };
-
-									grid[nPoint.X, nPoint.Y] = shapecount;
-									walkStack.Push(nPoint);
+										grid[nPoint.X, nPoint.Y] = shapecount;
+										walkStack.Push(nPoint);
+									}
 								}
 							}
 
 							var boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
 
-							if (allPoints.Count < 4 || boxes.Any(q => q.Item2.tl.X < boxrect.GetMiddle().X && q.Item2.tr.X > boxrect.GetMiddle().X && boxrect.GetArea() < q.Item2.GetArea()))
+							var box = boxes.FirstOrDefault(q =>
+								boxrect.tl.X < q.Item2.tr.X && boxrect.tl.X > q.Item2.tl.X ||
+								boxrect.tr.X < q.Item2.tr.X && boxrect.tr.X > q.Item2.tl.X ||
+								q.Item2.tl.X < boxrect.tr.X && q.Item2.tl.X > boxrect.tl.X ||
+								q.Item2.tr.X < boxrect.tr.X && q.Item2.tr.X > boxrect.tl.X
+								);
+
+							if (box != null)
 							{
+								allPoints.ForEach(pp => grid[pp.X, pp.Y] = box.Item1);
+
+								minX = Math.Min(minX, box.Item2.bl.X);
+								maxX = Math.Max(maxX, box.Item2.tr.X - 1);
+								minY = Math.Min(minY, box.Item2.bl.Y);
+								maxY = Math.Max(maxY, box.Item2.tr.Y - 1);
+
+								boxes.Remove(box);
+
+								boxrect = new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
+
+								boxes.Add(Tuple.Create(box.Item1, boxrect));
+							}
+							else if (allPoints.Count < 4)
+							{
+								shapecount--;
 								allPoints.ForEach(pp => grid[pp.X, pp.Y] = 0);
 							}
 							else
