@@ -7,24 +7,25 @@ The idea is to automatically parse the game state, find the next (valid) step an
 
 ###Step 1 - Capture
 
-![Step1](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot1.png)
+![Shot1](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot1.png)
 
 ###Step 2 - Find Hexagons
 
-![Step2](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot2.png)
-![Step3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
+![Shot2](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot2.png)
+![Shot3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
 
 ###Step 3 - Recognize Types
 
-![Step4](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
+![Shot4](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
 
 ###Step 4 - Image Processing
 
-![Step5](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot5.png)
+![Shot5](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot5.png)
 
 ###Step 5 - Text Recognition
 
-> **NOT IMPLEMENTED**
+![Shot6](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot6.png)
+![Shot7](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot7.png)
 
 ###Step 6 - Puzzle Solving
 
