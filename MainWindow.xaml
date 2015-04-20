@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="MainWindow" Height="950" Width="1400" WindowStartupLocation="CenterScreen">
+        Title="HexSolver (github.com/Mikescher/HexSolver)" Height="950" Width="1400" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"/>
@@ -70,11 +70,11 @@
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="15"/>
                             <RowDefinition Height="24"/>
-                            <RowDefinition Height="5"/>
-                            <RowDefinition Height="20"/>
-                            <RowDefinition Height="5"/>
-                            <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Content="Radius:"/>
@@ -116,10 +116,11 @@
                         <xctk:DoubleUpDown Grid.Row="20" Grid.Column="3" FormatString="F2" Value="38" Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
 
 
-                        <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="4" Content="Binary Pattern" Click="OnBinPattern"/>
-                        <Button Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="4" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
-                        <Button Grid.Row="27" Grid.Column="0" Grid.ColumnSpan="4" Content="Update" Click="HexOCRValueUpdate"/>
-                        <Button Grid.Row="29" Grid.Column="0" Grid.ColumnSpan="4" Content="Set" Click="HexOCRValueSet"/>
+                        <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="4" Content="Update" Click="HexOCRValueUpdate"/>
+                        <Button Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="4" Content="Set" Click="HexOCRValueSet"/>
+                        
+                        <Button Grid.Row="27" Grid.Column="0" Grid.ColumnSpan="4" Content="Binary Pattern" Click="OnBinPattern"/>
+                        <Button Grid.Row="29" Grid.Column="0" Grid.ColumnSpan="4" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
@@ -133,10 +134,23 @@
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
+
                         <Button Content="Find Types" Grid.Row="0" Click="OnTypifyClicked" />
                         <Button Content="Process" Grid.Row="2" Click="OnProcessClicked" />
                         <Button Content="[3] OCR" Grid.Row="4" Click="OnOCRClicked" FontWeight="Bold" />
                         <Button Content="OCR Distance" Grid.Row="6" Click="OnOCRDistanceClicked" />
+                    </Grid>
+                </Border>
+                <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+
+                        <Button Content="Hexagon Indizies" Grid.Row="0" Click="OnShowIndizies"/>
+                        <Button Content="Hint Groups" Grid.Row="2" Click="OnShowHintGroups"/>
                     </Grid>
                 </Border>
             </StackPanel>

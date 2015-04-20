@@ -116,6 +116,14 @@ namespace HexSolver
 			SetUIHexGridProperties(solver.HexProperties);
 		}
 
+		private void OnShowIndizies(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons));
+		}
+
 		private void HexOCRValueSet(object sender, RoutedEventArgs e)
 		{
 			if (solver == null || renderer == null)
@@ -182,6 +190,14 @@ namespace HexSolver
 				return;
 
 			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRDistance(solver.Screenshot, solver.FilteredHexagons));
+		}
+
+		private void OnShowHintGroups(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(null);
 		}
 
 		private HexGridProperties GetUIHexGridProperties()

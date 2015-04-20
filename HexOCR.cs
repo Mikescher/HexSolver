@@ -38,7 +38,21 @@ namespace HexSolver
 				allHexagons.Remove(rem.Key.X, rem.Key.Y);
 			}
 
-			return allHexagons;
+			int offsetX = -allHexagons.Select(p => p.Key.X).Min();
+			int offsetY = -allHexagons.Select(p => p.Key.Y).Min();
+
+			HexGrid result = new HexGrid();
+			result.SetCounterArea(new CounterArea(allHexagons.CounterArea.BoundingBox, allHexagons.CounterArea.InnerBox, allHexagons.CounterArea.OCRImage, patternOCR));
+
+			foreach (var hex in allHexagons)
+			{
+				var newPos = new Vec2i(hex.Key.X + offsetX, hex.Key.Y + offsetY);
+				var newCell = new HexagonCell(newPos, hex.Value.Image.OCRCenter, hex.Value.Image.OCRRadius, hex.Value.Image.OCRImage, patternOCR);
+
+				result.Set(newPos.X, newPos.Y, newCell);
+			}
+
+			return result;
 		}
 
 		public HexGrid GetAllHexagons(Bitmap shot, HexGridProperties prop)

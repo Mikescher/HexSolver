@@ -53,6 +53,38 @@ namespace HexSolver
 			return shot;
 		}
 
+		public Bitmap DisplayIndizies(Bitmap shot, HexGrid grid)
+		{
+			shot = new Bitmap(shot);
+
+			Font fnt = new Font("Arial", 8, FontStyle.Regular);
+			Brush fntBush1 = new SolidBrush(Color.Black);
+			StringFormat fmt = new StringFormat
+			{
+				LineAlignment = StringAlignment.Center,
+				Alignment = StringAlignment.Center
+			};
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+
+				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
+
+				foreach (var hex in grid)
+				{
+					var points =
+						Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+
+					g.FillPolygon(new SolidBrush(hex.Value.Type != HexagonType.NOCELL ? Color.Orange : Color.Wheat), points);
+					g.DrawLines(new Pen(Color.DarkGray), points);
+
+					g.DrawString(hex.Key.X + " | " + hex.Key.Y, fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+				}
+			}
+
+			return shot;
+		}
+
 		public Bitmap DisplayTypes(Bitmap shot, HexGrid grid)
 		{
 			shot = new Bitmap(shot);
