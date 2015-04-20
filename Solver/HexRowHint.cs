@@ -13,15 +13,93 @@ namespace HexSolver.Solver
 
 	class HexRowHint : HexHint
 	{
-		public HexRowHintType Type;
-		public readonly ICollection<HexagonCell> Cells;
-		public readonly int Number;
+		public HexRowHintType Type { get; private set; }
+		public ICollection<HexagonCell> Cells { get; private set; }
+		public int Number { get; private set; }
 
 		public HexRowHint(HexGrid grid, HexagonCell cell)
 		{
 			Type = ConvertHintType(cell.Hint);
 			Number = cell.Hint.Number;
 			Cells = GetCells(grid, cell).ToList().AsReadOnly();
+
+			CleanConditions();
+		}
+
+		private void CleanConditions()
+		{
+			switch (Type)
+			{
+				case HexRowHintType.NORMAL:
+					CleanConditions_Normal();
+					break;
+				case HexRowHintType.CONSECUTIVE:
+					CleanConditions_Consecutive();
+					break;
+				case HexRowHintType.NONCONSECUTIVE:
+					CleanConditions_Nonconsecutive();
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+		}
+
+		private void CleanConditions_Nonconsecutive()
+		{
+			var clist = Cells.ToList();
+
+			int min = Cells.Count;
+			int max = 0;
+
+			for (int i = 0; i < clist.Count; i++)
+			{
+				if (clist[i].Type == HexagonType.ACTIVE || clist[i].Type == HexagonType.HIDDEN)
+				{
+					min = Math.Min(min, i);
+					max = Math.Max(max, i + 1);
+				}
+			}
+
+			Cells = Cells.Skip(min).Take(max - min).ToList().AsReadOnly();
+		}
+
+		private void CleanConditions_Consecutive()
+		{
+			var clist = Cells.ToList();
+
+			int min = Cells.Count;
+			int max = 0;
+
+			for (int i = 0; i < clist.Count; i++)
+			{
+				if (clist[i].Type == HexagonType.ACTIVE || clist[i].Type == HexagonType.HIDDEN)
+				{
+					min = Math.Min(min, i);
+					max = Math.Max(max, i + 1);
+				}
+			}
+
+			Cells = Cells.Skip(min).Take(max - min).ToList().AsReadOnly();
+		}
+
+		private void CleanConditions_Normal()
+		{
+			var remove = new List<HexagonCell>();
+
+			foreach (var cell in Cells)
+			{
+				if (cell.Type == HexagonType.ACTIVE)
+				{
+					Number--;
+				}
+
+				if (cell.Type != HexagonType.HIDDEN)
+				{
+					remove.Add(cell);
+				}
+			}
+
+			Cells = Cells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
 		}
 
 		private HexRowHintType ConvertHintType(CellHint Hint)
@@ -88,9 +166,69 @@ namespace HexSolver.Solver
 			return Cells;
 		}
 
+		private bool IsNonConsecutiveForTemp()
+		{
+			return Cells.Count(p => p.IsTempActive() != false) > Number || !IsConsecutiveForTemp();
+		}
+
+		private bool IsConsecutiveForTemp()
+		{
+			int maxGroup = 0;
+			int currentGroup = 0;
+
+			bool prevGroupIsForce = false;
+			bool currentGroupIsForce = false;
+
+			foreach (var cell in Cells)
+			{
+				bool? active = cell.IsTempActive();
+
+				if (active == true)
+				{
+					if (!prevGroupIsForce)
+					{
+						currentGroup++;
+						maxGroup = Math.Max(currentGroup, maxGroup);
+					}
+
+					if (prevGroupIsForce)
+						return false;
+
+					currentGroupIsForce = true;
+				}
+				else if (active == null)
+				{
+					if (!prevGroupIsForce)
+					{
+						currentGroup++;
+						maxGroup = Math.Max(currentGroup, maxGroup);
+					}
+				}
+				else
+				{
+					if (currentGroupIsForce)
+					{
+						prevGroupIsForce = true;
+						currentGroupIsForce = false;
+						maxGroup = currentGroup;
+					}
+
+					currentGroup = 0;
+				}
+			}
+
+			return maxGroup >= Number;
+		}
+
 		public override bool IsTrueForTemp()
 		{
-			return Cells.Count(p => p.IsTempActive() == true) <= Number && Cells.Count(p => p.IsTempActive() == false) <= Cells.Count - Number;
+			return Cells.Count(p => p.IsTempActive() == true) <= Number &&
+				Cells.Count(p => p.IsTempActive() == false) <= Cells.Count - Number &&
+				(
+					(Type == HexRowHintType.NORMAL) ||
+					(Type == HexRowHintType.CONSECUTIVE && IsConsecutiveForTemp()) ||
+					(Type == HexRowHintType.NONCONSECUTIVE && IsNonConsecutiveForTemp())
+				);
 		}
 	}
 }

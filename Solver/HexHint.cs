@@ -24,6 +24,9 @@ namespace HexSolver
 			var varcells = cells.Where(p => p.Type == HexagonType.HIDDEN).ToList();
 			int count = varcells.Count;
 
+			if (count > 18)
+				return Enumerable.Empty<HexStep>().ToList();
+
 			List<HexHint> hints = varcells.SelectMany(p => hintlist.Get(p.Position)).Distinct().ToList();
 
 			FourStateBoolean[] result = Enumerable.Repeat(FourStateBoolean.UNSET, count).ToArray();
@@ -38,8 +41,17 @@ namespace HexSolver
 						varcells[i].TemporaryValue = ((bin & (1 << i)) != 0);
 					}
 
+					//foreach (var hint in hints)
+					//{
+					//	if (!hint.IsTrueForTemp())
+					//	{
+					//		continue;
+					//	}
+					//}
+
 					if (!hints.All(p => p.IsTrueForTemp()))
 						continue;
+
 
 					for (int i = 0; i < count; i++)
 					{

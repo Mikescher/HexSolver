@@ -26,10 +26,10 @@ namespace HexSolver
 
 		public HexGrid()
 		{
-			MinX = 0;
-			MaxX = 1;
-			MinY = 0;
-			MaxY = 1;
+			MinX = int.MaxValue;
+			MaxX = int.MinValue;
+			MinY = int.MaxValue;
+			MaxY = int.MinValue;
 		}
 
 		public void SetCounterArea(CounterArea area)
@@ -103,23 +103,23 @@ namespace HexSolver
 
 		public IEnumerable<KeyValuePair<Vec2i, HexagonCell>> GetSurrounding(Vec2i pos)
 		{
-			if (Get(pos.X + 1, pos.Y) != null)
-				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X + 1, pos.Y), Get(pos.X + 1, pos.Y));
-
-			if (Get(pos.X - 1, pos.Y) != null)
-				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X - 1, pos.Y), Get(pos.X - 1, pos.Y));
-
-			if (Get(pos.X, pos.Y + 1) != null)
-				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X, pos.Y + 1), Get(pos.X, pos.Y + 1));
-
 			if (Get(pos.X, pos.Y - 1) != null)
 				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X, pos.Y - 1), Get(pos.X, pos.Y - 1));
 
 			if (Get(pos.X + 1, pos.Y - 1) != null)
 				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X + 1, pos.Y - 1), Get(pos.X + 1, pos.Y - 1));
 
+			if (Get(pos.X + 1, pos.Y) != null)
+				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X + 1, pos.Y), Get(pos.X + 1, pos.Y));
+
+			if (Get(pos.X, pos.Y + 1) != null)
+				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X, pos.Y + 1), Get(pos.X, pos.Y + 1));
+
 			if (Get(pos.X - 1, pos.Y + 1) != null)
 				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X - 1, pos.Y + 1), Get(pos.X - 1, pos.Y + 1));
+
+			if (Get(pos.X - 1, pos.Y) != null)
+				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X - 1, pos.Y), Get(pos.X - 1, pos.Y));
 		}
 
 		private HexHintList GetHintList()
@@ -147,6 +147,8 @@ namespace HexSolver
 						throw new ArgumentOutOfRangeException();
 				}
 			}
+
+			list.Add(new HexCellSumHint(this));
 
 			return list;
 		}

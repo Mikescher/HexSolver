@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace HexSolver
 {
@@ -171,7 +170,7 @@ namespace HexSolver
 			if (shiftY)
 				posy += CellHeight + prop.CellGap / 2;
 
-			int rx = 0;
+			int rx = 1; // must be this big (is not allowed to be neg in this stage)
 			int ry = 0;
 
 			while (posx + prop.CellRadius + prop.CellGap < shot.Width)
@@ -586,8 +585,8 @@ namespace HexSolver
 			double calculatedPosY = PaddingY + (hexHeight + CellGap + hexHeight + CorrectionVertical) * offsetY;
 			PaddingY += anchor.Y - calculatedPosY;
 
-			NoCellBar_TR_X = 200;
-			NoCellBar_TR_Y = 190;
+			NoCellBar_TR_X = 175;
+			NoCellBar_TR_Y = 165;
 
 			var CounterArea_All = GetCounterArea(shot);
 

@@ -1,4 +1,5 @@
 ﻿using HexSolver.Helper;
+using HexSolver.Solver;
 using MSHC.Geometry;
 using MSHC.Helper;
 using System;
@@ -353,7 +354,7 @@ namespace HexSolver
 				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.White)), 0, 0, shot.Width, shot.Height);
 
 
-				foreach (var hint in grid.HintList)
+				foreach (var hint in grid.HintList.Where(p => !(p is HexCellSumHint)))
 				{
 					var points = hint
 						.GetCells()
@@ -384,7 +385,7 @@ namespace HexSolver
 			{
 				g.FillRectangle(new SolidBrush(Color.FromArgb(160, Color.White)), 0, 0, shot.Width, shot.Height);
 
-				foreach (var solution in grid.HintList.GetSolutions())
+				foreach (var solution in grid.HintList.GetSolutions().GroupBy(p => p.Cell.Position).Select(p => p.First()))
 				{
 					Color col = solution.Action == Solver.CellAction.ACTIVATE ? Color.Blue : Color.Black;
 

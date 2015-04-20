@@ -121,7 +121,7 @@ namespace MSHC.Geometry
 
 		public override int GetHashCode()
 		{
-			return X.GetHashCode() + Y.GetHashCode();
+			return X * 7561 + Y;
 		}
 
 		#endregion Operators

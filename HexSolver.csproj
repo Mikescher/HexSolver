@@ -66,6 +66,7 @@
     <Compile Include="HexcellsSolver.cs" />
     <Compile Include="HexGridProperties.cs" />
     <Compile Include="Helper\ColorExt.cs" />
+    <Compile Include="Solver\HexCellSumHint.cs" />
     <Compile Include="Solver\HexAreaHint.cs" />
     <Compile Include="Solver\HexNeighborHint.cs" />
     <Compile Include="Solver\HexRowHint.cs" />

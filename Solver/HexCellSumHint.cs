@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace HexSolver.Solver
 {
-	class HexAreaHint : HexHint
+	class HexCellSumHint : HexHint
 	{
 		public ICollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
-		public HexAreaHint(HexGrid grid, HexagonCell cell)
+		public HexCellSumHint(HexGrid grid)
 		{
-			Number = cell.Hint.Number;
-			Cells = GetCells(grid, cell).ToList().AsReadOnly();
+			Number = grid.CounterArea.Value.Value;
+			Cells = GetCells(grid).ToList().AsReadOnly();
 
 			CleanConditions();
 		}
@@ -23,11 +22,6 @@ namespace HexSolver.Solver
 
 			foreach (var cell in Cells)
 			{
-				if (cell.Type == HexagonType.ACTIVE)
-				{
-					Number--;
-				}
-
 				if (cell.Type != HexagonType.HIDDEN)
 				{
 					remove.Add(cell);
@@ -37,21 +31,9 @@ namespace HexSolver.Solver
 			Cells = Cells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
 		}
 
-		private IEnumerable<HexagonCell> GetCells(HexGrid grid, HexagonCell cell)
+		private IEnumerable<HexagonCell> GetCells(HexGrid grid)
 		{
-			for (int dx = -2; dx <= 2; dx++)
-			{
-				for (int dy = -2; dy <= 2; dy++)
-				{
-					if (Math.Abs(dx + dy) > 2)
-						continue;
-
-					var icell = grid.Get(cell.Position.X + dx, cell.Position.Y + dy);
-
-					if (icell != null)
-						yield return icell;
-				}
-			}
+			return grid.Select(p => p.Value);
 		}
 
 		public override ICollection<HexagonCell> GetCells()
