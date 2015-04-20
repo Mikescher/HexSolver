@@ -184,6 +184,16 @@ namespace MSHC.Geometry
 			Y = nY;
 		}
 
+		public Vec2d Sub(Vec2d other)
+		{
+			return new Vec2d(this.X - other.X, this.Y - other.Y);
+		}
+
+		public double Cross(Vec2d other)
+		{
+			return (this.X * other.Y) - (this.Y * other.X);
+		}
+
 		public override string ToString()
 		{
 			return String.Format("({0}|{1})", X, Y);

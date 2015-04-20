@@ -1,4 +1,5 @@
-﻿using MSHC.Geometry;
+﻿using HexSolver.Helper;
+using MSHC.Geometry;
 using MSHC.Helper;
 using System;
 using System.Drawing;
@@ -9,6 +10,8 @@ namespace HexSolver
 {
 	class HexRenderer
 	{
+		private static readonly Color HEXCOLOR_BLUE = Color.FromArgb(5, 164, 235);
+
 		private static readonly Pen[] hexpens = new[]
 		{
 			new Pen(new SolidBrush(Color.Orange)),
@@ -67,13 +70,11 @@ namespace HexSolver
 
 			using (Graphics g = Graphics.FromImage(shot))
 			{
-
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
 				foreach (var hex in grid)
 				{
-					var points =
-						Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
 					g.FillPolygon(new SolidBrush(hex.Value.Type != HexagonType.NOCELL ? Color.Orange : Color.Wheat), points);
 					g.DrawLines(new Pen(Color.DarkGray), points);
@@ -338,6 +339,38 @@ namespace HexSolver
 				g.DrawRectangle(pen, counter.Item2.bl.X, counter.Item2.bl.Y, counter.Item2.Width, counter.Item2.Height);
 
 				g.DrawRectangle(pen, counter.Item3.bl.X, counter.Item3.bl.Y, counter.Item3.Width, counter.Item3.Height);
+			}
+
+			return shot;
+		}
+
+		public Bitmap DisplayHintGroups(Bitmap shot, HexGrid grid)
+		{
+			shot = new Bitmap(shot);
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.White)), 0, 0, shot.Width, shot.Height);
+
+
+				foreach (var hint in grid.HintList)
+				{
+					var points = hint
+						.GetCells()
+						.SelectMany(q => Enumerable.Range(0, 7).Select(q.GetEdge))
+						.ToList();
+
+					if (points.Count() > 2)
+					{
+						var hull = GeometryHelper
+							.ComputeConvexHull(points, true)
+							.Select(p => new Point((int)p.X, (int)p.Y))
+							.ToArray();
+
+						g.FillPolygon(new SolidBrush(Color.FromArgb(64, HEXCOLOR_BLUE)), hull);
+						g.DrawPolygon(new Pen(Color.Blue), hull);
+					}
+				}
 			}
 
 			return shot;

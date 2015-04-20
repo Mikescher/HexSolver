@@ -1,4 +1,5 @@
-﻿using MSHC.Geometry;
+﻿using HexSolver.Solver;
+using MSHC.Geometry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,14 +8,29 @@ namespace HexSolver
 {
 	class HexGrid : IEnumerable<KeyValuePair<Vec2i, HexagonCell>>
 	{
-		private int minX = 0;
-		private int maxX = 1;
-		private int minY = 0;
-		private int maxY = 1;
+		public int MinX { get; private set; }
+		public int MaxX { get; private set; }
+		public int MinY { get; private set; }
+		public int MaxY { get; private set; }
 
 		private Dictionary<Vec2i, HexagonCell> map = new Dictionary<Vec2i, HexagonCell>();
 
 		public CounterArea CounterArea { get; private set; }
+
+		private HexHintList _HintList;
+
+		public HexHintList HintList
+		{
+			get { return _HintList ?? (_HintList = GetHintList()); }
+		}
+
+		public HexGrid()
+		{
+			MinX = 0;
+			MaxX = 1;
+			MinY = 0;
+			MaxY = 1;
+		}
 
 		public void SetCounterArea(CounterArea area)
 		{
@@ -41,8 +57,10 @@ namespace HexSolver
 
 		public HexagonCell Get(int x, int y)
 		{
-			if (map.ContainsKey(new Vec2i(x, y)))
-				return map[new Vec2i(x, y)];
+			var vec = new Vec2i(x, y);
+
+			if (map.ContainsKey(vec))
+				return map[vec];
 			else
 				return null;
 		}
@@ -54,19 +72,21 @@ namespace HexSolver
 
 		public void Set(int x, int y, HexagonCell value)
 		{
-			minX = Math.Min(minX, x);
-			maxX = Math.Max(maxX, x + 1);
-			minY = Math.Min(minY, y);
-			maxY = Math.Max(maxY, y + 1);
+			MinX = Math.Min(MinX, x);
+			MaxX = Math.Max(MaxX, x + 1);
+			MinY = Math.Min(MinY, y);
+			MaxY = Math.Max(MaxY, y + 1);
+
+			_HintList = null;
 
 			map[new Vec2i(x, y)] = value;
 		}
 
 		public IEnumerator<KeyValuePair<Vec2i, HexagonCell>> GetEnumerator()
 		{
-			for (int x = minX; x < maxX; x++)
+			for (int x = MinX; x < MaxX; x++)
 			{
-				for (int y = minY; y < maxY; y++)
+				for (int y = MinY; y < MaxY; y++)
 				{
 					Vec2i vec = new Vec2i(x, y);
 
@@ -100,6 +120,35 @@ namespace HexSolver
 
 			if (Get(pos.X - 1, pos.Y + 1) != null)
 				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X - 1, pos.Y + 1), Get(pos.X - 1, pos.Y + 1));
+		}
+
+		private HexHintList GetHintList()
+		{
+			HexHintList list = new HexHintList();
+
+			foreach (var hex in this)
+			{
+				switch (hex.Value.Hint.Area)
+				{
+					case CellHintArea.NONE:
+						break;
+					case CellHintArea.DIRECT:
+						list.Add(new HexNeighborHint(this, hex.Value));
+						break;
+					case CellHintArea.CIRCLE:
+						list.Add(new HexAreaHint(this, hex.Value));
+						break;
+					case CellHintArea.COLUMN_LEFT:
+					case CellHintArea.COLUMN_DOWN:
+					case CellHintArea.COLUMN_RIGHT:
+						list.Add(new HexRowHint(this, hex.Value));
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+			}
+
+			return list;
 		}
 	}
 }

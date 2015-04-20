@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace HexSolver
 {
@@ -33,7 +34,102 @@ namespace HexSolver
 				.Where(p => allHexagons.GetSurrounding(p.Key).All(q => q.Value.Type == HexagonType.NOCELL || q.Value.Type == HexagonType.UNKNOWN))
 				.ToList();
 
+			var keep = new List<KeyValuePair<Vec2i, HexagonCell>>();
+
+			#region Fill Holes
+
 			foreach (var rem in remove)
+			{
+				bool fx1 = false;
+				bool fx2 = false;
+				bool fy1 = false;
+				bool fy2 = false;
+				bool fz1 = false;
+				bool fz2 = false;
+
+				for (int x = rem.Key.X; x <= allHexagons.MaxX; x++)
+				{
+					var get = allHexagons.Get(x, rem.Key.Y);
+
+					if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+					{
+						fx1 = true;
+						break;
+					}
+				}
+
+				for (int x = rem.Key.X; x >= allHexagons.MinX; x--)
+				{
+					var get = allHexagons.Get(x, rem.Key.Y);
+
+					if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+					{
+						fx2 = true;
+						break;
+					}
+				}
+
+				for (int y = rem.Key.Y; y <= allHexagons.MaxY; y++)
+				{
+					var get = allHexagons.Get(rem.Key.X, y);
+
+					if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+					{
+						fy1 = true;
+						break;
+					}
+				}
+
+				for (int y = rem.Key.Y; y >= allHexagons.MinY; y--)
+				{
+					var get = allHexagons.Get(rem.Key.X, y);
+
+					if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+					{
+						fy2 = true;
+						break;
+					}
+				}
+
+				{
+					int x = rem.Key.X;
+					int y = rem.Key.Y;
+					for (; y <= allHexagons.MaxY || x >= allHexagons.MinX; x--, y++)
+					{
+						var get = allHexagons.Get(x, y);
+
+						if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+						{
+							fz1 = true;
+							break;
+						}
+					}
+				}
+
+				{
+					int x = rem.Key.X;
+					int y = rem.Key.Y;
+					for (; y >= allHexagons.MinY || x <= allHexagons.MaxX; x++, y--)
+					{
+						var get = allHexagons.Get(x, y);
+
+						if (get != null && get.Type != HexagonType.NOCELL && get.Type != HexagonType.UNKNOWN)
+						{
+							fz2 = true;
+							break;
+						}
+					}
+				}
+
+				if ((fx1 && fx2) || (fy1 && fy2) || (fz1 && fz2))
+				{
+					keep.Add(rem);
+				}
+			}
+
+			#endregion
+
+			foreach (var rem in remove.Where(p => !keep.Contains(p)))
 			{
 				allHexagons.Remove(rem.Key.X, rem.Key.Y);
 			}

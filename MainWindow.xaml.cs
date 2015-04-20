@@ -197,7 +197,7 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(null);
+			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons));
 		}
 
 		private HexGridProperties GetUIHexGridProperties()

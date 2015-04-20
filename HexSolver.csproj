@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Workflow.ComponentModel" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -61,9 +62,13 @@
     <Compile Include="CellHint.cs" />
     <Compile Include="CounterArea.cs" />
     <Compile Include="CounterValue.cs" />
+    <Compile Include="Helper\GeometryHelper.cs" />
     <Compile Include="HexcellsSolver.cs" />
     <Compile Include="HexGridProperties.cs" />
     <Compile Include="Helper\ColorExt.cs" />
+    <Compile Include="Solver\HexAreaHint.cs" />
+    <Compile Include="Solver\HexNeighborHint.cs" />
+    <Compile Include="Solver\HexRowHint.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -81,6 +86,8 @@
     <Compile Include="HexagonCellImage.cs" />
     <Compile Include="HexCam.cs" />
     <Compile Include="HexGrid.cs" />
+    <Compile Include="Solver\HexHint.cs" />
+    <Compile Include="Solver\HexHintList.cs" />
     <Compile Include="HexOCR.cs" />
     <Compile Include="HexRenderer.cs" />
     <Compile Include="MainWindow.xaml.cs">
