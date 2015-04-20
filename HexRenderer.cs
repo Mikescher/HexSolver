@@ -375,5 +375,34 @@ namespace HexSolver
 
 			return shot;
 		}
+
+		public Bitmap DisplaySolveSingle(Bitmap shot, HexGrid grid)
+		{
+			shot = new Bitmap(shot);
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+				g.FillRectangle(new SolidBrush(Color.FromArgb(160, Color.White)), 0, 0, shot.Width, shot.Height);
+
+				foreach (var solution in grid.HintList.GetSolutions())
+				{
+					Color col = solution.Action == Solver.CellAction.ACTIVATE ? Color.Blue : Color.Black;
+
+					int radius = (int)(solution.Cell.Image.OCRHeight - 2);
+					Vec2i center = (Vec2i)solution.Cell.Image.OCRCenter;
+
+					for (int i = 0; i < 20; i++)
+					{
+						int rad2 = (int)(radius * (i / 20.0));
+
+						g.FillEllipse(new SolidBrush(Color.FromArgb(32, col)), center.X - rad2, center.Y - rad2, 2 * rad2, 2 * rad2);
+					}
+
+					//g.DrawEllipse(new Pen(col), center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
+				}
+			}
+
+			return shot;
+		}
 	}
 }

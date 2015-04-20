@@ -1,5 +1,6 @@
 ﻿using MSHC.Geometry;
 using SimplePatternOCR;
+using System;
 using System.Drawing;
 
 namespace HexSolver
@@ -15,6 +16,8 @@ namespace HexSolver
 
 	class HexagonCell
 	{
+		public bool? TemporaryValue;
+
 		public Vec2i Position { get; private set; }
 		public HexagonCellImage Image { get; private set; }
 		public HexagonType Type { get { return Image.Type; } }
@@ -39,6 +42,23 @@ namespace HexSolver
 		public Bitmap GetProcessedImage(bool useTransparent, out int activePixel)
 		{
 			return Image.GetProcessedImage(useTransparent, out activePixel);
+		}
+
+		public bool? IsTempActive()
+		{
+			switch (Type)
+			{
+				case HexagonType.HIDDEN:
+					return TemporaryValue;
+				case HexagonType.ACTIVE:
+					return true;
+				case HexagonType.INACTIVE:
+					return false;
+				case HexagonType.NOCELL:
+					return false;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 	}
 }

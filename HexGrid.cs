@@ -124,7 +124,7 @@ namespace HexSolver
 
 		private HexHintList GetHintList()
 		{
-			HexHintList list = new HexHintList();
+			HexHintList list = new HexHintList(this);
 
 			foreach (var hex in this)
 			{

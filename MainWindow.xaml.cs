@@ -200,6 +200,18 @@ namespace HexSolver
 			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons));
 		}
 
+		private void OnSolveSingle(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			int time = Environment.TickCount;
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons));
+			time = Environment.TickCount - time;
+
+			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+		}
+
 		private HexGridProperties GetUIHexGridProperties()
 		{
 			return new HexGridPropertiesBuilder()
