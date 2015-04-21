@@ -19,6 +19,8 @@ namespace SimplePatternOCR
 		public int OffsetY;
 		public double Distance;
 
+		public int EulerNumber;
+
 		public Dictionary<string, double> AllDistances;
 	}
 }

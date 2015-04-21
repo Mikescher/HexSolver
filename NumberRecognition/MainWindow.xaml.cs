@@ -306,7 +306,7 @@ namespace NumberRecognition
 			{
 				var ocr = pocr.RecognizeOCR(tdata.Item2);
 
-				SetContentGridCell(ocr.Value + "        {" + string.Join(", ", ocr.Characters.Select(p => p.Distance.ToString("F0"))) + "}", 13, pos, ocr.Value == tdata.Item1);
+				SetContentGridCell(ocr.Value + "        {" + string.Join(", ", ocr.Characters.Select(p => p.Distance.ToString("F0"))) + "}" + "\r\n           {" + string.Join(", ", ocr.Characters.Select(p => p.EulerNumber)) + "}" , 13, pos, ocr.Value == tdata.Item1);
 
 				errors += ocr.Value == tdata.Item1 ? 0 : 1;
 
@@ -337,12 +337,12 @@ namespace NumberRecognition
 				//############################################
 
 
-				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => q.Key).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
+				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => Regex.IsMatch(q.Key, @"^[0-9+]+$") ? int.Parse(q.Key) : ((q.Key + "@")[0]+255)).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
 
 				if (ocr.Value != tdata.Item1)
 				{
 					var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
-					List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select tdata.Item1).ToList();
+					List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select match.Value).ToList();
 
 					int opos = 0;
 					foreach (var ochar in ochars)

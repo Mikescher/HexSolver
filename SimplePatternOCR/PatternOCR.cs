@@ -41,6 +41,7 @@ namespace SimplePatternOCR
 		private const int PATTERN_HEIGHT = 32;
 
 		private const int MAX_IMGDISTANCE_OFFSET = 4;
+		private const double EULER_DISTANCE_CORRECTION = 3.5;
 
 
 		private readonly string[] OCR_CHARACTERS =
@@ -48,6 +49,24 @@ namespace SimplePatternOCR
 			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
 			"{", "}", "-", "?", "10", "11", "12", "13", "14", "15", 
 			"16", "17", "18", "19", "20", "21", "22", "23", "24"
+		};
+
+		private static readonly Dictionary<string, int> EULER_DICTIONARY = new Dictionary<string, int>
+		{
+			{ "0", 1 },
+			{ "1", 0 },
+			{ "2", 0 },
+			{ "3", 0 },
+			{ "4", 1 },
+			{ "5", 0 },
+			{ "6", 1 },
+			{ "7", 0 },
+			{ "8", 2 },
+			{ "9", 1 },
+			{ "{", 0 },
+			{ "}", 0 },
+			{ "-", 0 },
+			{ "?", 0 },
 		};
 
 		private readonly PointI[] DIRECTIONS_E4 =
@@ -160,25 +179,31 @@ namespace SimplePatternOCR
 			return img;
 		}
 
-		private Tuple<int, int, double> GetImageDistance(bool[,] imgA, byte[,] imgPattern)
+		private Tuple<int, int, double, int> GetImageDistance(bool[,] imgA, byte[,] imgPattern, int imgAEuler, string pattern)
 		{
 			var result = Enumerable.Range(-MAX_IMGDISTANCE_OFFSET, 2 * MAX_IMGDISTANCE_OFFSET + 1)
 				.SelectMany(
 					ox =>
 						Enumerable
 							.Range(-MAX_IMGDISTANCE_OFFSET, 2 * MAX_IMGDISTANCE_OFFSET + 1)
-							.Select(oy => new { ofx = ox, ofy = oy, val = GetImageDistance(imgA, imgPattern, ox, oy) })
+							.Select(oy => new { ofx = ox, ofy = oy, val = GetImageDistance(imgA, imgPattern, ox, oy, imgAEuler, pattern) })
 						)
 				.OrderBy(p => p.val)
 				.First();
 
-			return Tuple.Create(result.ofx, result.ofy, result.val);
+			return Tuple.Create(result.ofx, result.ofy, result.val, imgAEuler);
 		}
 
-		private double GetImageDistance(bool[,] imgA, byte[,] imgPattern, int offsetX, int offsetY)
+		private double GetImageDistance(bool[,] imgA, byte[,] imgPattern, int offsetX, int offsetY, int imgAEuler, string pattern)
 		{
 			double d = 0;
 			int c = 0;
+
+			double euler_correction = 0;
+			if (EULER_DICTIONARY.ContainsKey(pattern))
+			{
+				euler_correction = (EULER_DICTIONARY[pattern] == imgAEuler) ? -EULER_DISTANCE_CORRECTION : +EULER_DISTANCE_CORRECTION;
+			}
 
 			for (int x = 0; x < PATTERN_WIDTH; x++)
 			{
@@ -197,7 +222,7 @@ namespace SimplePatternOCR
 				}
 			}
 
-			return (d / c) * 100;
+			return Math.Max(0, ((d / c) * 100) + euler_correction);
 		}
 
 		public List<bool[,]> RecognizeSingleCharacter(Bitmap img)
@@ -236,7 +261,91 @@ namespace SimplePatternOCR
 			return result;
 		}
 
-		// Tuple<result, List<Tuple<offset_x, offset_y, distance>>, List<Dictionary<reference, Tuple<offset_x, offset_y, distance>>>>
+		public int GetEulerNumber(bool[,] image)
+		{
+			bool[,] finished = new bool[PATTERN_WIDTH, PATTERN_HEIGHT];
+
+			for (int x = 0; x < PATTERN_WIDTH; x++)
+			{
+				for (int y = 0; y < PATTERN_HEIGHT; y++)
+				{
+					finished[x, y] = image[x, y];
+				}
+			}
+
+			{
+				Stack<PointI> outside = new Stack<PointI>();
+
+				for (int ix = 0; ix < PATTERN_WIDTH; ix++)
+				{
+					if (!finished[ix, 0])
+						outside.Push(new PointI() { X = ix, Y = 0 });
+					if (!finished[ix, PATTERN_HEIGHT - 1])
+						outside.Push(new PointI() { X = ix, Y = PATTERN_HEIGHT - 1 });
+				}
+				for (int iy = 0; iy < PATTERN_HEIGHT; iy++)
+				{
+					if (!finished[0, iy])
+						outside.Push(new PointI() { X = 0, Y = iy });
+					if (!finished[PATTERN_WIDTH - 1, iy])
+						outside.Push(new PointI() { X = PATTERN_WIDTH - 1, Y = iy });
+				}
+
+				while (outside.Count > 0)
+				{
+					PointI point = outside.Pop();
+					if (finished[point.X, point.Y])
+						continue;
+
+					finished[point.X, point.Y] = true;
+
+					if (point.X - 1 >= 0 && !finished[point.X - 1, point.Y])
+						outside.Push(new PointI() { X = point.X - 1, Y = point.Y });
+					if (point.Y - 1 >= 0 && !finished[point.X, point.Y - 1])
+						outside.Push(new PointI() { X = point.X, Y = point.Y - 1 });
+					if (point.X + 1 < PATTERN_WIDTH && !finished[point.X + 1, point.Y])
+						outside.Push(new PointI() { X = point.X + 1, Y = point.Y });
+					if (point.Y + 1 < PATTERN_HEIGHT && !finished[point.X, point.Y + 1])
+						outside.Push(new PointI() { X = point.X, Y = point.Y + 1 });
+				}
+			}
+
+			int euler = 0;
+			Stack<PointI> inside = new Stack<PointI>();
+
+			for (int x = 0; x < PATTERN_WIDTH; x++)
+			{
+				for (int y = 0; y < PATTERN_HEIGHT; y++)
+				{
+					if (!finished[x, y])
+					{
+						euler++;
+						inside.Push(new PointI() { X = x, Y = y });
+
+						while (inside.Count > 0)
+						{
+							PointI point = inside.Pop();
+							if (finished[point.X, point.Y])
+								continue;
+
+							finished[point.X, point.Y] = true;
+
+							if (point.X - 1 >= 0 && !finished[point.X - 1, point.Y])
+								inside.Push(new PointI() { X = point.X - 1, Y = point.Y });
+							if (point.Y - 1 >= 0 && !finished[point.X, point.Y - 1])
+								inside.Push(new PointI() { X = point.X, Y = point.Y - 1 });
+							if (point.X + 1 < PATTERN_WIDTH && !finished[point.X + 1, point.Y])
+								inside.Push(new PointI() { X = point.X + 1, Y = point.Y });
+							if (point.Y + 1 < PATTERN_HEIGHT && !finished[point.X, point.Y + 1])
+								inside.Push(new PointI() { X = point.X, Y = point.Y + 1 });
+						}
+					}
+				}
+			}
+
+			return euler;
+		}
+
 		public OCRResult RecognizeOCR(Bitmap img)
 		{
 			var ochars = RecognizeSingleCharacter(img);
@@ -251,8 +360,10 @@ namespace SimplePatternOCR
 
 			foreach (var ochar in ochars)
 			{
+				var euler = GetEulerNumber(ochar);
+
 				var matches = references
-					.Select(p => new { Reference = p, Distance = GetImageDistance(ochar, p.Value) })
+					.Select(p => new { Reference = p, Distance = GetImageDistance(ochar, p.Value, euler, p.Key) })
 					.OrderBy(p => p.Distance.Item3)
 					.ToList();
 
@@ -271,6 +382,8 @@ namespace SimplePatternOCR
 						OffsetX = matches.First().Distance.Item1,
 						OffsetY = matches.First().Distance.Item2,
 						Distance = matches.First().Distance.Item3,
+
+						EulerNumber = matches.First().Distance.Item4,
 
 						AllDistances = matches.ToDictionary(p => p.Reference.Key, p => p.Distance.Item3),
 					});
@@ -414,12 +527,12 @@ namespace SimplePatternOCR
 			{
 				byte* p = (byte*)(void*)Scan0;
 
-				for (int x = 0; x < 32; x++)
+				for (int x = 0; x < PATTERN_WIDTH; x++)
 				{
-					for (int y = 0; y < 32; y++)
+					for (int y = 0; y < PATTERN_HEIGHT; y++)
 					{
 						int patternValue;
-						if (x + offsetX < 0 || x + offsetX > 31 || y + offsetY < 0 || y + offsetY > 31)
+						if (x + offsetX < 0 || x + offsetX >= PATTERN_WIDTH || y + offsetY < 0 || y + offsetY >= PATTERN_HEIGHT)
 							patternValue = 255;
 						else
 							patternValue = imgPattern[x + offsetX, y + offsetY];
