@@ -1,6 +1,4 @@
-﻿using HexSolver.Solver;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -32,10 +30,32 @@ namespace HexSolver
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetCursorPos(out MousePoint lpMousePoint);
 
+		[DllImport("user32.dll")]
+		private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
 		private const int MOUSEEVENTF_LEFTDOWN = 0x02;
 		private const int MOUSEEVENTF_LEFTUP = 0x04;
 		private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
 		private const int MOUSEEVENTF_RIGHTUP = 0x10;
+
+		private const int SW_SHOWNORMAL = 1;
+		private const int SW_SHOWMAXIMIZED = 3;
+		private const int SW_RESTORE = 9;
+
+		[StructLayout(LayoutKind.Sequential)]
+		private struct WINDOWPLACEMENT
+		{
+			public int length;
+			public int flags;
+			public int showCmd;
+			public System.Drawing.Point ptMinPosition;
+			public System.Drawing.Point ptMaxPosition;
+			public System.Drawing.Rectangle rcNormalPosition;
+		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct RECT
@@ -53,9 +73,6 @@ namespace HexSolver
 			public int Y;
 		}
 
-		//###################################
-
-		private const int MOUSE_MOVEMENT_TIME = 600;
 
 		private Process _HexProcess;
 		private Process HexProcess
@@ -78,13 +95,12 @@ namespace HexSolver
 			set { _HexProcessBounds = value; }
 		}
 
-
 		public Bitmap GetScreenShot()
 		{
 			try
 			{
-				SetForegroundWindow(HexProcessHandle.Value);
-				Thread.Sleep(0);
+				ForceWindowToForeground();
+
 				Bitmap shot = GrabScreen(HexProcessBounds.Value);
 				Thread.Sleep(0);
 
@@ -94,9 +110,16 @@ namespace HexSolver
 			}
 			catch (Exception e)
 			{
-				Console.Error.WriteLine(e.ToString());
-				return null;
+				throw new Exception("Can't capture Hexcells window", e);
 			}
+		}
+
+		private bool IsMinimized(IntPtr hWnd)
+		{
+			WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+			GetWindowPlacement(hWnd, ref placement);
+
+			return placement.showCmd == 2;
 		}
 
 		private Process GetHexCellsProcess()
@@ -136,8 +159,27 @@ namespace HexSolver
 			return bmpScreenshot;
 		}
 
-		private void MoveMouseContinoous(int tx, int ty, double mtime)
+		public void ForceWindowToForeground() 
 		{
+			if (IsMinimized(HexProcessHandle.Value))
+			{
+				ShowWindow(HexProcessHandle.Value, SW_RESTORE);
+				Thread.Sleep(2000);
+			}
+			else
+			{
+				ShowWindow(HexProcessHandle.Value, SW_RESTORE);
+			}
+
+			SetForegroundWindow(HexProcessHandle.Value);
+			Thread.Sleep(0);
+		}
+
+		public void MoveMouseContinoous(int tx, int ty, double mtime)
+		{
+			tx += HexProcessBounds.Value.Left;
+			ty += HexProcessBounds.Value.Top;
+
 			MousePoint pos;
 			GetCursorPos(out pos);
 
@@ -152,37 +194,21 @@ namespace HexSolver
 				int cy = sy + (int)((ty - sy) * Math.Min(1.0, (Environment.TickCount - starttime) / mtime));
 
 				SetCursorPos(cx, cy);
+				Thread.Sleep(0);
 			}
 
 			SetCursorPos(tx, ty);
 		}
 
-		private void ClickMouseSimple(int x, int y, bool left)
+		public void ClickMouseSimple(int x, int y, bool left)
 		{
+			x += HexProcessBounds.Value.Left;
+			y += HexProcessBounds.Value.Top;
+
 			if (left)
 				mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)x, (uint)y, 0, 0);
 			else
 				mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)x, (uint)y, 0, 0);
-		}
-
-		public void Execute(HexStep solution)
-		{
-			SetForegroundWindow(HexProcessHandle.Value);
-
-			int x = (int)(HexProcessBounds.Value.Left + solution.Cell.Image.OCRCenter.X);
-			int y = (int)(HexProcessBounds.Value.Top + solution.Cell.Image.OCRCenter.Y);
-
-			MoveMouseContinoous(x, y, MOUSE_MOVEMENT_TIME);
-			ClickMouseSimple(x, y, solution.Action == CellAction.ACTIVATE);
-		}
-
-		public void Execute(IEnumerable<HexStep> solutions)
-		{
-			foreach (var solution in solutions)
-			{
-				Execute(solution);
-				Thread.Sleep(350);
-			}
 		}
 
 		public void Reset()

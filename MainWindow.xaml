@@ -11,7 +11,7 @@
         <Image Grid.Row="0" Grid.Column="1" Margin="5" Name="imgDisplay" Grid.ColumnSpan="2"/>
 
         <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel  Orientation="Vertical">
+            <StackPanel  Orientation="Vertical" x:Name="leftPanel">
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
@@ -148,11 +148,11 @@
 
                         <Button Content="Hexagon Indizies" Grid.Row="0" Click="OnShowIndizies"/>
                         <Button Content="Hint Groups" Grid.Row="2" Click="OnShowHintGroups"/>
-                        <Button Content="[4] Solve (Single)" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold"/>
+                        <Button Content="[4] Solve (Multi)" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold"/>
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
-                    <Grid Margin="5">
+                    <Grid Margin="5" x:Name="pnlExecute">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>

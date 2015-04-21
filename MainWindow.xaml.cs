@@ -1,10 +1,9 @@
-﻿using System;
+﻿using HexSolver.Solver;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -16,7 +15,7 @@ namespace HexSolver
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	partial class MainWindow : Window, IHexExecutorFeedback
 	{
 		[DllImport("gdi32")]
 		static extern int DeleteObject(IntPtr o);
@@ -43,6 +42,8 @@ namespace HexSolver
 			solver.Screenshot = null;
 
 			imgDisplay.Source = LoadBitmap(solver.Screenshot);
+
+			pnlExecute.IsEnabled = true;
 		}
 
 		private void OnShowPlainClicked(object sender, RoutedEventArgs e)
@@ -71,6 +72,8 @@ namespace HexSolver
 			}
 
 			imgDisplay.Source = LoadBitmap(solver.LoadScreenshot(bmp));
+
+			pnlExecute.IsEnabled = false;
 		}
 
 		private void OnExampleSaveClicked(object sender, RoutedEventArgs e)
@@ -207,6 +210,8 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
+			//solver.FilteredHexagons.HintList = null;//TODO REMOVE ME
+
 			int time = Environment.TickCount;
 			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
 			time = Environment.TickCount - time;
@@ -219,9 +224,8 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
-
-			solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions.First());
+			HexExecutor executor = new HexExecutor(solver, this);
+			executor.Start(HexEcecutionMode.Single);
 		}
 
 		private void OnExecuteMulti(object sender, RoutedEventArgs e)
@@ -229,9 +233,8 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
-
-			solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions);
+			HexExecutor executor = new HexExecutor(solver, this);
+			executor.Start(HexEcecutionMode.Multi);
 		}
 
 		private void OnExecuteAll(object sender, RoutedEventArgs e)
@@ -239,20 +242,59 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+			HexExecutor executor = new HexExecutor(solver, this);
+			executor.Start(HexEcecutionMode.All);
+		}
 
-			for (; ; )
+		void IHexExecutorFeedback.OnExecutorStart()
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
 			{
-				solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions);
-				Thread.Sleep(2000);
+				leftPanel.IsEnabled = false;
+			}));
+		}
 
-				solver.Cam.Reset();
-				solver.Screenshot = null;
+		void IHexExecutorFeedback.OnExecutorEnd()
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
+			{
+				leftPanel.IsEnabled = true;
+				pbarExecute.Maximum = 1;
+				pbarExecute.Value = 0;
+			}));
+		}
 
-				if (solver.FilteredHexagons.HintList.Solutions.Count == 0)
-					return;
-			}
+		void IHexExecutorFeedback.OnExecutorProgress(int current, int max)
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
+			{
+				pbarExecute.Maximum = max;
+				pbarExecute.Value = current;
+			}));
+		}
 
+		void IHexExecutorFeedback.OnExecutorScreenshotGrabbed()
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
+			}));
+		}
+
+		void IHexExecutorFeedback.OnExecutorSolutionExecuted(HexStep ocr)
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+			}));
+		}
+
+		void IHexExecutorFeedback.OnExecutorError(Exception e)
+		{
+			Dispatcher.BeginInvoke(new Action(delegate()
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}));
 		}
 
 		private HexGridProperties GetUIHexGridProperties()

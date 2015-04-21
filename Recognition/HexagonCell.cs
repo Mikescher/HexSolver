@@ -60,5 +60,10 @@ namespace HexSolver
 					throw new ArgumentOutOfRangeException();
 			}
 		}
+
+		public void Update(Bitmap newImage)
+		{
+			Image = new HexagonCellImage(Image.OCRCenter, Image.OCRRadius, newImage, Image.PatternOCR);
+		}
 	}
 }

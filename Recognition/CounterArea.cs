@@ -17,10 +17,8 @@ namespace HexSolver
 		private CounterValue _Value = null;
 		public CounterValue Value
 		{
-			get
-			{
-				return _Value ?? (_Value = GetCounterValue());
-			}
+			get { return _Value ?? (_Value = GetCounterValue()); }
+			set { _Value = value; }
 		}
 
 		public CounterArea(Rectangle o_area, Rectangle i_area, Bitmap image, PatternOCR pocr)
@@ -98,6 +96,12 @@ namespace HexSolver
 			int value = int.Parse(txt);
 
 			return new CounterValue(value, errDistance);
+		}
+
+		public void Update(Bitmap shot)
+		{
+			OCRImage = shot;
+			Value = null;
 		}
 	}
 }

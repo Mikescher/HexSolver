@@ -14,12 +14,14 @@ namespace HexSolver.Solver
 
 	class HexNeighborHint : HexHint
 	{
+		public readonly HexagonCell Source;
 		public HexNeighborHintType Type { get; private set; }
 		public ReadOnlyCollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
 		public HexNeighborHint(HexGrid grid, HexagonCell cell)
 		{
+			Source = cell;
 			Type = ConvertHintType(cell.Hint);
 			Number = cell.Hint.Number;
 			Cells = GetCells(grid, cell).ToList().AsReadOnly();

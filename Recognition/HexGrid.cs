@@ -18,10 +18,10 @@ namespace HexSolver
 		public CounterArea CounterArea { get; private set; }
 
 		private HexHintList _HintList;
-
 		public HexHintList HintList
 		{
 			get { return _HintList ?? (_HintList = GetHintList()); }
+			set { _HintList = value; }
 		}
 
 		public HexGrid()
@@ -149,6 +149,8 @@ namespace HexSolver
 			}
 
 			list.Add(new HexCellSumHint(this));
+
+			list.CleanUp();
 
 			return list;
 		}

@@ -6,11 +6,13 @@ namespace HexSolver.Solver
 {
 	class HexAreaHint : HexHint
 	{
+		public readonly HexagonCell Source;
 		public ICollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
 		public HexAreaHint(HexGrid grid, HexagonCell cell)
 		{
+			Source = cell;
 			Number = cell.Hint.Number;
 			Cells = GetCells(grid, cell).ToList().AsReadOnly();
 

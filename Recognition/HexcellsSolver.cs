@@ -100,5 +100,23 @@ namespace HexSolver
 		{
 			return _Screenshot != null;
 		}
+
+		public void Update(List<HexagonCell> updates)
+		{
+			Bitmap shot = Cam.GetScreenShot();
+
+			_Screenshot = shot;
+
+			foreach (var cell in updates)
+			{
+				cell.Update(shot);
+			}
+
+			AllHexagons.HintList = null;
+			AllHexagons.CounterArea.Update(shot);
+
+			FilteredHexagons.HintList = null;
+			FilteredHexagons.CounterArea.Update(shot);
+		}
 	}
 }

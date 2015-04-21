@@ -362,7 +362,7 @@ namespace HexSolver
 						.SelectMany(q => Enumerable.Range(0, 7).Select(q.GetEdge))
 						.ToList();
 
-					if (points.Count() > 2)
+					if (points.Count() > 2 && hint is HexAreaHint)
 					{
 						var hull = GeometryHelper
 							.ComputeConvexHull(points, true)

@@ -25,6 +25,7 @@ namespace HexSolver
 		public double OCRHeight { get; private set; }
 		public Bitmap OCRImage { get; private set; }
 		public Rectangle BoundingBox { get; private set; }
+		public readonly PatternOCR PatternOCR;
 
 		private HexagonType? _Type = null;
 		public HexagonType Type
@@ -41,7 +42,6 @@ namespace HexSolver
 			get { return _Hint ?? (_Hint = GetHexagonHint()); }
 		}
 
-		private readonly PatternOCR patternOCR;
 
 		public HexagonCellImage(Vec2d center, double radius, Bitmap image, PatternOCR pocr)
 		{
@@ -50,7 +50,7 @@ namespace HexSolver
 			this.OCRImage = image;
 			this.OCRHeight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
 			this.BoundingBox = GetBoundingBox(center, radius);
-			this.patternOCR = pocr;
+			this.PatternOCR = pocr;
 		}
 
 		private Rectangle GetBoundingBox()
@@ -351,13 +351,14 @@ namespace HexSolver
 			{
 				int activePixel;
 				Bitmap img = GetProcessedImage(false, out activePixel);
-				//img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				if (activePixel == 0)
 					return new CellHint();
 
+				//img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+
 				double errDistance;
-				var txt = patternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
@@ -375,13 +376,14 @@ namespace HexSolver
 			{
 				int activePixel;
 				Bitmap img = GetProcessedImage(false, out activePixel);
-				//img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				if (activePixel == 0)
 					return new CellHint();
 
+				//img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+
 				double errDistance;
-				var txt = patternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^[0-9]+$"))
 					return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt), errDistance);
@@ -407,10 +409,11 @@ namespace HexSolver
 					img = RotateImage(img, -60, Color.White);
 				else if (col == CellHintArea.COLUMN_RIGHT)
 					img = RotateImage(img, +60, Color.White);
+
 				//img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				double errDistance;
-				var txt = patternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);

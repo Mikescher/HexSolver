@@ -36,7 +36,16 @@ namespace HexSolver.Solver
 					hintMap[cell.Position].Add(hint);
 				else
 					hintMap[cell.Position] = new List<HexHint>() { hint };
+			}
+		}
 
+		public void Rem(HexHint hint)
+		{
+			list.Remove(hint);
+
+			foreach (var cell in hint.GetCells())
+			{
+				hintMap[cell.Position].Remove(hint);
 			}
 		}
 
@@ -48,6 +57,14 @@ namespace HexSolver.Solver
 		public List<HexHint> Get(Vec2i p)
 		{
 			return hintMap.ContainsKey(p) ? hintMap[p] : EMPTY_LIST;
+		}
+
+		public void CleanUp()
+		{
+			foreach (var junk in list.ToList().Where(p => ! p.GetCells().Any(q => q.Type == HexagonType.HIDDEN)))
+			{
+				Rem(junk);
+			}
 		}
 
 		public IEnumerator<HexHint> GetEnumerator()
@@ -73,7 +90,6 @@ namespace HexSolver.Solver
 			//TODO Next Level solver
 		}
 
-
 		private IEnumerable<HexStep> GetSolutions_Single()
 		{
 			foreach (var hint in this)
@@ -83,6 +99,11 @@ namespace HexSolver.Solver
 					yield return solution;
 				}
 			}
+		}
+
+		public void RemoveSolution(HexStep solution)
+		{
+			Solutions.Remove(solution);
 		}
 	}
 }
