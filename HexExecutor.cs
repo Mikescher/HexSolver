@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HexSolver.Solver;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -13,8 +15,10 @@ namespace HexSolver
 
 	class HexExecutor
 	{
-		private const int MOUSE_MOVEMENT_TIME = 200;
-		private const int CLICK_SLEEP_TIME = 250;
+		private System.Windows.Forms.Keys ABORT_KEY = System.Windows.Forms.Keys.Escape;
+
+		private const double MOUSE_MOVEMENT_TIME = 1;
+		private const int CLICK_SLEEP_TIME = 0;
 		private const int INTER_SOLUTION_SLEEP_TIME = 500;
 		private const int RECAPTURE_SLEEP = 2000;
 
@@ -78,7 +82,12 @@ namespace HexSolver
 			feedback.OnExecutorStart();
 			try
 			{
-				ExecuteSingle(0, Solver.FilteredHexagons.HintList.Solutions.Count);
+				var solutions = ExecuteSingle(0, Solver.FilteredHexagons.HintList.Solutions.Count);
+
+				Thread.Sleep(RECAPTURE_SLEEP);
+
+				Solver.Update(solutions.Select(p => p.Cell).ToList());
+				feedback.OnExecutorScreenshotGrabbed();
 			}
 			catch (Exception e)
 			{
@@ -103,6 +112,17 @@ namespace HexSolver
 
 					ExecuteSingle(progress, progressmax);
 					progress += currentProgress.Count;
+
+					if (Solver.Cam.IsKeyDownAsync(ABORT_KEY))
+						throw new Exception("Abort by User");
+
+					Thread.Sleep(RECAPTURE_SLEEP);
+
+					if (progress == progressmax)
+						break;
+
+					Solver.Update(currentProgress.Select(p => p.Cell).ToList());
+					feedback.OnExecutorScreenshotGrabbed();
 				}
 			}
 			catch (Exception e)
@@ -112,7 +132,7 @@ namespace HexSolver
 			feedback.OnExecutorEnd();
 		}
 
-		private void ExecuteSingle(int progress, int progmax)
+		private List<HexStep> ExecuteSingle(int progress, int progmax)
 		{
 			var solutions = Solver.FilteredHexagons.HintList.Solutions.ToList();
 			feedback.OnExecutorProgress(progress, progmax);
@@ -130,16 +150,19 @@ namespace HexSolver
 				Solver.Cam.ClickMouseSimple(solution_x, solution_y, solution.Action == HexSolver.Solver.CellAction.ACTIVATE);
 				Thread.Sleep(CLICK_SLEEP_TIME);
 
+				if (Solver.Cam.IsKeyDownAsync(ABORT_KEY))
+					throw new Exception("Abort by User");
+
 				feedback.OnExecutorSolutionExecuted(solution);
 				feedback.OnExecutorProgress(progress + i + 1, progmax);
 
 				Thread.Sleep(INTER_SOLUTION_SLEEP_TIME);
+
+				if (Solver.Cam.IsKeyDownAsync(ABORT_KEY))
+					throw new Exception("Abort by User");
 			}
 
-			Thread.Sleep(RECAPTURE_SLEEP);
-
-			Solver.Update(solutions.Select(p => p.Cell).ToList());
-			feedback.OnExecutorScreenshotGrabbed();
+			return solutions;
 		}
 	}
 }

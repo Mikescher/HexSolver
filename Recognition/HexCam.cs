@@ -37,6 +37,9 @@ namespace HexSolver
 		[return: MarshalAs(UnmanagedType.Bool)]
 		static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
+		[DllImport("user32.dll")]
+		private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); // Keys enumeration 
+
 		private const int MOUSEEVENTF_LEFTDOWN = 0x02;
 		private const int MOUSEEVENTF_LEFTUP = 0x04;
 		private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
@@ -95,7 +98,7 @@ namespace HexSolver
 			set { _HexProcessBounds = value; }
 		}
 
-		public Bitmap GetScreenShot()
+		public Bitmap GetScreenShot(bool returnFoucs)
 		{
 			try
 			{
@@ -104,7 +107,8 @@ namespace HexSolver
 				Bitmap shot = GrabScreen(HexProcessBounds.Value);
 				Thread.Sleep(0);
 
-				SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
+				if (returnFoucs)
+					SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
 				return shot;
 			}
@@ -159,7 +163,7 @@ namespace HexSolver
 			return bmpScreenshot;
 		}
 
-		public void ForceWindowToForeground() 
+		public void ForceWindowToForeground()
 		{
 			if (IsMinimized(HexProcessHandle.Value))
 			{
@@ -186,6 +190,8 @@ namespace HexSolver
 			int sx = pos.X;
 			int sy = pos.Y;
 
+			mtime = Math.Sqrt(Math.Pow(tx - sx, 2) + Math.Pow(ty - sy, 2)) * mtime;
+
 			int starttime = Environment.TickCount;
 
 			while ((Environment.TickCount - starttime) <= mtime)
@@ -209,6 +215,11 @@ namespace HexSolver
 				mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)x, (uint)y, 0, 0);
 			else
 				mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)x, (uint)y, 0, 0);
+		}
+
+		public bool IsKeyDownAsync(System.Windows.Forms.Keys key)
+		{
+			return Convert.ToBoolean(GetAsyncKeyState(key) & 0x8000);
 		}
 
 		public void Reset()

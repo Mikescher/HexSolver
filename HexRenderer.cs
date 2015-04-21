@@ -346,7 +346,7 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplayHintGroups(Bitmap shot, HexGrid grid)
+		public Bitmap DisplayHintGroups(Bitmap shot, HexGrid grid, Type filter)
 		{
 			shot = new Bitmap(shot);
 
@@ -355,14 +355,14 @@ namespace HexSolver
 				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.White)), 0, 0, shot.Width, shot.Height);
 
 
-				foreach (var hint in grid.HintList.Where(p => !(p is HexCellSumHint)))
+				foreach (var hint in grid.HintList.Where(p => !(p is HexCellSumHint)).Where(p => filter == null || p.GetType() == filter))
 				{
 					var points = hint
 						.GetCells()
 						.SelectMany(q => Enumerable.Range(0, 7).Select(q.GetEdge))
 						.ToList();
 
-					if (points.Count() > 2 && hint is HexAreaHint)
+					if (points.Count() > 2)
 					{
 						var hull = GeometryHelper
 							.ComputeConvexHull(points, true)

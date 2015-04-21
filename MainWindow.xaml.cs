@@ -202,7 +202,31 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons));
+			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null));
+		}
+
+		private void OnShowHintGroups_1(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint)));
+		}
+
+		private void OnShowHintGroups_2(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint)));
+		}
+
+		private void OnShowHintGroups_3(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint)));
 		}
 
 		private void OnSolveSingle(object sender, RoutedEventArgs e)

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SimplePatternOCR;
+using System.Collections.Generic;
 using System.Drawing;
-using SimplePatternOCR;
 
 namespace HexSolver
 {
@@ -13,7 +13,7 @@ namespace HexSolver
 		private Bitmap _Screenshot = null;
 		public Bitmap Screenshot
 		{
-			get { return _Screenshot ?? (_Screenshot = Cam.GetScreenShot()); }
+			get { return _Screenshot ?? (_Screenshot = Cam.GetScreenShot(true)); }
 			set
 			{
 				_Screenshot = value;
@@ -28,7 +28,7 @@ namespace HexSolver
 			set
 			{
 				if (value != null && Screenshot == null)
-					_Screenshot = Cam.GetScreenShot();
+					_Screenshot = Cam.GetScreenShot(true);
 
 				_HexProperties = value;
 				AllHexagons = null;
@@ -103,7 +103,7 @@ namespace HexSolver
 
 		public void Update(List<HexagonCell> updates)
 		{
-			Bitmap shot = Cam.GetScreenShot();
+			Bitmap shot = Cam.GetScreenShot(false);
 
 			_Screenshot = shot;
 
