@@ -236,12 +236,18 @@ namespace SimplePatternOCR
 			return result;
 		}
 
-		public Tuple<string, List<Tuple<int, int, double>>> RecognizeOCR(Bitmap img)
+		// Tuple<result, List<Tuple<offset_x, offset_y, distance>>, List<Dictionary<reference, Tuple<offset_x, offset_y, distance>>>>
+		public OCRResult RecognizeOCR(Bitmap img)
 		{
 			var ochars = RecognizeSingleCharacter(img);
 
 			var distances = new List<Tuple<int, int, double>>();
 			StringBuilder result = new StringBuilder();
+
+			OCRResult ocrResult = new OCRResult()
+			{
+				Characters = new List<OCRCharacterResult>(),
+			};
 
 			foreach (var ochar in ochars)
 			{
@@ -252,17 +258,29 @@ namespace SimplePatternOCR
 
 				if (matches.Count == 0)
 				{
-					distances.Add(Tuple.Create(0, 0, double.MaxValue));
+					throw new Exception("No References");
 				}
 				else
 				{
 					result.Append(matches.First().Reference.Key);
-					distances.Add(matches.First().Distance);
-				}
 
+					ocrResult.Characters.Add(new OCRCharacterResult()
+					{
+						Character = matches.First().Reference.Key,
+
+						OffsetX = matches.First().Distance.Item1,
+						OffsetY = matches.First().Distance.Item2,
+						Distance = matches.First().Distance.Item3,
+
+						AllDistances = matches.ToDictionary(p => p.Reference.Key, p => p.Distance.Item3),
+					});
+				}
 			}
 
-			return Tuple.Create(result.ToString(), distances);
+			ocrResult.Value = result.ToString();
+			ocrResult.Distance = ocrResult.Characters.Max(p => p.Distance);
+
+			return ocrResult;
 		}
 
 		public Tuple<int[,], List<Tuple<int, RectangleI>>> FindCharacterBoxes(Bitmap img)
@@ -483,9 +501,9 @@ namespace SimplePatternOCR
 		{
 			var ocr = RecognizeOCR(bmp);
 
-			errorDistance = ocr.Item2.Max(p => p.Item3);
+			errorDistance = ocr.Distance;
 
-			return ocr.Item1;
+			return ocr.Value;
 		}
 	}
 }

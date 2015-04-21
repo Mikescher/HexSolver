@@ -171,8 +171,6 @@ namespace NumberRecognition
 
 		private void SetContentGridCell(string datastr, int col, int row, bool valid)
 		{
-			int factor = 4;
-
 			Label lbl = new Label
 			{
 				Content = datastr,
@@ -308,32 +306,62 @@ namespace NumberRecognition
 			{
 				var ocr = pocr.RecognizeOCR(tdata.Item2);
 
-				SetContentGridCell(ocr.Item1 + "        {" + string.Join(", ", ocr.Item2.Select(p => p.Item3.ToString("F0"))) + "}", 13, pos, ocr.Item1 == tdata.Item1);
+				SetContentGridCell(ocr.Value + "        {" + string.Join(", ", ocr.Characters.Select(p => p.Distance.ToString("F0"))) + "}", 13, pos, ocr.Value == tdata.Item1);
 
-				errors += ocr.Item1 == tdata.Item1 ? 0 : 1;
+				errors += ocr.Value == tdata.Item1 ? 0 : 1;
 
 				//############################################
-
-				var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
-				List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select match.Value).ToList();
-
-				int opos = 0;
-				foreach (var ochar in ochars)
 				{
-					string pchar = null;
-					if (ochars.Count == characters_final.Count)
-						pchar = characters_final[opos];
-					if (ochars.Count == tdata.Item1.Length)
-						pchar = (tdata.Item1[opos] + "");
-					else
-						continue;
+					var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
+					List<String> characters_final = (from Match match in Regex.Matches(ocr.Value, "[0-9]+|[^0-9]+") select match.Value).ToList();
 
-					var pattern = pocr.GetPattern(pchar);
-					var diff = pocr.GetPatternDiff(ochar, pattern, ocr.Item2[opos].Item1, ocr.Item2[opos].Item2);
+					int opos = 0;
+					foreach (var ochar in ochars)
+					{
+						string pchar = null;
+						if (ochars.Count == characters_final.Count)
+							pchar = characters_final[opos];
+						else if (ochars.Count == ocr.Value.Length)
+							pchar = (ocr.Value[opos] + "");
+						else
+							continue;
 
-					SetContentGridCell(diff, 15 + 2 * opos, pos);
+						var pattern = pocr.GetPattern(pchar);
+						var diff = pocr.GetPatternDiff(ochar, pattern, ocr.Characters[opos].OffsetX, ocr.Characters[opos].OffsetY);
 
-					opos++;
+						SetContentGridCell(diff, 15 + 2 * opos, pos);
+
+						opos++;
+					}
+				}
+				//############################################
+
+
+				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => q.Key).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
+
+				if (ocr.Value != tdata.Item1)
+				{
+					var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
+					List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select tdata.Item1).ToList();
+
+					int opos = 0;
+					foreach (var ochar in ochars)
+					{
+						string pchar = null;
+						if (ochars.Count == characters_final.Count)
+							pchar = characters_final[opos];
+						else if (opos < tdata.Item1.Length)
+							pchar = (tdata.Item1[opos] + "");
+						else
+							continue;
+
+						var pattern = pocr.GetPattern(pchar);
+						var diff = pocr.GetPatternDiff(ochar, pattern, ocr.Characters[opos].OffsetX, ocr.Characters[opos].OffsetY);
+
+						SetContentGridCell(diff, 25 + 2 * opos, pos);
+
+						opos++;
+					}
 				}
 
 				pos += 2;
