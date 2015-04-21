@@ -1,6 +1,7 @@
 ﻿using MSHC.Geometry;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HexSolver.Solver
 {
@@ -55,9 +56,12 @@ namespace HexSolver.Solver
 
 		public IEnumerable<HexStep> GetSolutions()
 		{
-			foreach (var solution in GetSolutions_Single())
+			foreach (var solution in GetSolutions_Single().GroupBy(p => p.Cell))
 			{
-				yield return solution;
+				if (solution.Select(p => p.Action).Distinct().Count() != 1)
+					throw new Exception("Different SOlutions for single cell found");
+
+				yield return solution.First();
 			}
 
 			//

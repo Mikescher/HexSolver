@@ -43,7 +43,7 @@ namespace HexSolver.Solver
 			{
 				for (int dy = -2; dy <= 2; dy++)
 				{
-					if (Math.Abs(dx + dy) > 2)
+					if (Math.Abs(dx + dy) > 2 || dx * 100 + dy == 0)
 						continue;
 
 					var icell = grid.Get(cell.Position.X + dx, cell.Position.Y + dy);
@@ -57,6 +57,11 @@ namespace HexSolver.Solver
 		public override ICollection<HexagonCell> GetCells()
 		{
 			return Cells;
+		}
+
+		public override int GetNumber()
+		{
+			return Number;
 		}
 
 		public override bool IsTrueForTemp()

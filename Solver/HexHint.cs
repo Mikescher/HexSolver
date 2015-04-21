@@ -1,4 +1,5 @@
 ﻿using HexSolver.Solver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,6 +16,7 @@ namespace HexSolver
 	abstract class HexHint
 	{
 		public abstract ICollection<HexagonCell> GetCells();
+		public abstract int GetNumber();
 
 		public abstract bool IsTrueForTemp();
 
@@ -23,6 +25,10 @@ namespace HexSolver
 			var cells = GetCells();
 			var varcells = cells.Where(p => p.Type == HexagonType.HIDDEN).ToList();
 			int count = varcells.Count;
+			int myNumber = GetNumber() - cells.Count(p => p.Type == HexagonType.ACTIVE);
+
+			if (myNumber < 0)
+				throw new Exception("Invalid Game state [Number < 0]");
 
 			if (count > 18)
 				return Enumerable.Empty<HexStep>().ToList();
@@ -34,22 +40,25 @@ namespace HexSolver
 
 			using (new TemporaryGridModifier(varcells))
 			{
+				int acount;
+
 				for (int bin = 0; bin < (1 << count); bin++)
 				{
+					acount = 0;
 					for (int i = 0; i < count; i++)
 					{
-						varcells[i].TemporaryValue = ((bin & (1 << i)) != 0);
+						if ((bin & (1 << i)) != 0)
+						{
+							varcells[i].TemporaryValue = true;
+							acount++;
+						}
+						else
+						{
+							varcells[i].TemporaryValue = false;
+						}
 					}
 
-					//foreach (var hint in hints)
-					//{
-					//	if (!hint.IsTrueForTemp())
-					//	{
-					//		continue;
-					//	}
-					//}
-
-					if (!hints.All(p => p.IsTrueForTemp()))
+					if (acount != myNumber || hints.Any(p => !p.IsTrueForTemp()))
 						continue;
 
 

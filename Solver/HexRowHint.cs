@@ -166,6 +166,11 @@ namespace HexSolver.Solver
 			return Cells;
 		}
 
+		public override int GetNumber()
+		{
+			return Number;
+		}
+
 		private bool IsNonConsecutiveForTemp()
 		{
 			return Cells.Count(p => p.IsTempActive() != false) > Number || !IsConsecutiveForTemp();

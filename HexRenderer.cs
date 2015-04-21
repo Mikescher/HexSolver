@@ -385,7 +385,7 @@ namespace HexSolver
 			{
 				g.FillRectangle(new SolidBrush(Color.FromArgb(160, Color.White)), 0, 0, shot.Width, shot.Height);
 
-				foreach (var solution in grid.HintList.GetSolutions().GroupBy(p => p.Cell.Position).Select(p => p.First()))
+				foreach (var solution in grid.HintList.GetSolutions())
 				{
 					Color col = solution.Action == Solver.CellAction.ACTIVATE ? Color.Blue : Color.Black;
 

@@ -41,6 +41,11 @@ namespace HexSolver.Solver
 			return Cells;
 		}
 
+		public override int GetNumber()
+		{
+			return Number;
+		}
+
 		public override bool IsTrueForTemp()
 		{
 			return Cells.Count(p => p.IsTempActive() == true) <= Number && Cells.Count(p => p.IsTempActive() == false) <= Cells.Count - Number;
