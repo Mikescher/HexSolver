@@ -61,7 +61,7 @@ namespace HexSolver.Solver
 
 		public void CleanUp()
 		{
-			foreach (var junk in list.ToList().Where(p => ! p.GetCells().Any(q => q.Type == HexagonType.HIDDEN)))
+			foreach (var junk in list.ToList().Where(p => !p.GetCells().Any(q => q.Type == HexagonType.HIDDEN)))
 			{
 				Rem(junk);
 			}
@@ -79,15 +79,28 @@ namespace HexSolver.Solver
 
 		private IEnumerable<HexStep> GetSolutions()
 		{
+			bool finished = false;
+
 			foreach (var solution in GetSolutions_Single().GroupBy(p => p.Cell))
 			{
 				if (solution.Select(p => p.Action).Distinct().Count() != 1)
-					throw new Exception("Different Solutions for single cell found");
+					throw new Exception("Different Solutions for single cell found [A1]");
 
+				finished = true;
 				yield return solution.First();
 			}
 
-			//TODO Next Level solver
+			if (finished)
+				yield break;
+
+			foreach (var solution in GetSolutions_Double().GroupBy(p => p.Cell))
+			{
+				if (solution.Select(p => p.Action).Distinct().Count() != 1)
+					throw new Exception("Different Solutions for single cell found [A2]");
+
+				finished = true;
+				yield return solution.First();
+			}
 		}
 
 		private IEnumerable<HexStep> GetSolutions_Single()
@@ -95,6 +108,17 @@ namespace HexSolver.Solver
 			foreach (var hint in this)
 			{
 				foreach (var solution in hint.GetSolutions_Single(this))
+				{
+					yield return solution;
+				}
+			}
+		}
+
+		private IEnumerable<HexStep> GetSolutions_Double()
+		{
+			foreach (var hint in this)
+			{
+				foreach (var solution in hint.GetSolutions_Double(this))
 				{
 					yield return solution;
 				}

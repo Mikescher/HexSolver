@@ -160,7 +160,7 @@
                         <Button Content="A" Grid.Row="2" Grid.Column="2" Click="OnShowHintGroups_1" Grid.ColumnSpan="1"/>
                         <Button Content="B" Grid.Row="2" Grid.Column="4" Click="OnShowHintGroups_2" Grid.ColumnSpan="1"/>
                         <Button Content="C" Grid.Row="2" Grid.Column="6" Click="OnShowHintGroups_3" Grid.ColumnSpan="1"/>
-                        <Button Content="[4] Solve (Multi)" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold" Grid.ColumnSpan="7"/>
+                        <Button Content="[4] Solve" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold" Grid.ColumnSpan="7"/>
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
@@ -176,7 +176,7 @@
                         </Grid.RowDefinitions>
 
                         <Button Content="Execute (Single)" Grid.Row="0" Click="OnExecuteSingle"/>
-                        <Button Content="Execute (Current)" Grid.Row="2" Click="OnExecuteMulti"/>
+                        <Button Content="Execute (Set)" Grid.Row="2" Click="OnExecuteMulti"/>
                         <Button Content="[5] Execute (All)" Grid.Row="4" Click="OnExecuteAll" FontWeight="Bold"/>
                         <Label Content="(Hold ESC to abort)" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center" FontStyle="Italic"/>
                         <ProgressBar Grid.Row="6" Name="pbarExecute"/>

@@ -66,7 +66,7 @@
     <Compile Include="Recognition\CounterArea.cs" />
     <Compile Include="Recognition\CounterValue.cs" />
     <Compile Include="Helper\GeometryHelper.cs" />
-    <Compile Include="Recognition\HexcellsSolver.cs" />
+    <Compile Include="HexcellsSolver.cs" />
     <Compile Include="Recognition\HexGridProperties.cs" />
     <Compile Include="Helper\ColorExt.cs" />
     <Compile Include="Solver\HexCellSumHint.cs" />
@@ -192,6 +192,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="example\shot009.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="example\shot010.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
