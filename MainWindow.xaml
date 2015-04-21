@@ -5,7 +5,7 @@
         Title="HexSolver (github.com/Mikescher/HexSolver)" Height="950" Width="1400" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Image Grid.Row="0" Grid.Column="1" Margin="5" Name="imgDisplay" Grid.ColumnSpan="2"/>
@@ -64,10 +64,7 @@
                             <RowDefinition Height="26"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="26"/>
-                            <RowDefinition Height="5"/>
-                            <RowDefinition Height="26"/>
-                            <RowDefinition Height="15"/>
-                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="10"/>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
@@ -101,26 +98,24 @@
                             <ComboBoxItem>Bottom</ComboBoxItem>
                         </ComboBox>
 
-                        <Label Grid.Row="14" Grid.Column="0" Content="Bar TopRight X:"/>
-                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="200" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <Label Grid.Row="14" Grid.Column="0" Content="Bar TopRight:"/>
+                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="200" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
+                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="3" FormatString="F2" Value="190" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
 
-                        <Label Grid.Row="16" Grid.Column="0" Content="Bar TopRight Y:"/>
-                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="190" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <Label Grid.Row="16" Grid.Column="0" Content="Counter Pos:"/>
+                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="1270" Increment="5"  Minimum="0" x:Name="dudCounterX" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="3" FormatString="F2" Value="38" Increment="5"  Minimum="0" x:Name="dudCounterY" ValueChanged="HexOCRValueChanged"/>
 
-                        <Label Grid.Row="18" Grid.Column="0" Content="Counter Pos:"/>
-                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="1" FormatString="F2" Value="1270" Increment="5"  Minimum="0" x:Name="dudCounterX" ValueChanged="HexOCRValueChanged"/>
-                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="3" FormatString="F2" Value="38" Increment="5"  Minimum="0" x:Name="dudCounterY" ValueChanged="HexOCRValueChanged"/>
-
-                        <Label Grid.Row="20" Grid.Column="0" Content="Counter Size:"/>
-                        <xctk:DoubleUpDown Grid.Row="20" Grid.Column="1" FormatString="F2" Value="154" Increment="1"  Minimum="0" x:Name="dudCounterW" ValueChanged="HexOCRValueChanged"/>
-                        <xctk:DoubleUpDown Grid.Row="20" Grid.Column="3" FormatString="F2" Value="38" Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
+                        <Label Grid.Row="18" Grid.Column="0" Content="Counter Size:"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="1" FormatString="F2" Value="154" Increment="1"  Minimum="0" x:Name="dudCounterW" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="3" FormatString="F2" Value="38" Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
 
 
-                        <Button Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="4" Content="Update" Click="HexOCRValueUpdate"/>
-                        <Button Grid.Row="25" Grid.Column="0" Grid.ColumnSpan="4" Content="Set" Click="HexOCRValueSet"/>
+                        <Button Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="4" Content="Update" Click="HexOCRValueUpdate"/>
+                        <Button Grid.Row="22" Grid.Column="0" Grid.ColumnSpan="4" Content="Set" Click="HexOCRValueSet"/>
                         
-                        <Button Grid.Row="27" Grid.Column="0" Grid.ColumnSpan="4" Content="Binary Pattern" Click="OnBinPattern"/>
-                        <Button Grid.Row="29" Grid.Column="0" Grid.ColumnSpan="4" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
+                        <Button Grid.Row="24" Grid.Column="0" Grid.ColumnSpan="4" Content="Binary Pattern" Click="OnBinPattern"/>
+                        <Button Grid.Row="26" Grid.Column="0" Grid.ColumnSpan="4" Content="[2] Calculate" Click="HexOCRValueAuto" FontWeight="Bold"/>
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
@@ -154,6 +149,24 @@
                         <Button Content="Hexagon Indizies" Grid.Row="0" Click="OnShowIndizies"/>
                         <Button Content="Hint Groups" Grid.Row="2" Click="OnShowHintGroups"/>
                         <Button Content="[4] Solve (Single)" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold"/>
+                    </Grid>
+                </Border>
+                <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+
+                        <Button Content="Execute (Single)" Grid.Row="0" Click="OnExecuteSingle"/>
+                        <Button Content="Execute (Current)" Grid.Row="2" Click="OnExecuteMulti"/>
+                        <Button Content="[5] Execute (All)" Grid.Row="4" Click="OnExecuteAll" FontWeight="Bold"/>
+                        <ProgressBar Grid.Row="6" Name="pbarExecute"/>
                     </Grid>
                 </Border>
             </StackPanel>

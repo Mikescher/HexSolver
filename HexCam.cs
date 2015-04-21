@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HexSolver.Solver;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -10,15 +12,30 @@ namespace HexSolver
 {
 	class HexCam
 	{
+		[DllImport("user32.dll")]
+		private static extern long SetCursorPos(int x, int y);
+
 		[DllImport("user32.dll", SetLastError = true)]
-		static extern bool SetForegroundWindow(IntPtr hWnd);
+		private static extern bool SetForegroundWindow(IntPtr hWnd);
 
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool GetClientRect(HandleRef hWnd, out RECT lpRect);
+		private static extern bool GetClientRect(HandleRef hWnd, out RECT lpRect);
 
 		[DllImport("user32.dll")]
-		static extern bool ClientToScreen(IntPtr hwnd, ref Point lpPoint);
+		private static extern bool ClientToScreen(IntPtr hwnd, ref Point lpPoint);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+		private static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GetCursorPos(out MousePoint lpMousePoint);
+
+		private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+		private const int MOUSEEVENTF_LEFTUP = 0x04;
+		private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+		private const int MOUSEEVENTF_RIGHTUP = 0x10;
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct RECT
@@ -29,27 +46,55 @@ namespace HexSolver
 			public int Bottom;      // y position of lower-right corner
 		}
 
+		[StructLayout(LayoutKind.Sequential)]
+		public struct MousePoint
+		{
+			public int X;
+			public int Y;
+		}
+
+		//###################################
+
+		private const int MOUSE_MOVEMENT_TIME = 600;
+
+		private Process _HexProcess;
+		private Process HexProcess
+		{
+			get { return _HexProcess ?? (_HexProcess = GetHexCellsProcess()); }
+			set { _HexProcess = value; HexProcessBounds = null; }
+		}
+
+		private IntPtr? _HexProcessHandle;
+		private IntPtr? HexProcessHandle
+		{
+			get { return _HexProcessHandle ?? (_HexProcessHandle = HexProcess.MainWindowHandle); }
+			set { _HexProcessHandle = value; HexProcessBounds = null; }
+		}
+
+		private RECT? _HexProcessBounds;
+		private RECT? HexProcessBounds
+		{
+			get { return _HexProcessBounds ?? (_HexProcessBounds = GetClientRect(HexProcessHandle.Value)); }
+			set { _HexProcessBounds = value; }
+		}
+
+
 		public Bitmap GetScreenShot()
 		{
 			try
 			{
-				Process hcprocess = GetHexCellsProcess();
-				if (hcprocess == null)
-					return null;
-
-				SetForegroundWindow(hcprocess.MainWindowHandle);
+				SetForegroundWindow(HexProcessHandle.Value);
 				Thread.Sleep(0);
-
-				RECT hcbounds = GetClientRect(hcprocess.MainWindowHandle);
-				Bitmap shot = GrabScreen(hcbounds);
+				Bitmap shot = GrabScreen(HexProcessBounds.Value);
 				Thread.Sleep(0);
 
 				SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
 				return shot;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
+				Console.Error.WriteLine(e.ToString());
 				return null;
 			}
 		}
@@ -62,8 +107,11 @@ namespace HexSolver
 				.FirstOrDefault(p => p.MainWindowTitle.ToLower().Contains("hexcells"));
 		}
 
-		private RECT GetClientRect(IntPtr hWnd)
+		private RECT? GetClientRect(IntPtr hWnd)
 		{
+			if (hWnd == null)
+				return null;
+
 			RECT bounds;
 			GetClientRect(new HandleRef(this, hWnd), out bounds);
 
@@ -86,6 +134,60 @@ namespace HexSolver
 			}
 
 			return bmpScreenshot;
+		}
+
+		private void MoveMouseContinoous(int tx, int ty, double mtime)
+		{
+			MousePoint pos;
+			GetCursorPos(out pos);
+
+			int sx = pos.X;
+			int sy = pos.Y;
+
+			int starttime = Environment.TickCount;
+
+			while ((Environment.TickCount - starttime) <= mtime)
+			{
+				int cx = sx + (int)((tx - sx) * Math.Min(1.0, (Environment.TickCount - starttime) / mtime));
+				int cy = sy + (int)((ty - sy) * Math.Min(1.0, (Environment.TickCount - starttime) / mtime));
+
+				SetCursorPos(cx, cy);
+			}
+
+			SetCursorPos(tx, ty);
+		}
+
+		private void ClickMouseSimple(int x, int y, bool left)
+		{
+			if (left)
+				mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)x, (uint)y, 0, 0);
+			else
+				mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)x, (uint)y, 0, 0);
+		}
+
+		public void Execute(HexStep solution)
+		{
+			SetForegroundWindow(HexProcessHandle.Value);
+
+			int x = (int)(HexProcessBounds.Value.Left + solution.Cell.Image.OCRCenter.X);
+			int y = (int)(HexProcessBounds.Value.Top + solution.Cell.Image.OCRCenter.Y);
+
+			MoveMouseContinoous(x, y, MOUSE_MOVEMENT_TIME);
+			ClickMouseSimple(x, y, solution.Action == CellAction.ACTIVATE);
+		}
+
+		public void Execute(IEnumerable<HexStep> solutions)
+		{
+			foreach (var solution in solutions)
+			{
+				Execute(solution);
+				Thread.Sleep(350);
+			}
+		}
+
+		public void Reset()
+		{
+			HexProcess = null;
 		}
 	}
 }

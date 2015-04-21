@@ -2,7 +2,9 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -37,11 +39,11 @@ namespace HexSolver
 			if (solver == null || renderer == null)
 				return;
 
+			solver.Cam.Reset();
 			solver.Screenshot = null;
 
 			imgDisplay.Source = LoadBitmap(solver.Screenshot);
 		}
-
 
 		private void OnShowPlainClicked(object sender, RoutedEventArgs e)
 		{
@@ -206,10 +208,51 @@ namespace HexSolver
 				return;
 
 			int time = Environment.TickCount;
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons));
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
 			time = Environment.TickCount - time;
 
 			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+		}
+
+		private void OnExecuteSingle(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+
+			solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions.First());
+		}
+
+		private void OnExecuteMulti(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+
+			solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions);
+		}
+
+		private void OnExecuteAll(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+
+			for (; ; )
+			{
+				solver.Cam.Execute(solver.FilteredHexagons.HintList.Solutions);
+				Thread.Sleep(2000);
+
+				solver.Cam.Reset();
+				solver.Screenshot = null;
+
+				if (solver.FilteredHexagons.HintList.Solutions.Count == 0)
+					return;
+			}
+
 		}
 
 		private HexGridProperties GetUIHexGridProperties()

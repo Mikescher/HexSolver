@@ -1,4 +1,5 @@
 ﻿using MSHC.Geometry;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,15 @@ namespace HexSolver.Solver
 		private readonly List<HexHint> EMPTY_LIST = new List<HexHint>();
 
 		private List<HexHint> list = new List<HexHint>();
-
 		private Dictionary<Vec2i, List<HexHint>> hintMap = new Dictionary<Vec2i, List<HexHint>>();
-
 		public readonly HexGrid Grid;
+
+		private List<HexStep> _Solutions;
+		public List<HexStep> Solutions
+		{
+			get { return _Solutions ?? (_Solutions = GetSolutions().ToList()); }
+			set { _Solutions = value; }
+		}
 
 		public HexHintList(HexGrid grid)
 		{
@@ -54,17 +60,17 @@ namespace HexSolver.Solver
 			return GetEnumerator();
 		}
 
-		public IEnumerable<HexStep> GetSolutions()
+		private IEnumerable<HexStep> GetSolutions()
 		{
 			foreach (var solution in GetSolutions_Single().GroupBy(p => p.Cell))
 			{
 				if (solution.Select(p => p.Action).Distinct().Count() != 1)
-					throw new Exception("Different SOlutions for single cell found");
+					throw new Exception("Different Solutions for single cell found");
 
 				yield return solution.First();
 			}
 
-			//
+			//TODO Next Level solver
 		}
 
 

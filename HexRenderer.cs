@@ -3,6 +3,7 @@ using HexSolver.Solver;
 using MSHC.Geometry;
 using MSHC.Helper;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -377,7 +378,7 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplaySolveSingle(Bitmap shot, HexGrid grid)
+		public Bitmap DisplaySolveSingle(Bitmap shot, List<HexStep> solutions)
 		{
 			shot = new Bitmap(shot);
 
@@ -385,7 +386,7 @@ namespace HexSolver
 			{
 				g.FillRectangle(new SolidBrush(Color.FromArgb(160, Color.White)), 0, 0, shot.Width, shot.Height);
 
-				foreach (var solution in grid.HintList.GetSolutions())
+				foreach (var solution in solutions)
 				{
 					Color col = solution.Action == Solver.CellAction.ACTIVATE ? Color.Blue : Color.Black;
 
