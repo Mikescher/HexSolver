@@ -49,31 +49,22 @@ namespace HexSolver
 						int idx = (y * stride) + x * 4;
 
 						double s_value = ColorExt.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]);
+						byte bval = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
+
 						if (s_value >= 80)
 						{
-							if (useTransparency)
-							{
-								p[idx + 0] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 1] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 2] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 3] = 0;
-
-							}
-							else
-							{
-								p[idx + 0] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 1] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 2] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-								p[idx + 3] = 255;
-							}
+							p[idx + 0] = 255;
+							p[idx + 1] = 255;
+							p[idx + 2] = 255;
+							p[idx + 3] = (byte)(useTransparency ? 0 : 255);
 						}
 						else
 						{
 							activePixel++;
 
-							p[idx + 0] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-							p[idx + 1] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
-							p[idx + 2] = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
+							p[idx + 0] = bval;
+							p[idx + 1] = bval;
+							p[idx + 2] = bval;
 							p[idx + 3] = 255;
 						}
 					}
@@ -93,7 +84,8 @@ namespace HexSolver
 			var img = GetProcessedImage(false, out activepixel);
 			var txt = patternOCR.Recognize(img, OCRCoupling.HIGH_COUPLED_SEGMENTS, out errDistance);
 
-			img.Save(@"..\..\imgsave\img_counter_" + (txt).Replace("?", "Q") + "_" + (new Random()).Next(99999) + ".png");
+			if (StaticDebugSettings.SaveOCRImages)
+				img.Save(@"..\..\imgsave\img_counter_" + (txt).Replace("?", "Q") + "_" + (StaticDebugSettings.SaveCounter++) + ".png");
 
 			int value = int.Parse(txt);
 

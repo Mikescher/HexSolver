@@ -35,7 +35,7 @@ namespace HexSolver
 
 			int shotid = 1;
 			for (; File.Exists(String.Format("./example/shot{0:000}.png", shotid)); shotid++) { }
-			iudExample.Maximum = shotid-1;
+			iudExample.Maximum = shotid - 1;
 		}
 
 		private void OnCaptureClicked(object sender, RoutedEventArgs e)
@@ -96,6 +96,11 @@ namespace HexSolver
 			solver.Screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
 
 			MessageBox.Show("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
+		}
+
+		private void OnSaveOCRClicked(object sender, RoutedEventArgs e)
+		{
+			StaticDebugSettings.SaveOCRImages = ((CheckBox)sender).IsChecked.Value;
 		}
 
 		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -238,8 +243,6 @@ namespace HexSolver
 		{
 			if (solver == null || renderer == null)
 				return;
-
-			//solver.FilteredHexagons.HintList = null;//TODO REMOVE ME
 
 			int time = Environment.TickCount;
 			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));

@@ -17,6 +17,8 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="5"/>
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -29,11 +31,12 @@
                             <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
-                        <Button Content="[1] Recapture" Grid.Row="0" Padding="8 0" Click="OnCaptureClicked" FontWeight="Bold" Grid.ColumnSpan="3" />
-                        <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked" />
-                        <xctk:IntegerUpDown Grid.Row="2" Grid.Column="2" Value="1" Minimum="1" x:Name="iudExample"/>
-                        <Button Content="Show Plain" Grid.Row="4" Padding="8 0" Click="OnShowPlainClicked" Grid.ColumnSpan="3" />
-                        <Button Content="Save Example" Grid.Row="6" Padding="8 0" Click="OnExampleSaveClicked" Grid.ColumnSpan="3" />
+                        <Button Content="[1] Recapture" Grid.Row="0" Padding="8 0" Click="OnCaptureClicked" FontWeight="Bold" Grid.ColumnSpan="5" />
+                        <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked"  Grid.ColumnSpan="3"/>
+                        <xctk:IntegerUpDown Grid.Row="2" Grid.Column="4" Value="1" Minimum="1" x:Name="iudExample"/>
+                        <Button Content="Show Plain" Grid.Row="4" Padding="8 0" Click="OnShowPlainClicked" Grid.ColumnSpan="5" />
+                        <Button Content="Save Example" Grid.Row="6" Padding="8 0" Click="OnExampleSaveClicked"  />
+                        <CheckBox Content="Save OCR" Grid.Row="6" Grid.Column="2" Padding="8 0" Click="OnSaveOCRClicked" Grid.ColumnSpan="3" VerticalAlignment="Center" />
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">

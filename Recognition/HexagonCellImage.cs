@@ -341,7 +341,6 @@ namespace HexSolver
 			return returnBitmap;
 		}
 
-		//private static int ocrctr;
 		private CellHint GetHexagonHint()
 		{
 			if (Type == HexagonType.HIDDEN || Type == HexagonType.UNKNOWN)
@@ -355,7 +354,8 @@ namespace HexSolver
 				if (activePixel == 0)
 					return new CellHint();
 
-				//img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
+				if (StaticDebugSettings.SaveOCRImages)
+					img.Save(@"..\..\imgsave\img_inactive" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
 
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
@@ -380,7 +380,8 @@ namespace HexSolver
 				if (activePixel == 0)
 					return new CellHint();
 
-				//img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
+				if (StaticDebugSettings.SaveOCRImages)
+					img.Save(@"..\..\imgsave\img_active" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
 
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
@@ -410,7 +411,8 @@ namespace HexSolver
 				else if (col == CellHintArea.COLUMN_RIGHT)
 					img = RotateImage(img, +60, Color.White);
 
-				//img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
+				if (StaticDebugSettings.SaveOCRImages)
+					img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
 
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
