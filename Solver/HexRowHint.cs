@@ -175,7 +175,10 @@ namespace HexSolver.Solver
 
 		private bool IsNonConsecutiveForTemp()
 		{
-			return Cells.Count(p => p.IsTempActive() != false) > Number || !IsConsecutiveForTemp();
+			if (Cells.Count(p => p.IsTempActive() == true) == Number)
+				return !IsConsecutiveForTemp();
+			else
+				return Cells.Count(p => p.IsTempActive() != false) > Number || !IsConsecutiveForTemp();
 		}
 
 		private bool IsConsecutiveForTemp()
@@ -185,6 +188,8 @@ namespace HexSolver.Solver
 
 			bool prevGroupIsForce = false;
 			bool currentGroupIsForce = false;
+
+			bool recognizeNull = Cells.Count(p => p.IsTempActive() == true) < Number;
 
 			foreach (var cell in Cells)
 			{
@@ -203,7 +208,7 @@ namespace HexSolver.Solver
 
 					currentGroupIsForce = true;
 				}
-				else if (active == null)
+				else if (active == null && recognizeNull)
 				{
 					if (!prevGroupIsForce)
 					{
