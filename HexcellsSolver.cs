@@ -4,11 +4,7 @@ using System.Drawing;
 
 namespace HexSolver
 {
-	//TODO: How long does Update take ?
-	//TODO: Only calculate Hints that have changed since last full calculation
-	//TODO: example_010: error recognizing counter
-	//TODO: Why lag when solving
-	//TODO: Faster solving ?? (Only really needed downtime is 2s before screenshot) (perhaps mouse movement optional)
+	//TODO: Can't solve 3-1
 
 	class HexcellsSolver
 	{

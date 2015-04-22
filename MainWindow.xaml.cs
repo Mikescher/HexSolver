@@ -32,7 +32,6 @@ namespace HexSolver
 			solver = new HexcellsSolver();
 			renderer = new HexRenderer();
 
-
 			int shotid = 1;
 			for (; File.Exists(String.Format("./example/shot{0:000}.png", shotid)); shotid++) { }
 			iudExample.Maximum = shotid - 1;
@@ -287,7 +286,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorStart()
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				leftPanel.IsEnabled = false;
 			}));
@@ -295,7 +294,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorEnd()
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				leftPanel.IsEnabled = true;
 				pbarExecute.Maximum = 1;
@@ -305,7 +304,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorProgress(int current, int max)
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				pbarExecute.Maximum = max;
 				pbarExecute.Value = current;
@@ -314,7 +313,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorScreenshotGrabbed()
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
 			}));
@@ -322,7 +321,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorSolutionExecuted(HexStep ocr)
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
 			}));
@@ -330,7 +329,7 @@ namespace HexSolver
 
 		void IHexExecutorFeedback.OnExecutorError(Exception e)
 		{
-			Dispatcher.BeginInvoke(new Action(delegate()
+			Dispatcher.Invoke(new Action(delegate()
 			{
 				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
 			}));

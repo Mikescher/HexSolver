@@ -399,7 +399,7 @@ namespace HexSolver
 					{
 						int idx = (y * stride) + x * 4;
 
-						if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+						if (ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16)
 						{
 							topx = x;
 							topy = y;
@@ -414,7 +414,7 @@ namespace HexSolver
 
 					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
 
-					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+					if (ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16)
 						topy = y;
 
 					if (hdistance > 50)
@@ -427,7 +427,7 @@ namespace HexSolver
 
 					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
 
-					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+					if (ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16)
 						topx = x;
 
 					if (hdistance > 50)
@@ -447,7 +447,7 @@ namespace HexSolver
 
 					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
 
-					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+					if (ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16)
 						boty = y;
 
 					if (hdistance > 50)
@@ -460,7 +460,7 @@ namespace HexSolver
 
 					double hdistance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER);
 
-					if (p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B)
+					if (ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16)
 						botx = x;
 
 					if (hdistance > 50)
@@ -483,7 +483,7 @@ namespace HexSolver
 					{
 						int idx = (y * stride) + x * 4;
 
-						clear &= p[idx + 2] == COLOR_COUNTER.R && p[idx + 1] == COLOR_COUNTER.G && p[idx + 0] == COLOR_COUNTER.B;
+						clear &= ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_COUNTER) < 16;
 					}
 
 					firstHill |= !clear;

@@ -17,9 +17,9 @@ namespace HexSolver
 	{
 		private System.Windows.Forms.Keys ABORT_KEY = System.Windows.Forms.Keys.Escape;
 
-		private const double MOUSE_MOVEMENT_TIME = 1;
-		private const int CLICK_SLEEP_TIME = 0;
-		private const int INTER_SOLUTION_SLEEP_TIME = 500;
+		private const double MOUSE_MOVEMENT_TIME = 0.5;
+		private const int CLICK_SLEEP_TIME = 10;
+		private const int INTER_SOLUTION_SLEEP_TIME = 50;
 		private const int RECAPTURE_SLEEP = 2000;
 
 		private readonly IHexExecutorFeedback feedback;
