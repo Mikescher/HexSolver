@@ -90,7 +90,7 @@ namespace HexSolver
 			refdic.Add("19", Properties.Resources.pattern_19);
 
 
-			POCR = new PatternOCR(refdic);
+			POCR = new PatternOCR(refdic, OCRCoupling.NORMAL_COUPLED_SEGMENTS);
 			Cam = new HexCam();
 			OCR = new HexOCR(POCR);
 		}

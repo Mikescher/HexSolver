@@ -31,6 +31,11 @@ namespace HexSolver
 
 			solver = new HexcellsSolver();
 			renderer = new HexRenderer();
+
+
+			int shotid = 1;
+			for (; File.Exists(String.Format("./example/shot{0:000}.png", shotid)); shotid++) { }
+			iudExample.Maximum = shotid-1;
 		}
 
 		private void OnCaptureClicked(object sender, RoutedEventArgs e)

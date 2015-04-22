@@ -9,7 +9,13 @@
         </Grid.ColumnDefinitions>
         
         <StackPanel Orientation="Vertical" Margin="5 5">
+            <ComboBox Margin="0 0 0 10" SelectedIndex="1" Name="cbxCoupling">
+                <ComboBoxItem Content="LOW" HorizontalAlignment="Stretch"/>
+                <ComboBoxItem Content="NORMAL" HorizontalAlignment="Stretch"/>
+                <ComboBoxItem Content="HIGH" HorizontalAlignment="Stretch"/>
+            </ComboBox>
             <Button  Content="Load" Margin="0 0 0 10" Click="Load_Click"/>
+            <Button  Content="Load Error" Margin="0 0 0 10" Click="LoadError_Click"/>
             <Button  Content="Load All" Margin="0 0 0 10" Click="LoadAll_Click"/>
             <Button  Content="Segmentize" Margin="0 0 0 10" Click="Boxing_Click"/>
             <Button  Content="Train" Margin="0 0 0 10" Click="Train_Click"/>

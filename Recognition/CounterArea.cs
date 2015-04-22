@@ -91,8 +91,9 @@ namespace HexSolver
 			int activepixel;
 
 			var img = GetProcessedImage(false, out activepixel);
-			img.Save(@"C:/asd.png");
-			var txt = patternOCR.Recognize(img, out errDistance);
+			var txt = patternOCR.Recognize(img, OCRCoupling.HIGH_COUPLED_SEGMENTS, out errDistance);
+
+			img.Save(@"..\..\imgsave\img_counter_" + (txt).Replace("?", "Q") + "_" + (new Random()).Next(99999) + ".png");
 
 			int value = int.Parse(txt);
 

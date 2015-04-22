@@ -145,6 +145,34 @@ namespace NumberRecognition
 			}
 		}
 
+		private void LoadError_Click(object sender, RoutedEventArgs e)
+		{
+			ContentGrid.Children.Clear();
+			ContentGrid.RowDefinitions.Clear();
+
+			int pos = 1;
+			foreach (var file in Directory.EnumerateFileSystemEntries(@"..\..\errordata", "*.png", SearchOption.AllDirectories))
+			{
+				System.Drawing.Image ifile = System.Drawing.Image.FromFile(file);
+				Bitmap bmp = new Bitmap(ifile.Width, ifile.Height, PixelFormat.Format32bppArgb);
+				using (Graphics g = Graphics.FromImage(bmp))
+				{
+					g.DrawImageUnscaled(ifile, 0, 0);
+				}
+
+				ContentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
+				ContentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+
+				SetContentGridCell(bmp, 1, pos);
+
+				pos += 2;
+
+				string fn = Path.GetFileNameWithoutExtension(file);
+
+				data.Add(Tuple.Create(fn.Substring(0, fn.Contains('_') ? fn.IndexOf('_') : fn.Length).Replace("Q", "?"), bmp));
+			}
+		}
+
 		private void SetContentGridCell(Bitmap dataimg, int col, int row)
 		{
 			int factor = 4;
@@ -191,7 +219,9 @@ namespace NumberRecognition
 
 		private void Boxing_Click(object sender, RoutedEventArgs e)
 		{
-			PatternOCR pocr = new PatternOCR();
+			Color[] CLRS = new Color[] { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Fuchsia, Color.SaddleBrown, Color.Purple, Color.Orange, Color.LightGray };
+
+			PatternOCR pocr = new PatternOCR((OCRCoupling)cbxCoupling.SelectedIndex);
 
 			{
 				int pos = 1;
@@ -209,12 +239,8 @@ namespace NumberRecognition
 						{
 							for (int y = 1; y < img.Height - 1; y++)
 							{
-								if (grid[x, y] > 0 && grid[x, y] % 3 == 0)
-									img.SetPixel(x, y, Color.Red);
-								if (grid[x, y] > 0 && grid[x, y] % 3 == 1)
-									img.SetPixel(x, y, Color.Green);
-								if (grid[x, y] > 0 && grid[x, y] % 3 == 2)
-									img.SetPixel(x, y, Color.Blue);
+								if (grid[x, y] > 0)
+									img.SetPixel(x, y, CLRS[grid[x, y] % CLRS.Length]);
 							}
 						}
 					}
@@ -258,7 +284,7 @@ namespace NumberRecognition
 
 		private void Train_Click(object sender, RoutedEventArgs e)
 		{
-			PatternOCR pocr = new PatternOCR();
+			PatternOCR pocr = new PatternOCR((OCRCoupling)cbxCoupling.SelectedIndex);
 
 			List<Tuple<string, bool[,]>> trainingdata = new List<Tuple<string, bool[,]>>();
 
@@ -297,16 +323,16 @@ namespace NumberRecognition
 				.Where(p => Regex.IsMatch(p.File, @"^pattern_(.*)\.png$"))
 				.ToDictionary(p => Regex.Match(p.File, @"^pattern_(.*)\.png$").Groups[1].Value.Replace("Q", "?"), q => new Bitmap(System.Drawing.Image.FromFile(q.Path)));
 
-			PatternOCR pocr = new PatternOCR(references);
+			PatternOCR pocr = new PatternOCR(references, (OCRCoupling)cbxCoupling.SelectedIndex);
 
 			int errors = 0;
 
 			int pos = 1;
 			foreach (var tdata in data)
 			{
-				var ocr = pocr.RecognizeOCR(tdata.Item2);
+				var ocr = pocr.RecognizeOCR(tdata.Item2, (OCRCoupling)cbxCoupling.SelectedIndex);
 
-				SetContentGridCell(ocr.Value + "        {" + string.Join(", ", ocr.Characters.Select(p => p.Distance.ToString("F0"))) + "}" + "\r\n           {" + string.Join(", ", ocr.Characters.Select(p => p.EulerNumber)) + "}" , 13, pos, ocr.Value == tdata.Item1);
+				SetContentGridCell(ocr.Value + "        {" + string.Join(", ", ocr.Characters.Select(p => p.Distance.ToString("F0"))) + "}" + "\r\n           {" + string.Join(", ", ocr.Characters.Select(p => p.EulerNumber)) + "}", 13, pos, ocr.Value == tdata.Item1);
 
 				errors += ocr.Value == tdata.Item1 ? 0 : 1;
 
@@ -337,7 +363,7 @@ namespace NumberRecognition
 				//############################################
 
 
-				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => Regex.IsMatch(q.Key, @"^[0-9+]+$") ? int.Parse(q.Key) : ((q.Key + "@")[0]+255)).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
+				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => Regex.IsMatch(q.Key, @"^[0-9+]+$") ? int.Parse(q.Key) : ((q.Key + "@")[0] + 255)).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
 
 				if (ocr.Value != tdata.Item1)
 				{

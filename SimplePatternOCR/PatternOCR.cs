@@ -7,6 +7,13 @@ using System.Text;
 
 namespace SimplePatternOCR
 {
+	public enum OCRCoupling
+	{
+		LOW_COUPLED_SEGMENTS = 0,
+		NORMAL_COUPLED_SEGMENTS = 1,
+		HIGH_COUPLED_SEGMENTS = 2,
+	}
+
 	public class PatternOCR
 	{
 		private struct PointI
@@ -31,11 +38,19 @@ namespace SimplePatternOCR
 			}
 		}
 
-		private const double FCB_TRESHOLD_INIT = 180;
-		private const double FCB_TRESHOLD_FLOOD = 170;
-		private const double FCB_TRESHOLD_X = 35;
-		private const double FCB_TRESHOLD_Y = 200;
-		private const int FCB_MIN_SIZE = 4;
+		public OCRCoupling Coupling;
+
+		private readonly double[] _FCB_TRESHOLD_INIT = {160, 180, 225};
+		private readonly double[] _FCB_TRESHOLD_FLOOD = {150, 170, 220};
+		private readonly double[] _FCB_TRESHOLD_X = { 65, 35, 2 };
+		private readonly double[] _FCB_TRESHOLD_Y = {210, 200, 190};
+		private readonly int[] _FCB_MIN_SIZE = {4, 4, 16};
+
+		private double FCB_TRESHOLD_INIT { get { return _FCB_TRESHOLD_INIT[(int)Coupling]; } }
+		private double FCB_TRESHOLD_FLOOD { get { return _FCB_TRESHOLD_FLOOD[(int)Coupling]; } }
+		private double FCB_TRESHOLD_X { get { return _FCB_TRESHOLD_X[(int)Coupling]; } }
+		private double FCB_TRESHOLD_Y { get { return _FCB_TRESHOLD_Y[(int)Coupling]; } }
+		private int FCB_MIN_SIZE { get { return _FCB_MIN_SIZE[(int)Coupling]; } }
 
 		private const int PATTERN_WIDTH = 32;
 		private const int PATTERN_HEIGHT = 32;
@@ -81,13 +96,15 @@ namespace SimplePatternOCR
 
 		private Dictionary<string, byte[,]> references = new Dictionary<string, byte[,]>();
 
-		public PatternOCR()
+		public PatternOCR(OCRCoupling coupling)
 		{
+			Coupling = coupling;
 			references = new Dictionary<string, byte[,]>();
 		}
 
-		public PatternOCR(Dictionary<string, Bitmap> refdic)
+		public PatternOCR(Dictionary<string, Bitmap> refdic, OCRCoupling coupling)
 		{
+			Coupling = coupling;
 			LoadReferencePatterns(refdic);
 		}
 
@@ -346,8 +363,9 @@ namespace SimplePatternOCR
 			return euler;
 		}
 
-		public OCRResult RecognizeOCR(Bitmap img)
+		public OCRResult RecognizeOCR(Bitmap img, OCRCoupling coupling)
 		{
+			Coupling = coupling;
 			var ochars = RecognizeSingleCharacter(img);
 
 			var distances = new List<Tuple<int, int, double>>();
@@ -610,9 +628,9 @@ namespace SimplePatternOCR
 			return TrainPatterns(trainingdata).ToDictionary(p => p.Key, p => ByteArrToGrayscaleBitmap(p.Value));
 		}
 
-		public string Recognize(Bitmap bmp, out double errorDistance)
+		public string Recognize(Bitmap bmp, OCRCoupling coupling, out double errorDistance)
 		{
-			var ocr = RecognizeOCR(bmp);
+			var ocr = RecognizeOCR(bmp, coupling);
 
 			errorDistance = ocr.Distance;
 

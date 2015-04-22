@@ -358,7 +358,7 @@ namespace HexSolver
 				//img.Save(@"..\..\imgsave\img_inactive" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				double errDistance;
-				var txt = PatternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
@@ -383,7 +383,7 @@ namespace HexSolver
 				//img.Save(@"..\..\imgsave\img_active" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				double errDistance;
-				var txt = PatternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^[0-9]+$"))
 					return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt), errDistance);
@@ -413,7 +413,7 @@ namespace HexSolver
 				//img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (ocrctr++) + ".png", ImageFormat.Png);
 
 				double errDistance;
-				var txt = PatternOCR.Recognize(img, out errDistance);
+				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
