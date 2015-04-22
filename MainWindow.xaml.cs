@@ -103,6 +103,13 @@ namespace HexSolver
 			StaticDebugSettings.SaveOCRImages = ((CheckBox)sender).IsChecked.Value;
 		}
 
+		private void OnCleanImageSave(object sender, RoutedEventArgs e)
+		{
+			int cleaned = StaticDebugSettings.CleanImageSave();
+
+			MessageBox.Show(cleaned + " images due to redundancy removed");
+		}
+
 		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			if (solver == null || renderer == null)

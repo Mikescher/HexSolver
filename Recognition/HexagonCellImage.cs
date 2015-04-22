@@ -354,11 +354,10 @@ namespace HexSolver
 				if (activePixel == 0)
 					return new CellHint();
 
-				if (StaticDebugSettings.SaveOCRImages)
-					img.Save(@"..\..\imgsave\img_inactive" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
-
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
+
+				StaticDebugSettings.ImageSave(img, txt);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
@@ -380,11 +379,10 @@ namespace HexSolver
 				if (activePixel == 0)
 					return new CellHint();
 
-				if (StaticDebugSettings.SaveOCRImages)
-					img.Save(@"..\..\imgsave\img_active" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
-
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
+
+				StaticDebugSettings.ImageSave(img, txt);
 
 				if (Regex.IsMatch(txt, @"^[0-9]+$"))
 					return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt), errDistance);
@@ -411,11 +409,10 @@ namespace HexSolver
 				else if (col == CellHintArea.COLUMN_RIGHT)
 					img = RotateImage(img, +60, Color.White);
 
-				if (StaticDebugSettings.SaveOCRImages)
-					img.Save(@"..\..\imgsave\img_nocell_" + (int)col + "_" + (StaticDebugSettings.SaveCounter++) + ".png", ImageFormat.Png);
-
 				double errDistance;
 				var txt = PatternOCR.Recognize(img, OCRCoupling.NORMAL_COUPLED_SEGMENTS, out errDistance);
+
+				StaticDebugSettings.ImageSave(img, txt);
 
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);

@@ -84,8 +84,7 @@ namespace HexSolver
 			var img = GetProcessedImage(false, out activepixel);
 			var txt = patternOCR.Recognize(img, OCRCoupling.HIGH_COUPLED_SEGMENTS, out errDistance);
 
-			if (StaticDebugSettings.SaveOCRImages)
-				img.Save(@"..\..\imgsave\img_counter_" + (txt).Replace("?", "Q") + "_" + (StaticDebugSettings.SaveCounter++) + ".png");
+			StaticDebugSettings.ImageSave(img, txt);
 
 			int value = int.Parse(txt);
 
