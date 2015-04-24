@@ -18,7 +18,8 @@ namespace HexSolver
 	[DebuggerDisplay("HexCell :: {Position} - {Type} - {Hint}")]
 	class HexagonCell
 	{
-		public bool? TemporaryValue;
+		public bool? TemporaryValue; // Only temporary - not approved
+		public bool? FutureValue;    // Only temporary - approved
 
 		public Vec2i Position { get; private set; }
 		public HexagonCellImage Image { get; private set; }
@@ -51,7 +52,12 @@ namespace HexSolver
 			switch (Type)
 			{
 				case HexagonType.HIDDEN:
-					return TemporaryValue;
+					if (FutureValue == true)
+						return true;
+					else if (FutureValue == false)
+						return false;
+					else
+						return TemporaryValue;
 				case HexagonType.ACTIVE:
 					return true;
 				case HexagonType.INACTIVE:

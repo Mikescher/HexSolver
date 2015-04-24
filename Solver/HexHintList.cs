@@ -17,7 +17,7 @@ namespace HexSolver.Solver
 		private List<HexStep> _Solutions;
 		public List<HexStep> Solutions
 		{
-			get { return _Solutions ?? (_Solutions = GetSolutions().ToList()); }
+			get { return _Solutions ?? (_Solutions = GetSolutions()); }
 			set { _Solutions = value; }
 		}
 
@@ -76,8 +76,28 @@ namespace HexSolver.Solver
 		{
 			return GetEnumerator();
 		}
+		private List<HexStep> GetSolutions()
+		{
+			using (new FutureGridModifier(Grid.Select(p => p.Value)))
+			{
+				List<HexStep> solutions = GetSolutions_All().ToList();
 
-		private IEnumerable<HexStep> GetSolutions()
+				for (; ; )
+				{
+					int count = solutions.Count;
+
+					solutions.ForEach(p => p.Cell.FutureValue = p.Action == CellAction.ACTIVATE ? true : false);
+
+					solutions = solutions.Concat(GetSolutions_Single()).Distinct().ToList();
+
+					if (solutions.Count == count)
+						return solutions;
+				}
+
+			}
+		}
+
+		private IEnumerable<HexStep> GetSolutions_All()
 		{
 			bool finished = false;
 
