@@ -123,14 +123,21 @@ namespace HexSolver.Solver
 			bool prevGroupIsForce = false;
 			bool currentGroupIsForce = false;
 
+			// [NULL] is an possible [TRUE]
 			bool recognizeNull = Cells.Count(p => p.IsTempActive() == true) < Number;
-			bool totalFilled = Cells.All(p => p.IsTempActive() != false) && Cells.Count >= Number;
 
-			if (recognizeNull && totalFilled)
+			// Every Cell Is possible [TRUE]
+			bool totalFilled = recognizeNull ? Cells.All(p => p.IsTempActive() != false) : Cells.All(p => p.IsTempActive() == true);
+
+			// Every Cell Is [TRUE] And we have enough cells to complete the Number
+			if (recognizeNull && totalFilled && Cells.Count >= Number)
 				return true;
 
 			int offset = 0;
-			for (; !totalFilled && Cells[offset].IsTempActive() != false; offset++) { }
+			if (recognizeNull)
+				for (; !totalFilled && Cells[offset].IsTempActive() != false; offset++) { }
+			else
+				for (; !totalFilled && Cells[offset].IsTempActive() == true; offset++) { }
 
 			for (int i = 0; i < Cells.Count; i++)
 			{
