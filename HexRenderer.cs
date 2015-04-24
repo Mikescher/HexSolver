@@ -153,6 +153,7 @@ namespace HexSolver
 				Font fnt_big = new Font("Arial", 22, FontStyle.Bold);
 				Brush fntBush1 = new SolidBrush(Color.Black);
 				Brush fntBush2 = new SolidBrush(Color.FromArgb(32, Color.Black));
+				Brush fntBush3 = new SolidBrush(Color.Red);
 				Pen bluepen = new Pen(Color.FromArgb(0, 164, 235));
 				Brush bluebrush = new SolidBrush(Color.FromArgb(128, 0, 164, 235));
 				StringFormat fmt = new StringFormat
@@ -224,7 +225,12 @@ namespace HexSolver
 					}
 					else
 					{
-						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush2, hex.Value.Image.BoundingBox, fmt);
+						if (hex.Value.Type == HexagonType.NOCELL || hex.Value.Type == HexagonType.HIDDEN)
+							g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush2, hex.Value.Image.BoundingBox, fmt);
+						else if (hex.Value.Type == HexagonType.UNKNOWN)
+							g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush3, hex.Value.Image.BoundingBox, fmt);
+						else
+							g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
 					}
 				}
 

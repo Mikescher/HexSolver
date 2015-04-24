@@ -129,5 +129,35 @@ namespace HexSolver.Solver
 		{
 			Solutions.Remove(solution);
 		}
+
+		public void Optimize()
+		{
+			int changed = 1;
+			while (changed > 0)
+			{
+				changed = 0;
+
+				foreach (var hint in list)
+				{
+					foreach (var subhint in list)
+					{
+						if (subhint == hint)
+							continue;
+
+						if (subhint.GetCells().Count() > 0 && !subhint.GetCells().Except(hint.GetCells()).Any() && hint.CanSubtract(subhint))
+						{
+							changed++;
+
+							hint.Subtract(subhint);
+
+							break;
+						}
+					}
+				}
+
+				CleanUp();
+			}
+		}
+
 	}
 }

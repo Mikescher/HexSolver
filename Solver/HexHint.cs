@@ -23,6 +23,9 @@ namespace HexSolver
 
 		public abstract bool IsTrueForTemp();
 
+		public abstract void Subtract(HexHint subhint);
+		public abstract bool CanSubtract(HexHint subhint);
+
 		public List<HexStep> GetSolutions_Single(HexHintList hintlist)
 		{
 			var varcells = GetCells().Where(p => p.Type == HexagonType.HIDDEN).ToList();

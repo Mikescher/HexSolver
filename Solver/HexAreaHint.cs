@@ -70,5 +70,16 @@ namespace HexSolver.Solver
 		{
 			return Cells.Count(p => p.IsTempActive() == true) <= Number && Cells.Count(p => p.IsTempActive() == false) <= Cells.Count - Number;
 		}
+
+		public override bool CanSubtract(HexHint subhint)
+		{
+			return true;
+		}
+
+		public override void Subtract(HexHint subhint)
+		{
+			Cells = Cells.Except(subhint.GetCells()).ToList().AsReadOnly();
+			Number -= subhint.GetNumber();
+		}
 	}
 }

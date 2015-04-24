@@ -1,6 +1,7 @@
 ﻿using MSHC.Geometry;
 using SimplePatternOCR;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace HexSolver
@@ -14,6 +15,7 @@ namespace HexSolver
 		UNKNOWN   // NOT IDENTIFIED
 	}
 
+	[DebuggerDisplay("HexCell :: {Position} - {Type} - {Hint}")]
 	class HexagonCell
 	{
 		public bool? TemporaryValue;

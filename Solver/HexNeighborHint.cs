@@ -185,5 +185,16 @@ namespace HexSolver.Solver
 					(Type == HexNeighborHintType.NONCONSECUTIVE && IsNonConsecutiveForTemp())
 				);
 		}
+
+		public override bool CanSubtract(HexHint subhint)
+		{
+			return this.Type == HexNeighborHintType.NORMAL;
+		}
+
+		public override void Subtract(HexHint subhint)
+		{
+			Cells = Cells.Except(subhint.GetCells()).ToList().AsReadOnly();
+			Number -= subhint.GetNumber();
+		}
 	}
 }

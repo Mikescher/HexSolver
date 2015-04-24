@@ -151,6 +151,7 @@ namespace HexSolver
 			list.Add(new HexCellSumHint(this));
 
 			list.CleanUp();
+			list.Optimize();
 
 			return list;
 		}
