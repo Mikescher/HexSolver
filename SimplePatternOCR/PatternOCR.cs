@@ -40,11 +40,11 @@ namespace SimplePatternOCR
 
 		public OCRCoupling Coupling;
 
-		private readonly double[] _FCB_TRESHOLD_INIT = {160, 180, 225};
-		private readonly double[] _FCB_TRESHOLD_FLOOD = {150, 170, 220};
+		private readonly double[] _FCB_TRESHOLD_INIT = { 160, 180, 225 };
+		private readonly double[] _FCB_TRESHOLD_FLOOD = { 150, 170, 220 };
 		private readonly double[] _FCB_TRESHOLD_X = { 65, 35, 2 };
-		private readonly double[] _FCB_TRESHOLD_Y = {210, 200, 190};
-		private readonly int[] _FCB_MIN_SIZE = {4, 4, 16};
+		private readonly double[] _FCB_TRESHOLD_Y = { 210, 200, 190 };
+		private readonly int[] _FCB_MIN_SIZE = { 4, 4, 16 };
 
 		private double FCB_TRESHOLD_INIT { get { return _FCB_TRESHOLD_INIT[(int)Coupling]; } }
 		private double FCB_TRESHOLD_FLOOD { get { return _FCB_TRESHOLD_FLOOD[(int)Coupling]; } }
@@ -409,7 +409,7 @@ namespace SimplePatternOCR
 			}
 
 			ocrResult.Value = result.ToString();
-			ocrResult.Distance = ocrResult.Distance;
+			ocrResult.Distance = ocrResult.Characters.Max(p => p.Distance);
 
 			return ocrResult;
 		}

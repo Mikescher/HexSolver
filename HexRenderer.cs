@@ -249,12 +249,18 @@ namespace HexSolver
 			{
 				g.FillRectangle(new SolidBrush(Color.White), 0, 0, shot.Width, shot.Height);
 
+				Font fnt_small = new Font("Arial", 7, FontStyle.Italic);
 				Font fnt = new Font("Arial", 12, FontStyle.Bold);
 				Font fnt_big = new Font("Arial", 22, FontStyle.Bold);
 				Brush fntBush1 = new SolidBrush(Color.Black);
 				StringFormat fmt = new StringFormat
 				{
 					LineAlignment = StringAlignment.Center,
+					Alignment = StringAlignment.Center
+				};
+				StringFormat fmt_down = new StringFormat
+				{
+					LineAlignment = StringAlignment.Far,
 					Alignment = StringAlignment.Center
 				};
 
@@ -265,12 +271,13 @@ namespace HexSolver
 
 					if (hex.Value.Hint.Type != CellHintType.NONE)
 					{
-						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 50.0);
+						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 35.0);
 						int col = (int)(perc * 255);
 
 						g.FillPolygon(new SolidBrush(Color.FromArgb(col, 255 - col, 0)), points);
 
 						g.DrawString(hex.Value.Hint.ToString(), fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+						g.DrawString("" + (int)hex.Value.Hint.OCRDistance, fnt_small, fntBush1, hex.Value.Image.BoundingBox, fmt_down);
 					}
 					else
 					{
