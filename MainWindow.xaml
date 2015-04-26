@@ -159,6 +159,8 @@
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="24"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
                         <Button Content="Hexagon Indizies" Grid.Row="0" Click="OnShowIndizies" Grid.ColumnSpan="7"/>
@@ -167,6 +169,8 @@
                         <Button Content="B" Grid.Row="2" Grid.Column="4" Click="OnShowHintGroups_2" Grid.ColumnSpan="1"/>
                         <Button Content="C" Grid.Row="2" Grid.Column="6" Click="OnShowHintGroups_3" Grid.ColumnSpan="1"/>
                         <Button Content="[4] Solve" Grid.Row="4" Click="OnSolveSingle" FontWeight="Bold" Grid.ColumnSpan="7"/>
+                        <Button Content="TSP Ordering" Grid.Row="6" Click="OnSolveTSP" Grid.ColumnSpan="5"/>
+                        <Button Content="~" Grid.Row="6" Grid.Column="6" Click="OnSolveTSPBezier" Grid.ColumnSpan="1"/>
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">

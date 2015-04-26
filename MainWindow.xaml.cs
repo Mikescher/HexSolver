@@ -257,6 +257,30 @@ namespace HexSolver
 			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
 		}
 
+		private void OnSolveTSP(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			int time = Environment.TickCount;
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, false));
+			time = Environment.TickCount - time;
+
+			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+		}
+
+		private void OnSolveTSPBezier(object sender, RoutedEventArgs e)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			int time = Environment.TickCount;
+			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, true));
+			time = Environment.TickCount - time;
+
+			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+		}
+
 		private void OnExecuteSingle(object sender, RoutedEventArgs e)
 		{
 			if (solver == null || renderer == null)

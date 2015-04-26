@@ -1,4 +1,5 @@
-﻿using MSHC.Geometry;
+﻿using HexSolver.TSPOrder;
+using MSHC.Geometry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,14 @@ namespace HexSolver.Solver
 {
 	class HexHintList : IEnumerable<HexHint>
 	{
+		private const int POPULATION_SIZE = (1 << 11);
+		private const int MAX_GEN = (1 << 14);
+		private const int GROUP_SIZE = 5;
+		private const int MUTATION = 3;
+		private const int SEED = 0;
+		private const int CITY_CHANCE = 90;
+		private const int CITY_COUNT = 5;
+
 		private readonly List<HexHint> EMPTY_LIST = new List<HexHint>();
 
 		private List<HexHint> list = new List<HexHint>();
@@ -91,9 +100,12 @@ namespace HexSolver.Solver
 					solutions = solutions.Concat(GetSolutions_Single()).Distinct().ToList();
 
 					if (solutions.Count == count)
-						return solutions;
-				}
+					{
+						solutions = TSP_Order(solutions);
 
+						return solutions;
+					}
+				}
 			}
 		}
 
@@ -179,5 +191,20 @@ namespace HexSolver.Solver
 			}
 		}
 
+		private List<HexStep> TSP_Order(List<HexStep> solutions)
+		{
+			TSPSorter tsp = new TSPSorter(POPULATION_SIZE, MAX_GEN, GROUP_SIZE, MUTATION, SEED, CITY_CHANCE, CITY_COUNT);
+
+			long startTime = Environment.TickCount;
+
+			List<HexStep> result = tsp
+				.Order(solutions.Select(p => new TSPNode((int)p.Cell.Image.OCRCenter.X, (int)p.Cell.Image.OCRCenter.Y, p)).ToList())
+				.Select(p => (HexStep)p.Data)
+				.ToList();
+
+			Console.Out.WriteLine("TSP Calculations in " + (Environment.TickCount - startTime) + "ms");
+
+			return result;
+		}
 	}
 }

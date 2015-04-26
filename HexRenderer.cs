@@ -419,5 +419,43 @@ namespace HexSolver
 
 			return shot;
 		}
+
+		public Bitmap DisplaySolveSingleOrdered(Bitmap shot, List<HexStep> solutions, bool bezier)
+		{
+			shot = new Bitmap(shot);
+
+			using (Graphics g = Graphics.FromImage(shot))
+			{
+
+				foreach (var solution in solutions)
+				{
+					Color col = solution.Action == Solver.CellAction.ACTIVATE ? Color.Blue : Color.Black;
+
+					int radius = (int)(solution.Cell.Image.OCRHeight - 5);
+					Vec2i center = (Vec2i)solution.Cell.Image.OCRCenter;
+
+					g.DrawEllipse(new Pen(col, 4), center.X - radius, center.Y - radius, 2 * radius, 2 * radius);
+				}
+
+				g.FillRectangle(new SolidBrush(Color.FromArgb(120, Color.White)), 0, 0, shot.Width, shot.Height);
+
+
+				if (!bezier)
+				{
+					for (int i = 1; i < solutions.Count; i++)
+					{
+						Vec2i last = (Vec2i)solutions[i - 1].Cell.Image.OCRCenter;
+						Vec2i center = (Vec2i)solutions[i].Cell.Image.OCRCenter;
+						g.DrawLine(new Pen(Color.Blue, 4), last.X, last.Y, center.X, center.Y);
+					}
+				}
+				else
+				{
+					g.DrawCurve(new Pen(Color.Blue, 4), solutions.Select(p => new Point((int)p.Cell.Image.OCRCenter.X, (int)p.Cell.Image.OCRCenter.Y)).ToArray());
+				}
+			}
+
+			return shot;
+		}
 	}
 }

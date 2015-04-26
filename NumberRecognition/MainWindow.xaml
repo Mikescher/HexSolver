@@ -16,6 +16,7 @@
             </ComboBox>
             <Button  Content="Load" Margin="0 0 0 10" Click="Load_Click"/>
             <Button  Content="Load Error" Margin="0 0 0 10" Click="LoadError_Click"/>
+            <Button  Content="Load Counter" Margin="0 0 0 10" Click="LoadCounter_Click"/>
             <Button  Content="Load All" Margin="0 0 0 10" Click="LoadAll_Click"/>
             <Button  Content="Segmentize" Margin="0 0 0 10" Click="Boxing_Click"/>
             <Button  Content="Train" Margin="0 0 0 10" Click="Train_Click"/>
@@ -63,7 +64,6 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="10"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.ColumnSpan="3" Grid.Column="10" HorizontalAlignment="Left" Height="100" Margin="0,310,0,0" VerticalAlignment="Top" Width="100"/>
                 <!-- DYNAMICALLY ADD ELEMENTS -->
             </Grid>
         </ScrollViewer>

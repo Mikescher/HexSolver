@@ -77,6 +77,10 @@
     <Compile Include="Solver\HexStep.cs" />
     <Compile Include="Solver\TemporaryGridModifier.cs" />
     <Compile Include="StaticDebugSettings.cs" />
+    <Compile Include="TSPOrder\TSPNode.cs" />
+    <Compile Include="TSPOrder\TSPPopulation.cs" />
+    <Compile Include="TSPOrder\TSPSorter.cs" />
+    <Compile Include="TSPOrder\TSPTour.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

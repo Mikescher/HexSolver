@@ -102,6 +102,7 @@ namespace NumberRecognition
 		{
 			ContentGrid.Children.Clear();
 			ContentGrid.RowDefinitions.Clear();
+			data.Clear();
 
 			int pos = 1;
 			foreach (var tdata in standard_trainingdata)
@@ -121,6 +122,7 @@ namespace NumberRecognition
 		{
 			ContentGrid.Children.Clear();
 			ContentGrid.RowDefinitions.Clear();
+			data.Clear();
 
 			int pos = 1;
 			foreach (var file in Directory.EnumerateFileSystemEntries(@"..\..\testdata", "*.png", SearchOption.AllDirectories))
@@ -141,7 +143,7 @@ namespace NumberRecognition
 
 				string fn = Path.GetFileNameWithoutExtension(file);
 
-				data.Add(Tuple.Create(fn.Substring(0, fn.IndexOf('_')).Replace("Q", "?"), bmp));
+				data.Add(Tuple.Create(fn.Substring(0, fn.Contains('_') ? fn.IndexOf('_') : fn.Length).Replace("Q", "?"), bmp));
 			}
 		}
 
@@ -149,9 +151,39 @@ namespace NumberRecognition
 		{
 			ContentGrid.Children.Clear();
 			ContentGrid.RowDefinitions.Clear();
+			data.Clear();
 
 			int pos = 1;
 			foreach (var file in Directory.EnumerateFileSystemEntries(@"..\..\errordata", "*.png", SearchOption.AllDirectories))
+			{
+				System.Drawing.Image ifile = System.Drawing.Image.FromFile(file);
+				Bitmap bmp = new Bitmap(ifile.Width, ifile.Height, PixelFormat.Format32bppArgb);
+				using (Graphics g = Graphics.FromImage(bmp))
+				{
+					g.DrawImageUnscaled(ifile, 0, 0);
+				}
+
+				ContentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
+				ContentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+
+				SetContentGridCell(bmp, 1, pos);
+
+				pos += 2;
+
+				string fn = Path.GetFileNameWithoutExtension(file);
+
+				data.Add(Tuple.Create(fn.Substring(0, fn.Contains('_') ? fn.IndexOf('_') : fn.Length).Replace("Q", "?"), bmp));
+			}
+		}
+
+		private void LoadCounter_Click(object sender, RoutedEventArgs e)
+		{
+			ContentGrid.Children.Clear();
+			ContentGrid.RowDefinitions.Clear();
+			data.Clear();
+
+			int pos = 1;
+			foreach (var file in Directory.EnumerateFileSystemEntries(@"..\..\counterdata", "*.png", SearchOption.AllDirectories))
 			{
 				System.Drawing.Image ifile = System.Drawing.Image.FromFile(file);
 				Bitmap bmp = new Bitmap(ifile.Width, ifile.Height, PixelFormat.Format32bppArgb);
