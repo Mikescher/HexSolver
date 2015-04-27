@@ -5,7 +5,9 @@ An automatic solver for [Hexcells](http://www.matthewbrowngames.com/hexcells.htm
 The idea is to automatically parse the game state, find the next (valid) step and execute it.  
 *(Rinse and Repeat until everything is solved)*
 
-####[> Animation](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
+### [> Current Release](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
+
+### [> Animation](https://github.com/Mikescher/HexSolver/releases)
 
 ##Usage
 
