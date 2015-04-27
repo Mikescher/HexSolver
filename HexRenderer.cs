@@ -451,7 +451,8 @@ namespace HexSolver
 				}
 				else
 				{
-					g.DrawCurve(new Pen(Color.Blue, 4), solutions.Select(p => new Point((int)p.Cell.Image.OCRCenter.X, (int)p.Cell.Image.OCRCenter.Y)).ToArray());
+					if (solutions.Count > 1)
+						g.DrawCurve(new Pen(Color.Blue, 4), solutions.Select(p => new Point((int)p.Cell.Image.OCRCenter.X, (int)p.Cell.Image.OCRCenter.Y)).ToArray());
 				}
 			}
 

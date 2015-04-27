@@ -34,6 +34,9 @@ namespace HexSolver.TSPOrder
 
 		public List<TSPNode> Order(List<TSPNode> _nodes)
 		{
+			if (_nodes.Count < 3)
+				return _nodes.ToList();
+
 			rand = new Random(seed);
 
 			this.nodes = _nodes;

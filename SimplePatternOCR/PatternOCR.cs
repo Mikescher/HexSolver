@@ -409,7 +409,7 @@ namespace SimplePatternOCR
 			}
 
 			ocrResult.Value = result.ToString();
-			ocrResult.Distance = ocrResult.Characters.Max(p => p.Distance);
+			ocrResult.Distance = (ocrResult.Characters.Count == 0) ? 0 : ocrResult.Characters.Max(p => p.Distance);
 
 			return ocrResult;
 		}
