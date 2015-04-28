@@ -29,58 +29,86 @@ namespace HexSolver
 		{
 			InitializeComponent();
 
-			solver = new HexcellsSolver();
-			renderer = new HexRenderer();
-
-			int shotid = 1;
-			for (; File.Exists(String.Format("./example/shot{0:000}.png", shotid)); shotid++) { }
-			iudExample.Maximum = shotid - 1;
-		}
-
-		private void OnCaptureClicked(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			solver.Cam.Reset();
-			solver.Screenshot = null;
-
-			imgDisplay.Source = LoadBitmap(solver.Screenshot);
-
-			pnlExecute.IsEnabled = true;
-		}
-
-		private void OnShowPlainClicked(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			imgDisplay.Source = LoadBitmap(solver.Screenshot);
-		}
-
-		private void OnExampleLoadClicked(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			int shotid = iudExample.Value.Value;
-
-			if (!File.Exists(String.Format("./example/shot{0:000}.png", shotid)))
-				return;
-
-			Image file = Image.FromFile(String.Format("./example/shot{0:000}.png", shotid));
-			Bitmap bmp = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
-			using (Graphics g = Graphics.FromImage(bmp))
+			try
 			{
-				g.DrawImageUnscaled(file, 0, 0);
+				solver = new HexcellsSolver();
+				renderer = new HexRenderer();
+
+				int shotid = 1;
+				for (; File.Exists(String.Format("./example/shot{0:000}.png", shotid)); shotid++) { }
+				iudExample.Maximum = shotid - 1;
 			}
-
-			imgDisplay.Source = LoadBitmap(solver.LoadScreenshot(bmp));
-
-			pnlExecute.IsEnabled = false;
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnExampleSaveClicked(object sender, RoutedEventArgs e)
+		private void OnCaptureClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				solver.Cam.Reset();
+				solver.Screenshot = null;
+
+				imgDisplay.Source = LoadBitmap(solver.Screenshot);
+
+				pnlExecute.IsEnabled = true;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowPlainClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(solver.Screenshot);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnExampleLoadClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				int shotid = iudExample.Value.Value;
+
+				if (!File.Exists(String.Format("./example/shot{0:000}.png", shotid)))
+					return;
+
+				Image file = Image.FromFile(String.Format("./example/shot{0:000}.png", shotid));
+				Bitmap bmp = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
+				using (Graphics g = Graphics.FromImage(bmp))
+				{
+					g.DrawImageUnscaled(file, 0, 0);
+				}
+
+				imgDisplay.Source = LoadBitmap(solver.LoadScreenshot(bmp));
+
+				pnlExecute.IsEnabled = false;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnExampleSaveClicked(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
@@ -88,200 +116,347 @@ namespace HexSolver
 			if (!solver.IsScreenshotLoaded())
 				return;
 
-			int i = 1;
-			while (File.Exists(String.Format(@"..\..\example\shot{0:000}.png", i)))
-				i++;
+			try
+			{
+				int i = 1;
+				while (File.Exists(String.Format(@"..\..\example\shot{0:000}.png", i)))
+					i++;
 
-			solver.Screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
+				solver.Screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
 
-			MessageBox.Show("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
+				MessageBox.Show("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnSaveOCRClicked(object sender, RoutedEventArgs e)
+		private void OnSaveOCRClicked(object sender, RoutedEventArgs eargs)
 		{
-			StaticDebugSettings.SaveOCRImages = ((CheckBox)sender).IsChecked.Value;
+			try
+			{
+				StaticDebugSettings.SaveOCRImages = ((CheckBox)sender).IsChecked.Value;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnCleanImageSave(object sender, RoutedEventArgs e)
+		private void OnCleanImageSave(object sender, RoutedEventArgs eargs)
 		{
-			int cleaned = StaticDebugSettings.CleanImageSave();
+			try
+			{
+				int cleaned = StaticDebugSettings.CleanImageSave();
 
-			MessageBox.Show(cleaned + " images due to redundancy removed");
+				MessageBox.Show(cleaned + " images due to redundancy removed");
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			HexOCRValueSet(sender, null);
-		}
-
-		private void cbSwap_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			HexOCRValueSet(sender, null);
-		}
-
-		private void HexOCRValueAuto(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-
-			solver.HexProperties = null;
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, solver.AllHexagons));
-
-			SetUIHexGridProperties(solver.HexProperties);
-		}
-
-		private void OnShowIndizies(object sender, RoutedEventArgs e)
+		private void HexOCRValueChanged(object sender, RoutedPropertyChangedEventArgs<object> eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons));
+			try
+			{
+				HexOCRValueSet(sender, null);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void HexOCRValueSet(object sender, RoutedEventArgs e)
+		private void cbSwap_SelectionChanged(object sender, SelectionChangedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
-			if (skipUpdate)
-				return;
 
-			solver.HexProperties = GetUIHexGridProperties();
-			HexGrid all = solver.AllHexagons;
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, all));
+			try
+			{
+				HexOCRValueSet(sender, null);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnBinPattern(object sender, RoutedEventArgs e)
+		private void HexOCRValueAuto(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
-			if (skipUpdate)
-				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR));
+			try
+			{
+				solver.HexProperties = null;
+
+				imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, solver.AllHexagons));
+
+				SetUIHexGridProperties(solver.HexProperties);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void HexOCRValueUpdate(object sender, RoutedEventArgs e)
-		{
-			SetUIHexGridProperties(solver.HexProperties);
-		}
-
-		private void OnTypifyClicked(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-			if (skipUpdate)
-				return;
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayTypes(solver.Screenshot, solver.FilteredHexagons));
-		}
-
-		private void OnProcessClicked(object sender, RoutedEventArgs e)
+		private void OnShowIndizies(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
-			if (skipUpdate)
-				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRProcess(solver.Screenshot, solver.FilteredHexagons));
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnOCRClicked(object sender, RoutedEventArgs e)
-		{
-			if (solver == null || renderer == null)
-				return;
-			if (skipUpdate)
-				return;
-
-			imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
-		}
-
-		private void OnOCRDistanceClicked(object sender, RoutedEventArgs e)
+		private void HexOCRValueSet(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 			if (skipUpdate)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayOCRDistance(solver.Screenshot, solver.FilteredHexagons));
+			try
+			{
+				solver.HexProperties = GetUIHexGridProperties();
+				HexGrid all = solver.AllHexagons;
+
+				imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, all));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnShowHintGroups(object sender, RoutedEventArgs e)
+		private void OnBinPattern(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void HexOCRValueUpdate(object sender, RoutedEventArgs eargs)
+		{
+			try
+			{
+				SetUIHexGridProperties(solver.HexProperties);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnTypifyClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayTypes(solver.Screenshot, solver.FilteredHexagons));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnProcessClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayOCRProcess(solver.Screenshot, solver.FilteredHexagons));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnOCRClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnOCRDistanceClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayOCRDistance(solver.Screenshot, solver.FilteredHexagons));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowHintGroups(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null));
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnShowHintGroups_1(object sender, RoutedEventArgs e)
+		private void OnShowHintGroups_1(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint)));
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint)));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnShowHintGroups_2(object sender, RoutedEventArgs e)
+		private void OnShowHintGroups_2(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint)));
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint)));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnShowHintGroups_3(object sender, RoutedEventArgs e)
+		private void OnShowHintGroups_3(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint)));
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint)));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnSolveSingle(object sender, RoutedEventArgs e)
+		private void OnSolveSingle(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			int time = Environment.TickCount;
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
-			time = Environment.TickCount - time;
+			try
+			{
+				int time = Environment.TickCount;
+				imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingle(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions));
+				time = Environment.TickCount - time;
 
-			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+				Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnSolveTSP(object sender, RoutedEventArgs e)
+		private void OnSolveTSP(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			int time = Environment.TickCount;
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, false));
-			time = Environment.TickCount - time;
+			try
+			{
+				int time = Environment.TickCount;
+				imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, false));
+				time = Environment.TickCount - time;
 
-			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+				Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnSolveTSPBezier(object sender, RoutedEventArgs e)
+		private void OnSolveTSPBezier(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
-			int time = Environment.TickCount;
-			imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, true));
-			time = Environment.TickCount - time;
+			try
+			{
+				int time = Environment.TickCount;
+				imgDisplay.Source = LoadBitmap(renderer.DisplaySolveSingleOrdered(solver.Screenshot, solver.FilteredHexagons.HintList.Solutions, true));
+				time = Environment.TickCount - time;
 
-			Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+				Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void OnExecuteSingle(object sender, RoutedEventArgs e)
+		private void OnExecuteSingle(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
@@ -290,7 +465,7 @@ namespace HexSolver
 			executor.Start(HexEcecutionMode.Single);
 		}
 
-		private void OnExecuteMulti(object sender, RoutedEventArgs e)
+		private void OnExecuteMulti(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
@@ -299,7 +474,7 @@ namespace HexSolver
 			executor.Start(HexEcecutionMode.Multi);
 		}
 
-		private void OnExecuteAll(object sender, RoutedEventArgs e)
+		private void OnExecuteAll(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
