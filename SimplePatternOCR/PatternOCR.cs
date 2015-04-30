@@ -29,6 +29,9 @@ namespace SimplePatternOCR
 			public int X_Max { get { return X + Width; } }
 			public int Y_Max { get { return Y + Height; } }
 
+			public int X_Mid { get { return X + Width/2; } }
+			public int Y_Mid { get { return Y + Height/2; } }
+
 			public RectangleI(int x, int y, int w, int h)
 			{
 				X = x;
@@ -495,8 +498,11 @@ namespace SimplePatternOCR
 							var box = boxes.FirstOrDefault(q =>
 								boxrect.X < q.Item2.X_Max && boxrect.X > q.Item2.X ||
 								boxrect.X_Max < q.Item2.X_Max && boxrect.X_Max > q.Item2.X ||
+								boxrect.X_Mid < q.Item2.X_Max && boxrect.X_Mid > q.Item2.X ||
+
 								q.Item2.X < boxrect.X_Max && q.Item2.X > boxrect.X ||
-								q.Item2.X_Max < boxrect.X_Max && q.Item2.X_Max > boxrect.X
+								q.Item2.X_Max < boxrect.X_Max && q.Item2.X_Max > boxrect.X ||
+								q.Item2.X_Mid < boxrect.X_Max && q.Item2.X_Mid > boxrect.X
 								);
 
 							if (box != null)

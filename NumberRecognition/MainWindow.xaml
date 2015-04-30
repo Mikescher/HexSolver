@@ -14,6 +14,7 @@
                 <ComboBoxItem Content="NORMAL" HorizontalAlignment="Stretch"/>
                 <ComboBoxItem Content="HIGH" HorizontalAlignment="Stretch"/>
             </ComboBox>
+            <CheckBox Content="Save errordata" Margin="0 0 0 10" Name="cbSaveError"/>
             <Button  Content="Load" Margin="0 0 0 10" Click="Load_Click"/>
             <Button  Content="Load Error" Margin="0 0 0 10" Click="LoadError_Click"/>
             <Button  Content="Load Counter" Margin="0 0 0 10" Click="LoadCounter_Click"/>
