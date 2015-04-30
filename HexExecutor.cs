@@ -20,7 +20,7 @@ namespace HexSolver
 		private const double MOUSE_MOVEMENT_TIME = 0.5;
 		private const int CLICK_SLEEP_TIME = 10;
 		private const int INTER_SOLUTION_SLEEP_TIME = 50;
-		private const int RECAPTURE_SLEEP = 2000;
+		private const int RECAPTURE_SLEEP = 2500;
 
 		private readonly IHexExecutorFeedback feedback;
 		private readonly HexcellsSolver Solver;

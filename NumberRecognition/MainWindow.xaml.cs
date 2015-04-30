@@ -399,6 +399,14 @@ namespace NumberRecognition
 
 				if (ocr.Value != tdata.Item1)
 				{
+					int sidx = 0;
+					while (File.Exists(string.Format(@"..\..\errordata\{0}_{1}.png", tdata.Item1, sidx)))
+						sidx++;
+					tdata.Item2.Save(string.Format(@"..\..\errordata\{0}_{1}.png", tdata.Item1, sidx));
+					Console.Out.WriteLine("Saved errordata to " + Path.GetFullPath(string.Format(@"..\..\errordata\{0}_{1}.png", tdata.Item1, sidx)));
+
+					//######################################################
+
 					var ochars = pocr.RecognizeSingleCharacter(tdata.Item2);
 					List<String> characters_final = (from Match match in Regex.Matches(tdata.Item1, "[0-9]+|[^0-9]+") select match.Value).ToList();
 
