@@ -29,8 +29,8 @@ namespace SimplePatternOCR
 			public int X_Max { get { return X + Width; } }
 			public int Y_Max { get { return Y + Height; } }
 
-			public int X_Mid { get { return X + Width/2; } }
-			public int Y_Mid { get { return Y + Height/2; } }
+			public int X_Mid { get { return X + Width / 2; } }
+			public int Y_Mid { get { return Y + Height / 2; } }
 
 			public RectangleI(int x, int y, int w, int h)
 			{
@@ -327,6 +327,14 @@ namespace SimplePatternOCR
 						outside.Push(new PointI() { X = point.X + 1, Y = point.Y });
 					if (point.Y + 1 < PATTERN_HEIGHT && !finished[point.X, point.Y + 1])
 						outside.Push(new PointI() { X = point.X, Y = point.Y + 1 });
+					if (point.X + 1 < PATTERN_WIDTH && point.Y + 1 < PATTERN_HEIGHT && !finished[point.X + 1, point.Y + 1])
+						outside.Push(new PointI() { X = point.X + 1, Y = point.Y + 1 });
+					if (point.X + 1 < PATTERN_WIDTH && point.Y - 1 >= 0 && !finished[point.X + 1, point.Y - 1])
+						outside.Push(new PointI() { X = point.X + 1, Y = point.Y - 1 });
+					if (point.X - 1 >= 0 && point.Y + 1 < PATTERN_HEIGHT && !finished[point.X - 1, point.Y + 1])
+						outside.Push(new PointI() { X = point.X - 1, Y = point.Y + 1 });
+					if (point.X - 1 >= 0 && point.Y - 1 >= 0 && !finished[point.X - 1, point.Y - 1])
+						outside.Push(new PointI() { X = point.X - 1, Y = point.Y - 1 });
 				}
 			}
 
@@ -342,11 +350,15 @@ namespace SimplePatternOCR
 						euler++;
 						inside.Push(new PointI() { X = x, Y = y });
 
+						int size = 0;
 						while (inside.Count > 0)
 						{
+
 							PointI point = inside.Pop();
 							if (finished[point.X, point.Y])
 								continue;
+
+							size++;
 
 							finished[point.X, point.Y] = true;
 
@@ -358,7 +370,19 @@ namespace SimplePatternOCR
 								inside.Push(new PointI() { X = point.X + 1, Y = point.Y });
 							if (point.Y + 1 < PATTERN_HEIGHT && !finished[point.X, point.Y + 1])
 								inside.Push(new PointI() { X = point.X, Y = point.Y + 1 });
+							if (point.X + 1 < PATTERN_WIDTH && point.Y + 1 < PATTERN_HEIGHT && !finished[point.X + 1, point.Y + 1])
+								inside.Push(new PointI() { X = point.X + 1, Y = point.Y + 1 });
+							if (point.X + 1 < PATTERN_WIDTH && point.Y - 1 >= 0 && !finished[point.X + 1, point.Y - 1])
+								inside.Push(new PointI() { X = point.X + 1, Y = point.Y - 1 });
+							if (point.X - 1 >= 0 && point.Y + 1 < PATTERN_HEIGHT && !finished[point.X - 1, point.Y + 1])
+								inside.Push(new PointI() { X = point.X - 1, Y = point.Y + 1 });
+							if (point.X - 1 >= 0 && point.Y - 1 >= 0 && !finished[point.X - 1, point.Y - 1])
+								inside.Push(new PointI() { X = point.X - 1, Y = point.Y - 1 });
+
 						}
+
+						if (size <= 12)
+							euler--;
 					}
 				}
 			}
