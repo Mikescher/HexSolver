@@ -359,6 +359,8 @@ namespace NumberRecognition
 
 			int errors = 0;
 
+			List<int> distanceTable = new List<int>();
+
 			int pos = 1;
 			foreach (var tdata in data)
 			{
@@ -393,7 +395,6 @@ namespace NumberRecognition
 					}
 				}
 				//############################################
-
 
 				SetContentGridCell(string.Join("\r\n", ocr.Characters.Select(p => string.Join(" | ", p.AllDistances.OrderBy(q => Regex.IsMatch(q.Key, @"^[0-9+]+$") ? int.Parse(q.Key) : ((q.Key + "@")[0] + 255)).Select(q => String.Format("{0}: {1:X}", q.Key, (int)q.Value))))), 23, pos, true);
 
@@ -430,11 +431,21 @@ namespace NumberRecognition
 						opos++;
 					}
 				}
+				else
+				{
+					foreach (var chr in ocr.Characters)
+					{
+						if (chr.Character != "-")
+							distanceTable.Add((int)chr.Distance);
+					}
+				}
 
 				pos += 2;
 			}
 
 			MessageBox.Show(errors + "/" + data.Count + "  false detections");
+
+			MessageBox.Show("Distances: " + Environment.NewLine + string.Join(Environment.NewLine, distanceTable.GroupBy(p => p).OrderBy(p => p.Key).Select(p => string.Format("{0:00} = {1}", p.Key, p.Count()))));
 		}
 	}
 }

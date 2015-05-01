@@ -281,6 +281,22 @@ namespace SimplePatternOCR
 			return result;
 		}
 
+		public int GetActivePixel(bool[,] map)
+		{
+			int r = 0;
+
+			for (int row = 0; row < map.GetLength(0); row++)
+			{
+				for (int col = 0; col < map.GetLength(1); col++)
+				{
+					if (map[row, col])
+						r++;
+				}
+			}
+
+			return r;
+		}
+
 		public int GetEulerNumber(bool[,] image)
 		{
 			bool[,] finished = new bool[PATTERN_WIDTH, PATTERN_HEIGHT];
@@ -406,6 +422,7 @@ namespace SimplePatternOCR
 			foreach (var ochar in ochars)
 			{
 				var euler = GetEulerNumber(ochar);
+				var activePixel = GetActivePixel(ochar);
 
 				var matches = references
 					.Select(p => new { Reference = p, Distance = GetImageDistance(ochar, p.Value, euler, p.Key) })
@@ -418,6 +435,22 @@ namespace SimplePatternOCR
 				}
 				else
 				{
+					if (activePixel == ochar.GetLength(0) * ochar.GetLength(1))
+					{
+						matches = matches
+							.Select(p => new { Reference = p.Reference, Distance = Tuple.Create(p.Distance.Item1, p.Distance.Item2, p.Distance.Item3 + ((p.Reference.Key == "-") ? 0 : 64), p.Distance.Item4) })
+							.OrderBy(p => p.Distance.Item3)
+							.ToList();
+					}
+
+					if (matches.First().Distance.Item3 > 70)
+					{
+						matches = matches
+							.Select(p => new { Reference = p.Reference, Distance = Tuple.Create(p.Distance.Item1, p.Distance.Item2, p.Distance.Item3 + ((p.Reference.Key == "-") ? 0 : 48), p.Distance.Item4) })
+							.OrderBy(p => p.Distance.Item3)
+							.ToList();
+					}
+
 					result.Append(matches.First().Reference.Key);
 
 					ocrResult.Characters.Add(new OCRCharacterResult()
