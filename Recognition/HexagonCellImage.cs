@@ -359,6 +359,10 @@ namespace HexSolver
 
 				StaticDebugSettings.ImageSave(img, txt);
 
+				if (txt == "-5") // special case (pOCR fail)
+					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, 5, errDistance);
+				if (txt == "2-") // special case (pOCR fail)
+					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, 2, errDistance);
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
 				if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
@@ -414,6 +418,10 @@ namespace HexSolver
 
 				StaticDebugSettings.ImageSave(img, txt);
 
+				if (txt == "-5") // special case (pOCR fail)
+					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, 5, errDistance);
+				if (txt == "2-") // special case (pOCR fail)
+					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, 2, errDistance);
 				if (Regex.IsMatch(txt, @"^\{[0-9]+\}$"))
 					return new CellHint(CellHintType.CONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 2)), errDistance);
 				if (Regex.IsMatch(txt, @"^-[0-9]+-$"))
