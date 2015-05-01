@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexSolver", "HexSolver.csproj", "{D1882A7A-C01D-4CA6-89E8-0D6A7A2B7891}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexSolver", "HexSolver\HexSolver.csproj", "{D1882A7A-C01D-4CA6-89E8-0D6A7A2B7891}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumberRecognition", "NumberRecognition\NumberRecognition.csproj", "{4B8224F9-69FC-449F-8156-71FA16B2B996}"
 EndProject

@@ -4,8 +4,6 @@ using System.Drawing;
 
 namespace HexSolver
 {
-	//TODO: Can't solve 3-1
-
 	class HexcellsSolver
 	{
 		public HexCam Cam { get; private set; }

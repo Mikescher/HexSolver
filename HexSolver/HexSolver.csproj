@@ -162,7 +162,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="SimplePatternOCR\SimplePatternOCR.csproj">
+    <ProjectReference Include="..\SimplePatternOCR\SimplePatternOCR.csproj">
       <Project>{8b35509e-da67-4877-8e4b-84a65ce657e4}</Project>
       <Name>SimplePatternOCR</Name>
     </ProjectReference>
