@@ -259,7 +259,6 @@ namespace SimplePatternOCR
 
 				double scale = Math.Min((PATTERN_WIDTH * 1.0) / box.Item2.Width, (PATTERN_HEIGHT * 1.0) / box.Item2.Height);
 
-
 				for (int x = 0; x < PATTERN_WIDTH; x++)
 				{
 					for (int y = 0; y < PATTERN_HEIGHT; y++)
