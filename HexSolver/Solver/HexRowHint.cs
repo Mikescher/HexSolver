@@ -151,7 +151,8 @@ namespace HexSolver.Solver
 
 				if (icell != null)
 				{
-					yield return icell;
+					if (icell.Type != HexagonType.NOCELL) // Ignore NoCells in rows - it think ??
+						yield return icell;
 				}
 				else
 				{

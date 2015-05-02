@@ -20,6 +20,15 @@ namespace HexSolver
 
 			text = text.Replace("?", "Q");
 
+			if (text.EndsWith("-") && !text.StartsWith("-"))
+				text = "-" + text;
+			if (!text.EndsWith("-") && text.StartsWith("-"))
+				text = text + "-";
+			if (text.EndsWith("{") && !text.StartsWith("}"))
+				text = "{" + text;
+			if (!text.EndsWith("{") && text.StartsWith("}"))
+				text = text + "}";
+
 			int shotid = ImageSaveDict.ContainsKey(text) ? ImageSaveDict[text] : 0;
 			while (File.Exists(String.Format(@"..\..\imgsave\{0}_{1}.png", text, shotid)))
 				shotid++;

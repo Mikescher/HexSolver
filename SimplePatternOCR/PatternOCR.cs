@@ -58,7 +58,8 @@ namespace SimplePatternOCR
 		private const int PATTERN_WIDTH = 32;
 		private const int PATTERN_HEIGHT = 32;
 
-		private const int MAX_IMGDISTANCE_OFFSET = 4;
+		private const int MAX_IMGDISTANCE_OFFSET_X = 8;
+		private const int MAX_IMGDISTANCE_OFFSET_Y = 4;
 		private const double EULER_DISTANCE_CORRECTION = 3.5;
 
 
@@ -201,11 +202,11 @@ namespace SimplePatternOCR
 
 		private Tuple<int, int, double, int> GetImageDistance(bool[,] imgA, byte[,] imgPattern, int imgAEuler, string pattern)
 		{
-			var result = Enumerable.Range(-MAX_IMGDISTANCE_OFFSET, 2 * MAX_IMGDISTANCE_OFFSET + 1)
+			var result = Enumerable.Range(-MAX_IMGDISTANCE_OFFSET_X, 2 * MAX_IMGDISTANCE_OFFSET_X + 1)
 				.SelectMany(
 					ox =>
 						Enumerable
-							.Range(-MAX_IMGDISTANCE_OFFSET, 2 * MAX_IMGDISTANCE_OFFSET + 1)
+							.Range(-MAX_IMGDISTANCE_OFFSET_Y, 2 * MAX_IMGDISTANCE_OFFSET_Y + 1)
 							.Select(oy => new { ofx = ox, ofy = oy, val = GetImageDistance(imgA, imgPattern, ox, oy, imgAEuler, pattern) })
 						)
 				.OrderBy(p => p.val)
