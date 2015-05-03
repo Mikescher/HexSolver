@@ -36,6 +36,7 @@ The idea is to automatically parse the game state, find the next (valid) step an
  - 3-Step solving of the current configuration (tested on the original levels and many of the generated ones)
  - Finding the optimal execution path by solving the corresponding [TSP](http://en.wikipedia.org/wiki/Travelling_salesman_problem)
  - Automatic execution by programmatically moving the mouse
+ - Saving the current (captured) state as an [*.hexcells](https://github.com/BlaXpirit/sixcells) file
 
 ##HexSolvers internal steps
 

@@ -58,8 +58,21 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplayIndizies(Bitmap shot, HexGrid grid)
+		public Bitmap DisplayIndizies(Bitmap shot, HexGrid grid, bool offset)
 		{
+			Func<Vec2i, Vec2i> Convert;
+			if (offset)
+			{
+				int ox = grid.Min(p => p.Key.X);
+				int oy = grid.Min(p => p.Key.X + 2 * p.Key.Y);
+
+				Convert = (v) => new Vec2i(v.X - ox, v.X + 2 * v.Y - oy);
+			}
+			else
+			{
+				Convert = (v) => v;
+			}
+
 			shot = new Bitmap(shot);
 
 			Font fnt = new Font("Arial", 8, FontStyle.Regular);
@@ -77,11 +90,12 @@ namespace HexSolver
 				foreach (var hex in grid)
 				{
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
+					var key = Convert(hex.Key);
 
 					g.FillPolygon(new SolidBrush(hex.Value.Type != HexagonType.NOCELL ? Color.Orange : Color.Wheat), points);
 					g.DrawLines(new Pen(Color.DarkGray), points);
 
-					g.DrawString(hex.Key.X + " | " + hex.Key.Y, fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+					g.DrawString(key.X + " | " + key.Y, fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
 				}
 			}
 

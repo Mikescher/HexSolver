@@ -73,5 +73,50 @@ namespace HexSolver
 		{
 			Image = new HexagonCellImage(Image.OCRCenter, Image.OCRRadius, newImage, Image.PatternOCR);
 		}
+
+		public string GetLevelRepresentation()
+		{
+			switch (Type)
+			{
+				case HexagonType.HIDDEN:
+					return @"??";
+				case HexagonType.ACTIVE:
+					if (Hint.Area == CellHintArea.CIRCLE)
+						return @"X+";
+					else
+						return @"X.";
+				case HexagonType.INACTIVE:
+					if (Hint.Area == CellHintArea.DIRECT)
+						return @"O+";
+					else
+						return @"O.";
+				case HexagonType.NOCELL:
+					if (Hint.Area == CellHintArea.NONE)
+						return @"..";
+					if (Hint.Area == CellHintArea.COLUMN_LEFT && Hint.Type == CellHintType.COUNT)
+						return @"/+";
+					if (Hint.Area == CellHintArea.COLUMN_LEFT && Hint.Type == CellHintType.CONSECUTIVE)
+						return @"/c";
+					if (Hint.Area == CellHintArea.COLUMN_LEFT && Hint.Type == CellHintType.NONCONSECUTIVE)
+						return @"/n";
+					if (Hint.Area == CellHintArea.COLUMN_DOWN && Hint.Type == CellHintType.COUNT)
+						return @"|+";
+					if (Hint.Area == CellHintArea.COLUMN_DOWN && Hint.Type == CellHintType.CONSECUTIVE)
+						return @"|c";
+					if (Hint.Area == CellHintArea.COLUMN_DOWN && Hint.Type == CellHintType.NONCONSECUTIVE)
+						return @"|n";
+					if (Hint.Area == CellHintArea.COLUMN_RIGHT && Hint.Type == CellHintType.COUNT)
+						return @"\+";
+					if (Hint.Area == CellHintArea.COLUMN_RIGHT && Hint.Type == CellHintType.CONSECUTIVE)
+						return @"\c";
+					if (Hint.Area == CellHintArea.COLUMN_RIGHT && Hint.Type == CellHintType.NONCONSECUTIVE)
+						return @"\n";
+					break;
+				case HexagonType.UNKNOWN:
+					throw new Exception("Can't save cell of type UNKNOWN");
+			}
+
+			throw new Exception("Can't save cell of type HIDDEN");
+		}
 	}
 }

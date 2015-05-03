@@ -3,6 +3,8 @@ using MSHC.Geometry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace HexSolver
 {
@@ -154,6 +156,72 @@ namespace HexSolver
 			list.Optimize();
 
 			return list;
+		}
+
+		public bool CanConvertToLevelFile()
+		{
+			int ox = this.Min(p => p.Key.X);
+			int oy = this.Min(p => p.Key.X + 2 * p.Key.Y);
+
+			Func<Vec2i, Vec2i> Convert = (v) => new Vec2i(v.X - ox, v.X + 2 * v.Y - oy);
+
+			int maxX = this.Max(p => Convert(p.Key).X);
+			int maxY = this.Max(p => Convert(p.Key).Y);
+
+			bool validSize = maxX > 0 && maxY > 0 && maxX <= 33 && maxY <= 33;
+
+			return this.All(p => p.Value.Type != HexagonType.UNKNOWN) && validSize;
+		}
+
+		public string ConvertToLevelFile()
+		{
+			if (!CanConvertToLevelFile())
+			{
+				throw new Exception("Can't convert to Levelfile :(");
+			}
+
+			int ox = this.Min(p => p.Key.X);
+			int oy = this.Min(p => p.Key.X + 2 * p.Key.Y);
+
+			Func<Vec2i, Vec2i> Convert = (v) => new Vec2i(v.X - ox, v.X + 2 * v.Y - oy);
+
+			int maxX = this.Max(p => Convert(p.Key).X);
+			int maxY = this.Max(p => Convert(p.Key).Y);
+
+			StringBuilder builder = new StringBuilder();
+
+			builder.Append("\t" + "Hexcells level v1" + "\n");
+
+			builder.Append("\t" + "" + "\n");
+			builder.Append("\t" + "" + "\n");
+			builder.Append("\t" + "" + "\n");
+			builder.Append("\t" + "" + "\n");
+
+			int offset_x = (33 - (maxX - 1)) / 2;
+			int offset_y = (33 - (maxY - 1)) / 2;
+
+			for (int y = 0; y < 33; y++)
+			{
+				builder.Append("\t");
+				for (int x = 0; x < 33; x++)
+				{
+					var found = this
+						.Where(p => Convert(p.Key).X + offset_x == x)
+						.Where(p => Convert(p.Key).Y + offset_y == y)
+						.Select(p => p.Value)
+						.FirstOrDefault();
+
+					if (found == null)
+						builder.Append("..");
+					else
+						builder.Append(found.GetLevelRepresentation());
+				}
+
+				if (y + 1 < 33)
+					builder.Append("\n");
+			}
+
+			return builder.ToString();
 		}
 	}
 }

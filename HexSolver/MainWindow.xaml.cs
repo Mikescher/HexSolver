@@ -1,4 +1,5 @@
 ﻿using HexSolver.Solver;
+using Microsoft.Win32;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -214,7 +215,22 @@ namespace HexSolver
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons, false));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowIndiziesOffset(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayIndizies(solver.Screenshot, solver.FilteredHexagons, true));
 			}
 			catch (Exception e)
 			{
@@ -411,6 +427,49 @@ namespace HexSolver
 				time = Environment.TickCount - time;
 
 				Console.Out.WriteLine("Calculated Single Step in " + time + "ms");
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnSaveLevel(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				if (!solver.FilteredHexagons.CanConvertToLevelFile())
+				{
+					MessageBox.Show("Can't save > because of the implications", "Can't save", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				SaveFileDialog sfd = new SaveFileDialog();
+				sfd.Filter = "Hexcells Level file (*.hexcells)|*.hexcells|All Files (*)|*";
+				sfd.DefaultExt = "hexcells";
+
+				if (sfd.ShowDialog() == true)
+				{
+					File.WriteAllText(sfd.FileName, solver.FilteredHexagons.ConvertToLevelFile());
+				}
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnClipboardLevel(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				Clipboard.SetText(solver.FilteredHexagons.ConvertToLevelFile());
 			}
 			catch (Exception e)
 			{
