@@ -30,6 +30,8 @@ namespace HexSolver
 		{
 			InitializeComponent();
 
+			Title = "HexSolver " + App.HS_VERSION + " (github.com/Mikescher/HexSolver)";
+
 			try
 			{
 				solver = new HexcellsSolver();
