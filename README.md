@@ -9,7 +9,7 @@ The idea is to automatically parse the game state, find the next (valid) step an
 
 ### [> Animation](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
 
-##Usage
+## Usage
 
  - Start HexCells Infinite *(should also work with the other Hexcell games)*
  - I recommend window-mode with 1440x900 resolution (for the OCR to work best)
@@ -20,7 +20,7 @@ The idea is to automatically parse the game state, find the next (valid) step an
  - Don't manually move your mouse until finished (press ESC to abort)
  - If you just want to see the next step press **Solve** (Can take around 5-10 seconds)
 
-##Troubleshooting
+## Troubleshooting
 
  - HexSolver needs an minimum amount of orange cells to recognize the layout
  - HexSolver only works when all cells are in an uniform grid (click **Calculate** to see the grid)
@@ -28,7 +28,7 @@ The idea is to automatically parse the game state, find the next (valid) step an
  - If you find the (uncommon) case of two row-hint in one cell, HexSolver will fail *<sup>(sorry)</sup>*
  - If HexSolver fails to solve a configuration or the OCR module fails, please send me an <u>full-resolution</u> screenshot of the game.
 
-##Features
+## Features
 
  - Automatic finding of game window and capturing of its graphical output
  - Dynamically finding the hexagon layout
@@ -38,14 +38,14 @@ The idea is to automatically parse the game state, find the next (valid) step an
  - Automatic execution by programmatically moving the mouse
  - Saving the current (captured) state as an [*.hexcells](https://github.com/BlaXpirit/sixcells) file
 
-##HexSolvers internal steps
+## HexSolvers internal steps
 
-###Step 1 - Capture
+### Step 1 - Capture
 
 ![Shot1](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot1.png)
 *(Captured Screenshot)*
 
-###Step 2 - Find Hexagons
+### Step 2 - Find Hexagons
 
 ![Shot2](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot2.png)
 *(Binarizing Image to find hexagons)*
@@ -53,17 +53,17 @@ The idea is to automatically parse the game state, find the next (valid) step an
 ![Shot3](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot3.png)
 *(Putting Hexagon Grid over screenshot)*
 
-###Step 3 - Recognize Types
+### Step 3 - Recognize Types
 
 ![Shot4](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot4.png)
 *(Find the layout and the cell types)*
 
-###Step 4 - Image Processing
+### Step 4 - Image Processing
 
 ![Shot5](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot5.png)
 *(Find the cells with numbers and extract them)*
 
-###Step 5 - Text Recognition
+### Step 5 - Text Recognition
 
 ![Shot6](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot6.png)
 *(OCR the numbers with my own HexCells-OCR engine)*
@@ -71,7 +71,7 @@ The idea is to automatically parse the game state, find the next (valid) step an
 ![Shot7](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot7.png)
 *(the OCR distance of the different numbers)*
 
-###Step 6 - Puzzle Solving
+### Step 6 - Puzzle Solving
 
 ![Shot8](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot8.png)
 *(Show all the current active hints)*
@@ -82,6 +82,6 @@ The idea is to automatically parse the game state, find the next (valid) step an
 ![Shot10](https://raw.githubusercontent.com/Mikescher/HexSolver/master/README-FILES/shot10.png)
 *(Find an optimal execution path by TSP algorithm)*
 
-###Step 7 - Solution Executing
+### Step 7 - Solution Executing
 
-####[>>> Animation <<<](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
+#### [>>> Animation <<<](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
