@@ -1,13 +1,13 @@
 HexSolver <i><small><sup>(an Hexcells solver)<sup></small></i>
 ==============================================================
 
-An automatic solver for [Hexcells](http://www.matthewbrowngames.com/hexcells.html), [Hexcells Plus](http://www.matthewbrowngames.com/hexcellsplus.html) and [Hexcells Infinite](http://www.matthewbrowngames.com/hexcellsinfinite.html).  
+An automatic solver for [Hexcells](https://store.steampowered.com/app/265890/Hexcells/), [Hexcells Plus](https://store.steampowered.com/app/271900/Hexcells_Plus/) and [Hexcells Infinite](https://store.steampowered.com/app/304410/Hexcells_Infinite/).  
 The idea is to automatically parse the game state, find the next (valid) step and execute it.  
 *(Rinse and Repeat until everything is solved)*
 
 ### [> Current Release](https://github.com/Mikescher/HexSolver/releases)
 
-### [> Animation](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
+[![Execution Animation](README-FILES/animation1_small.gif)](http://gfycat.com/GrotesqueRecklessAcornbarnacle)
 
 ## Usage
 
