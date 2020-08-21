@@ -20,7 +20,7 @@
                             <ColumnDefinition Width="5"/>
                             <ColumnDefinition Width="35"/>
                             <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="60"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="24"/>
@@ -28,7 +28,8 @@
                             <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
-                        <Button Content="[1] Recapture" Grid.Row="0" Padding="8 0" Click="OnCaptureClicked" FontWeight="Bold" Grid.ColumnSpan="5" />
+                        <Button Content="[1] Recapture" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Padding="8 0" Click="OnCaptureClicked"     FontWeight="Bold"  />
+                        <Button Content="Update"        Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="1" Padding="8 0" Click="OnSoftCaptureClicked" FontStyle="Italic" />
                         
                         <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked"  Grid.ColumnSpan="3"/>
                         <xctk:IntegerUpDown Grid.Row="2" Grid.Column="4" Value="1" Minimum="1" x:Name="iudExample"/>

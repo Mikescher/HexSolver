@@ -1,4 +1,5 @@
 ﻿using SimplePatternOCR;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -50,7 +51,7 @@ namespace HexSolver
 		public HexGrid AllHexagons
 		{
 			get { return _AllHexagons ?? (_AllHexagons = OCR.GetAllHexagons(Screenshot, HexProperties)); }
-			private set
+			set
 			{
 				_AllHexagons = value;
 				FilteredHexagons = null;
@@ -102,7 +103,12 @@ namespace HexSolver
 			OCR = new HexOCR(POCR);
 		}
 
-		public Bitmap LoadScreenshot(Bitmap bmp)
+		public void TakeSoftScreenshot()
+        {
+			_Screenshot = Cam.GetScreenShot(true); //No Prop Reset
+        }
+
+        public Bitmap LoadScreenshot(Bitmap bmp)
 		{
 			Screenshot = bmp;
 

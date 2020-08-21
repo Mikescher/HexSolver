@@ -67,6 +67,26 @@ namespace HexSolver
 			}
 		}
 
+		private void OnSoftCaptureClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				solver.TakeSoftScreenshot();
+				solver.AllHexagons = null;
+
+				imgDisplay.Source = LoadBitmap(solver.Screenshot);
+
+				pnlExecute.IsEnabled = true;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 		private void OnShowPlainClicked(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
