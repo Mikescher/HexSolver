@@ -328,7 +328,7 @@ namespace HexSolver
 			shot = new Bitmap(shot);
 
 			var counter = ocr.GetCounterArea(shot);
-			bool[,] pattern = ocr.GetPattern(shot, pparams, MathExt.Min(counter.Item1.bl.X - 10, counter.Item2.bl.X - 10, counter.Item3.bl.X - 10));
+			bool[,] pattern = ocr.GetPattern(shot, pparams, counter.Item4, counter.Item5);
 			var centers = ocr.GetHexPatternCenters(pattern, shot.Width, shot.Height, out var errs);
 			var grid = ocr.GetHexPatternGrid(centers);
 

@@ -202,7 +202,7 @@ namespace HexSolver
 			return result;
 		}
 
-		public bool[,] GetPattern(Bitmap shot, HexPatternParameter pparams, int max_x)
+		public bool[,] GetPattern(Bitmap shot, HexPatternParameter pparams, int ignore_x, int ignore_y)
 		{
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -221,10 +221,12 @@ namespace HexSolver
 			{
 				byte* p = (byte*)(void*)Scan0;
 
-				for (int x = 0; x < max_x; x++)
+				for (int x = 0; x < width; x++)
 				{
 					for (int y = 0; y < height; y++)
 					{
+						if (x > ignore_x && y < ignore_y) continue;
+
 						int idx = (y * stride) + x * 4;
 
 						result[x, y] = false;
@@ -425,7 +427,7 @@ namespace HexSolver
 			return Tuple.Create(distances_x.Average(), distances_y.Average());
 		}
 
-		public Tuple<Rect2i, Rect2i, Rect2i> GetCounterArea(Bitmap shot)
+		public Tuple<Rect2i, Rect2i, Rect2i, int, int> GetCounterArea(Bitmap shot)
 		{
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -584,7 +586,10 @@ namespace HexSolver
 
 			shot.UnlockBits(srcData);
 
-			return Tuple.Create(resultAll, resultNumber, resultInner);
+			var ignore_x = MathExt.Min(resultAll.bl.X - 10, resultNumber.bl.X - 10, resultInner.bl.X - 10);
+			var ignore_y = MathExt.Max(resultAll.bl.Y + 10, resultNumber.bl.Y + 10, resultInner.bl.Y + 10);
+
+			return Tuple.Create(resultAll, resultNumber, resultInner, ignore_x, ignore_y);
 		}
 
 		public HexGridProperties FindHexPattern(Bitmap shot, HexPatternParameter pparams)
@@ -604,7 +609,7 @@ namespace HexSolver
 			//##################################
 
 			var counter = GetCounterArea(shot);
-			bool[,] pattern = GetPattern(shot, pparams, MathExt.Min(counter.Item1.bl.X - 10, counter.Item2.bl.X - 10, counter.Item3.bl.X - 10));
+			bool[,] pattern = GetPattern(shot, pparams, counter.Item4, counter.Item5);
 			var centers = GetHexPatternCenters(pattern, shot.Width, shot.Height, out _);
 			var grid = GetHexPatternGrid(centers);
 			double hexHeight = GetHexPatternHeight(pattern, shot.Height, centers) - 2;

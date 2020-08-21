@@ -94,22 +94,22 @@
                         </Grid.RowDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Content="Radius:"/>
-                        <xctk:DoubleUpDown Grid.Row="0"  Grid.Column="1" FormatString="F2" Value="23"    Increment=".01"  Minimum="0" x:Name="dudRadius" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="0"  Grid.Column="1" FormatString="F2" Value="16"    Increment=".01"  Minimum="0" x:Name="dudRadius" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Content="Gap:"/>
-                        <xctk:DoubleUpDown Grid.Row="2"  Grid.Column="1" FormatString="F2" Value="7.4"  Increment=".01"  Minimum="0" x:Name="dudGap"    ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="2"  Grid.Column="1" FormatString="F2" Value="4"  Increment=".01"  Minimum="0" x:Name="dudGap"    ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="4" Grid.Column="0" Content="H Correction:"/>
-                        <xctk:DoubleUpDown Grid.Row="4"  Grid.Column="1" FormatString="F2" Value="0.6"   Increment=".01"  Minimum="0" x:Name="dudHCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="4"  Grid.Column="1" FormatString="F2" Value="0"   Increment=".01"  Minimum="0" x:Name="dudHCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="6" Grid.Column="0" Content="V Correction:"/>
-                        <xctk:DoubleUpDown Grid.Row="6"  Grid.Column="1" FormatString="F2" Value="0.0"   Increment=".01"  Minimum="0" x:Name="dudVCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="6"  Grid.Column="1" FormatString="F2" Value="0"   Increment=".01"  Minimum="0" x:Name="dudVCorr"  ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="8" Grid.Column="0" Content="Padding X:"/>
-                        <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="56.5"   Increment=".01"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="8"  Grid.Column="1" FormatString="F2" Value="0"   Increment=".01"  Minimum="0" x:Name="dudPadX"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="10" Grid.Column="0" Content="Padding Y:"/>
-                        <xctk:DoubleUpDown Grid.Row="10" Grid.Column="1" FormatString="F2" Value="48.5" Increment=".01"  Minimum="0" x:Name="dudPadY"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
+                        <xctk:DoubleUpDown Grid.Row="10" Grid.Column="1" FormatString="F2" Value="0" Increment=".01"  Minimum="0" x:Name="dudPadY"   ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="3"/>
 
                         <Label Grid.Row="12" Grid.Column="0" Content="Swap:"/>
                         <ComboBox Grid.Row="12" Grid.Column="1" x:Name="cbSwap" SelectedIndex="1" SelectionChanged="cbSwap_SelectionChanged" Grid.ColumnSpan="3">
@@ -118,16 +118,16 @@
                         </ComboBox>
 
                         <Label Grid.Row="14" Grid.Column="0" Content="Bar TopRight:"/>
-                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="200" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
-                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="3" FormatString="F2" Value="190" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
+                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="1" FormatString="F2" Value="0" Increment="5"  Minimum="0" x:Name="dudBarTopRightX" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
+                        <xctk:DoubleUpDown Grid.Row="14" Grid.Column="3" FormatString="F2" Value="0" Increment="5"  Minimum="0" x:Name="dudBarTopRightY" ValueChanged="HexOCRValueChanged" Grid.ColumnSpan="1"/>
 
                         <Label Grid.Row="16" Grid.Column="0" Content="Counter Pos:"/>
-                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="1270" Increment="5"  Minimum="0" x:Name="dudCounterX" ValueChanged="HexOCRValueChanged"/>
-                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="3" FormatString="F2" Value="38" Increment="5"  Minimum="0" x:Name="dudCounterY" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="1" FormatString="F2" Value="0" Increment="5"  Minimum="0" x:Name="dudCounterX" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="16" Grid.Column="3" FormatString="F2" Value="0" Increment="5"  Minimum="0" x:Name="dudCounterY" ValueChanged="HexOCRValueChanged"/>
 
                         <Label Grid.Row="18" Grid.Column="0" Content="Counter Size:"/>
-                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="1" FormatString="F2" Value="154" Increment="1"  Minimum="0" x:Name="dudCounterW" ValueChanged="HexOCRValueChanged"/>
-                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="3" FormatString="F2" Value="38"  Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="1" FormatString="F2" Value="200" Increment="1"  Minimum="0" x:Name="dudCounterW" ValueChanged="HexOCRValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="18" Grid.Column="3" FormatString="F2" Value="200"  Increment="1"  Minimum="0" x:Name="dudCounterH" ValueChanged="HexOCRValueChanged"/>
                     </Grid>
                 </Expander>
 
@@ -315,7 +315,7 @@
                             </Grid.ColumnDefinitions>
                             <Button Content="[4] Solve" Grid.Column="0" Click="OnSolveSingle" FontWeight="Bold"/>
                             <Button Content="[5] Save" Grid.Column="2" Click="OnSaveLevel" FontWeight="Bold"/>
-                            <Button Content="C&amp;V" Grid.Column="4" Click="OnClipboardLevel" />
+                            <Button Content="C&amp;V" Grid.Column="4" Click="OnClipboardLevel" ToolTip="Copy Level to CLipboard" />
                         </Grid>
 
                         <Button Content="TSP Ordering" Grid.Row="8" Grid.Column="0" Click="OnSolveTSP"       Grid.ColumnSpan="5" />
