@@ -284,18 +284,27 @@
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
                             <RowDefinition Height="24"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
-                        <Button Content="Hexagon Indizies" Grid.Row="0" Click="OnShowIndizies" Grid.ColumnSpan="5"/>
-                        <Button Content="#" Grid.Row="0" Grid.Column="6" Click="OnShowIndiziesOffset"/>
-                        <Button Content="Hint Groups" Grid.Row="2" Click="OnShowHintGroups" Grid.ColumnSpan="1"/>
-                        <Button Content="A" Grid.Row="2" Grid.Column="2" Click="OnShowHintGroups_1" Grid.ColumnSpan="1"/>
-                        <Button Content="B" Grid.Row="2" Grid.Column="4" Click="OnShowHintGroups_2" Grid.ColumnSpan="1"/>
-                        <Button Content="C" Grid.Row="2" Grid.Column="6" Click="OnShowHintGroups_3" Grid.ColumnSpan="1"/>
-                        <Grid Grid.Row="4" Grid.ColumnSpan="7">
+                        <Button Content="Hexagon Indizies" Grid.Row="0" Grid.Column="0" Click="OnShowIndizies"       Grid.ColumnSpan="5"/>
+                        <Button Content="#"                Grid.Row="0" Grid.Column="6" Click="OnShowIndiziesOffset" Grid.ColumnSpan="1"/>
+
+                        <Button Content="Hint Groups" Grid.Row="2" Grid.Column="0" Click="OnShowHintGroups_Limit"   Grid.ColumnSpan="1"/>
+                        <Button Content="A"           Grid.Row="2" Grid.Column="2" Click="OnShowHintGroups_Limit_1" Grid.ColumnSpan="1"/>
+                        <Button Content="B"           Grid.Row="2" Grid.Column="4" Click="OnShowHintGroups_Limit_2" Grid.ColumnSpan="1"/>
+                        <Button Content="C"           Grid.Row="2" Grid.Column="6" Click="OnShowHintGroups_Limit_3" Grid.ColumnSpan="1"/>
+
+                        <Button Content="All Hint Groups" Grid.Row="4" Grid.Column="0" Click="OnShowHintGroups_All"   Grid.ColumnSpan="1"/>
+                        <Button Content="A"               Grid.Row="4" Grid.Column="2" Click="OnShowHintGroups_All_1" Grid.ColumnSpan="1"/>
+                        <Button Content="B"               Grid.Row="4" Grid.Column="4" Click="OnShowHintGroups_All_2" Grid.ColumnSpan="1"/>
+                        <Button Content="C"               Grid.Row="4" Grid.Column="6" Click="OnShowHintGroups_All_3" Grid.ColumnSpan="1"/>
+
+                        <Grid Grid.Row="6" Grid.ColumnSpan="7">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="5"/>
@@ -307,8 +316,9 @@
                             <Button Content="[5] Save" Grid.Column="2" Click="OnSaveLevel" FontWeight="Bold"/>
                             <Button Content="C&amp;V" Grid.Column="4" Click="OnClipboardLevel" />
                         </Grid>
-                        <Button Content="TSP Ordering" Grid.Row="6" Click="OnSolveTSP" Grid.ColumnSpan="5"/>
-                        <Button Content="~" Grid.Row="6" Grid.Column="6" Click="OnSolveTSPBezier" Grid.ColumnSpan="1"/>
+
+                        <Button Content="TSP Ordering" Grid.Row="8" Grid.Column="0" Click="OnSolveTSP"       Grid.ColumnSpan="5" />
+                        <Button Content="~"            Grid.Row="8" Grid.Column="6" Click="OnSolveTSPBezier" Grid.ColumnSpan="1" />
                     </Grid>
                 </Border>
                 <Border Margin="3" BorderThickness="1" CornerRadius="2" BorderBrush="LightGray">

@@ -411,7 +411,7 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplayHintGroups(Bitmap shot, HexGrid grid, Type filter)
+		public Bitmap DisplayHintGroups(Bitmap shot, HexGrid grid, Type filter, bool limitToActiveCells)
 		{
 			shot = new Bitmap(shot);
 
@@ -419,11 +419,12 @@ namespace HexSolver
 			{
 				g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.White)), 0, 0, shot.Width, shot.Height);
 
+				var hints = limitToActiveCells ? grid.HintList : grid.GetHintList(true);
 
-				foreach (var hint in grid.HintList.Where(p => !(p is HexCellSumHint)).Where(p => filter == null || p.GetType() == filter))
+				foreach (var hint in hints.Where(p => !(p is HexCellSumHint)).Where(p => filter == null || p.GetType() == filter))
 				{
 					var points = hint
-						.GetCells()
+						.GetCells(!limitToActiveCells)
 						.SelectMany(q => Enumerable.Range(0, 7).Select(q.GetEdge))
 						.ToList();
 

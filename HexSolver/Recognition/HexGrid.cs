@@ -124,7 +124,7 @@ namespace HexSolver
 				yield return new KeyValuePair<Vec2i, HexagonCell>(new Vec2i(pos.X - 1, pos.Y), Get(pos.X - 1, pos.Y));
 		}
 
-		private HexHintList GetHintList()
+		public HexHintList GetHintList(bool raw = false)
 		{
 			HexHintList list = new HexHintList(this);
 
@@ -154,8 +154,11 @@ namespace HexSolver
 
 			list.Add(new HexCellSumHint(this));
 
-			list.CleanUp();
-			list.Optimize();
+			if (!raw)
+			{
+				list.CleanUp();
+				list.Optimize();
+			}
 
 			return list;
 		}

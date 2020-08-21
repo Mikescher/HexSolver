@@ -15,6 +15,7 @@ namespace HexSolver.Solver
 	{
 		public readonly HexagonCell Source;
 		public HexRowHintType Type { get; private set; }
+		public readonly ICollection<HexagonCell> AllCells;
 		public ICollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
@@ -23,7 +24,7 @@ namespace HexSolver.Solver
 			Source = cell;
 			Type = ConvertHintType(cell.Hint);
 			Number = cell.Hint.Number;
-			Cells = GetCells(grid, cell).ToList().AsReadOnly();
+			AllCells = GetCells(grid, cell).ToList().AsReadOnly();
 
 			CleanConditions();
 		}
@@ -48,9 +49,9 @@ namespace HexSolver.Solver
 
 		private void CleanConditions_Nonconsecutive()
 		{
-			var clist = Cells.ToList();
+			var clist = AllCells.ToList();
 
-			int min = Cells.Count;
+			int min = AllCells.Count;
 			int max = 0;
 
 			for (int i = 0; i < clist.Count; i++)
@@ -62,14 +63,14 @@ namespace HexSolver.Solver
 				}
 			}
 
-			Cells = Cells.Skip(min).Take(max - min).ToList().AsReadOnly();
+			Cells = AllCells.Skip(min).Take(max - min).ToList().AsReadOnly();
 		}
 
 		private void CleanConditions_Consecutive()
 		{
-			var clist = Cells.ToList();
+			var clist = AllCells.ToList();
 
-			int min = Cells.Count;
+			int min = AllCells.Count;
 			int max = 0;
 
 			for (int i = 0; i < clist.Count; i++)
@@ -81,14 +82,14 @@ namespace HexSolver.Solver
 				}
 			}
 
-			Cells = Cells.Skip(min).Take(max - min).ToList().AsReadOnly();
+			Cells = AllCells.Skip(min).Take(max - min).ToList().AsReadOnly();
 		}
 
 		private void CleanConditions_Normal()
 		{
 			var remove = new List<HexagonCell>();
 
-			foreach (var cell in Cells)
+			foreach (var cell in AllCells)
 			{
 				if (cell.Type == HexagonType.ACTIVE)
 				{
@@ -101,7 +102,7 @@ namespace HexSolver.Solver
 				}
 			}
 
-			Cells = Cells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
+			Cells = AllCells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
 		}
 
 		private HexRowHintType ConvertHintType(CellHint Hint)
@@ -164,9 +165,9 @@ namespace HexSolver.Solver
 			}
 		}
 
-		public override ICollection<HexagonCell> GetCells()
+		public override ICollection<HexagonCell> GetCells(bool full = false)
 		{
-			return Cells;
+			return full ? AllCells : Cells;
 		}
 
 		public override int GetNumber()

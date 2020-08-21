@@ -18,7 +18,7 @@ namespace HexSolver
 		private const int LIMIT_SINGLE = 18;
 		private const int LIMIT_DOUBLE = 12;
 
-		public abstract ICollection<HexagonCell> GetCells();
+		public abstract ICollection<HexagonCell> GetCells(bool full = false);
 		public abstract int GetNumber();
 
 		public abstract bool IsTrueForTemp();

@@ -16,6 +16,7 @@ namespace HexSolver.Solver
 	{
 		public readonly HexagonCell Source;
 		public HexNeighborHintType Type { get; private set; }
+		public readonly ICollection<HexagonCell> AllCells;
 		public ReadOnlyCollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
@@ -24,7 +25,7 @@ namespace HexSolver.Solver
 			Source = cell;
 			Type = ConvertHintType(cell.Hint);
 			Number = cell.Hint.Number;
-			Cells = GetCells(grid, cell).ToList().AsReadOnly();
+			AllCells = GetCells(grid, cell).ToList().AsReadOnly();
 
 			CleanConditions();
 		}
@@ -50,18 +51,20 @@ namespace HexSolver.Solver
 		private void CleanConditions_Nonconsecutive()
 		{
 			// Nothing ...
+			Cells = AllCells.ToList().AsReadOnly();
 		}
 
 		private void CleanConditions_Consecutive()
 		{
 			// Nothing ...
+			Cells = AllCells.ToList().AsReadOnly();
 		}
 
 		private void CleanConditions_Normal()
 		{
 			var remove = new List<HexagonCell>();
 
-			foreach (var cell in Cells)
+			foreach (var cell in AllCells)
 			{
 				if (cell.Type == HexagonType.ACTIVE)
 				{
@@ -74,7 +77,7 @@ namespace HexSolver.Solver
 				}
 			}
 
-			Cells = Cells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
+			Cells = AllCells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
 		}
 
 		private HexNeighborHintType ConvertHintType(CellHint Hint)
@@ -97,9 +100,9 @@ namespace HexSolver.Solver
 			return grid.GetSurrounding(cell.Position).Select(p => p.Value);
 		}
 
-		public override ICollection<HexagonCell> GetCells()
+		public override ICollection<HexagonCell> GetCells(bool full = false)
 		{
-			return Cells;
+			return full ? AllCells : Cells;
 		}
 
 		public override int GetNumber()

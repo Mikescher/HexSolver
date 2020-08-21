@@ -393,14 +393,14 @@ namespace HexSolver
 			}
 		}
 
-		private void OnShowHintGroups(object sender, RoutedEventArgs eargs)
+		private void OnShowHintGroups_Limit(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null, true));
 			}
 			catch (Exception e)
 			{
@@ -408,14 +408,14 @@ namespace HexSolver
 			}
 		}
 
-		private void OnShowHintGroups_1(object sender, RoutedEventArgs eargs)
+		private void OnShowHintGroups_Limit_1(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint)));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint), true));
 			}
 			catch (Exception e)
 			{
@@ -423,14 +423,14 @@ namespace HexSolver
 			}
 		}
 
-		private void OnShowHintGroups_2(object sender, RoutedEventArgs eargs)
+		private void OnShowHintGroups_Limit_2(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint)));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint), true));
 			}
 			catch (Exception e)
 			{
@@ -438,14 +438,74 @@ namespace HexSolver
 			}
 		}
 
-		private void OnShowHintGroups_3(object sender, RoutedEventArgs eargs)
+		private void OnShowHintGroups_Limit_3(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
 				return;
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint)));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint), true));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowHintGroups_All(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, null, false));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowHintGroups_All_1(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexNeighborHint), false));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowHintGroups_All_2(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexRowHint), false));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnShowHintGroups_All_3(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				imgDisplay.Source = LoadBitmap(renderer.DisplayHintGroups(solver.Screenshot, solver.FilteredHexagons, typeof(HexAreaHint), false));
 			}
 			catch (Exception e)
 			{

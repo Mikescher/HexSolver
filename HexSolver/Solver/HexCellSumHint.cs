@@ -5,13 +5,14 @@ namespace HexSolver.Solver
 {
 	class HexCellSumHint : HexHint
 	{
+		public readonly ICollection<HexagonCell> AllCells;
 		public ICollection<HexagonCell> Cells { get; private set; }
 		public int Number { get; private set; }
 
 		public HexCellSumHint(HexGrid grid)
 		{
 			Number = grid.CounterArea.Value.Value;
-			Cells = GetCells(grid).ToList().AsReadOnly();
+			AllCells = GetCells(grid).ToList().AsReadOnly();
 
 			CleanConditions();
 		}
@@ -20,7 +21,7 @@ namespace HexSolver.Solver
 		{
 			var remove = new List<HexagonCell>();
 
-			foreach (var cell in Cells)
+			foreach (var cell in AllCells)
 			{
 				if (cell.Type != HexagonType.HIDDEN)
 				{
@@ -28,7 +29,7 @@ namespace HexSolver.Solver
 				}
 			}
 
-			Cells = Cells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
+			Cells = AllCells.Where(p => !(remove.Contains(p))).ToList().AsReadOnly();
 		}
 
 		private IEnumerable<HexagonCell> GetCells(HexGrid grid)
@@ -36,9 +37,9 @@ namespace HexSolver.Solver
 			return grid.Select(p => p.Value);
 		}
 
-		public override ICollection<HexagonCell> GetCells()
+		public override ICollection<HexagonCell> GetCells(bool full = false)
 		{
-			return Cells;
+			return full ? AllCells : Cells;
 		}
 
 		public override int GetNumber()
