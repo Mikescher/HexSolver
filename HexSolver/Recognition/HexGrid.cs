@@ -130,6 +130,8 @@ namespace HexSolver
 
 			foreach (var hex in this)
 			{
+				if (hex.Value.Hint.IsError) throw new Exception("OCR failed for some cells");
+
 				switch (hex.Value.Hint.Area)
 				{
 					case CellHintArea.NONE:

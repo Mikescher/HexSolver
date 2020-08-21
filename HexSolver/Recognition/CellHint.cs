@@ -24,8 +24,11 @@
 		public CellHintArea Area { get; private set; }
 		public int Number { get; private set; }
 		public double OCRDistance { get; private set; }
+		public string AltDisplayValue { get; private set; } = null;
 
-		public CellHint()
+        public bool IsError => Type==CellHintType.NONE && OCRDistance>0;
+
+        public CellHint()
 			: this(CellHintType.NONE, CellHintArea.NONE, 0, 0)
 		{
 			// NOP
@@ -39,8 +42,19 @@
 			OCRDistance = ocrd;
 		}
 
+		public CellHint(CellHintType t, CellHintArea a, int n, double ocrd, string adv)
+		{
+			Number = n;
+			Area = a;
+			Type = t;
+			OCRDistance = ocrd;
+			AltDisplayValue = adv;
+		}
+
 		public override string ToString()
 		{
+			if (AltDisplayValue != null) return AltDisplayValue;
+
 			string result = "";
 
 			switch (Type)

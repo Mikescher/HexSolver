@@ -11,10 +11,15 @@ namespace HexSolver
 {
 	class HexagonCellImage
 	{
-		public static readonly Color COLOR_CELL_HIDDEN = Color.FromArgb(250, 155, 95);
-		public static readonly Color COLOR_CELL_ACTIVE = Color.FromArgb(100, 155, 230);
-		public static readonly Color COLOR_CELL_INACTIVE = Color.FromArgb(125, 90, 125);
-		public static readonly Color COLOR_CELL_NOCELL = Color.FromArgb(231, 231, 231);
+		public static readonly Color COLOR_CELL_HIDDEN   = Color.FromArgb(250, 155,  95);  // Orange
+		public static readonly Color COLOR_CELL_ACTIVE   = Color.FromArgb(100, 155, 230);  // Blue
+		public static readonly Color COLOR_CELL_INACTIVE = Color.FromArgb(125,  90, 125);  // Black
+		public static readonly Color COLOR_CELL_NOCELL   = Color.FromArgb(231, 231, 231);  // Grey
+
+		public static readonly Color REAL_COLOR_CELL_HIDDEN   = Color.FromArgb(255, 177,  41);  // Orange
+		public static readonly Color REAL_COLOR_CELL_ACTIVE   = Color.FromArgb(  5, 164, 235);  // Blue
+		public static readonly Color REAL_COLOR_CELL_INACTIVE = Color.FromArgb( 62,  62,  62);  // Black
+		public static readonly Color REAL_COLOR_CELL_NOCELL   = Color.FromArgb(239, 239, 239);  // Grey
 
 		public static readonly Color[] COLOR_CELLS = new Color[] { COLOR_CELL_HIDDEN, COLOR_CELL_ACTIVE, COLOR_CELL_INACTIVE, COLOR_CELL_NOCELL, Color.Transparent };
 
@@ -351,7 +356,7 @@ namespace HexSolver
 				int activePixel;
 				Bitmap img = GetProcessedImage(false, out activePixel);
 
-				if (activePixel == 0)
+				if (activePixel < 6)
 					return new CellHint();
 
 				double errDistance;
@@ -373,7 +378,7 @@ namespace HexSolver
 				if (Regex.IsMatch(txt, @"^-[0-9]+$")) // special case (pOCR fail)
 					return new CellHint(CellHintType.NONCONSECUTIVE, CellHintArea.DIRECT, int.Parse(txt.Substring(1, txt.Length - 1)), errDistance);
 
-				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
+				return new CellHint(CellHintType.NONE, CellHintArea.NONE, 0, 99, txt);
 			}
 
 			if (Type == HexagonType.ACTIVE)
@@ -381,7 +386,7 @@ namespace HexSolver
 				int activePixel;
 				Bitmap img = GetProcessedImage(false, out activePixel);
 
-				if (activePixel == 0)
+				if (activePixel < 6)
 					return new CellHint();
 
 				double errDistance;
@@ -392,14 +397,15 @@ namespace HexSolver
 				if (Regex.IsMatch(txt, @"^[0-9]+$"))
 					return new CellHint(CellHintType.COUNT, CellHintArea.CIRCLE, int.Parse(txt), errDistance);
 
-				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
+				return new CellHint(CellHintType.NONE, CellHintArea.NONE, 0, 999, txt);
 			}
 
 			if (Type == HexagonType.NOCELL)
 			{
 				int activePixel;
 				Bitmap img = GetProcessedImage(false, out activePixel);
-				if (activePixel == 0)
+
+				if (activePixel < 6)
 					return new CellHint();
 
 				CellHintArea col = GetHintColumn(img);
@@ -431,7 +437,7 @@ namespace HexSolver
 				if (Regex.IsMatch(txt, @"^-[0-9]+$")) // special case (pOCR fail)
 					return new CellHint(CellHintType.NONCONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 1)), errDistance);
 
-				throw new Exception("OCR failed (" + txt + ") :> " + errDistance);
+				return new CellHint(CellHintType.NONE, CellHintArea.NONE, 0, 999999);
 			}
 
 			throw new Exception("WTF - Type ==" + Type);

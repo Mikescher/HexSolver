@@ -70,6 +70,7 @@
     <Compile Include="HexcellsSolver.cs" />
     <Compile Include="Recognition\HexGridProperties.cs" />
     <Compile Include="Helper\ColorExt.cs" />
+    <Compile Include="Recognition\HexPatternParameter.cs" />
     <Compile Include="Solver\FutureGridModifier.cs" />
     <Compile Include="Solver\HexCellSumHint.cs" />
     <Compile Include="Solver\HexAreaHint.cs" />

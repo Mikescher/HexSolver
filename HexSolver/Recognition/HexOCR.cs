@@ -17,6 +17,7 @@ namespace HexSolver
 		}
 
 		private const int MINIMUM_PATTERN_SIZE = 24;
+		private const int PATTERN_ENFORCED_RAD = 3;
 
 		public static readonly Color COLOR_COUNTER = Color.FromArgb(5, 164, 235);
 
@@ -201,7 +202,7 @@ namespace HexSolver
 			return result;
 		}
 
-		public bool[,] GetPattern(Bitmap shot)
+		public bool[,] GetPattern(Bitmap shot, HexPatternParameter pparams, int max_x)
 		{
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -212,19 +213,46 @@ namespace HexSolver
 
 			bool[,] result = new bool[width, height];
 
+			ColorExt.Cache(HexagonCellImage.REAL_COLOR_CELL_ACTIVE);
+			ColorExt.Cache(HexagonCellImage.REAL_COLOR_CELL_HIDDEN);
+			ColorExt.Cache(HexagonCellImage.REAL_COLOR_CELL_INACTIVE);
+
 			unsafe
 			{
 				byte* p = (byte*)(void*)Scan0;
 
-				for (int x = 0; x < width; x++)
+				for (int x = 0; x < max_x; x++)
 				{
 					for (int y = 0; y < height; y++)
 					{
 						int idx = (y * stride) + x * 4;
 
-						double distance = ColorExt.GetHueDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.COLOR_CELL_HIDDEN);
+						result[x, y] = false;
 
-						result[x, y] = (distance < 16.875);
+						if (pparams.UseActiveCellsInBinaryGridRecognition)
+						{
+							var ok = ((pparams.ActiveCellHueThreshold >= 255) || ColorExt.GetHueDistance(       p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_ACTIVE) < pparams.ActiveCellHueThreshold)
+							      && ((pparams.ActiveCellSatThreshold >= 255) || ColorExt.GetSaturationDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_ACTIVE) < pparams.ActiveCellSatThreshold)
+							      && ((pparams.ActiveCellValThreshold >= 255) || ColorExt.GetValueDistance(     p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_ACTIVE) < pparams.ActiveCellValThreshold);
+							if (ok) { result[x, y] = true; continue; }
+						}
+
+						if (pparams.UseHiddenCellsInBinaryGridRecognition)
+						{
+							var ok = ((pparams.HiddenCellHueThreshold >= 255) || ColorExt.GetHueDistance(       p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_HIDDEN) < pparams.HiddenCellHueThreshold)
+							      && ((pparams.HiddenCellSatThreshold >= 255) || ColorExt.GetSaturationDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_HIDDEN) < pparams.HiddenCellSatThreshold)
+							      && ((pparams.HiddenCellValThreshold >= 255) || ColorExt.GetValueDistance(     p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_HIDDEN) < pparams.HiddenCellValThreshold);
+							if (ok) { result[x, y] = true; continue; }
+						}
+
+						if (pparams.UseInactiveCellsInBinaryGridRecognition)
+						{
+							var ok = ((pparams.InactiveCellHueThreshold >= 255) || ColorExt.GetHueDistance(       p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_INACTIVE) < pparams.InactiveCellHueThreshold)
+							      && ((pparams.InactiveCellSatThreshold >= 255) || ColorExt.GetSaturationDistance(p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_INACTIVE) < pparams.InactiveCellSatThreshold)
+							      && ((pparams.InactiveCellValThreshold >= 255) || ColorExt.GetValueDistance(     p[idx + 2], p[idx + 1], p[idx + 0], HexagonCellImage.REAL_COLOR_CELL_INACTIVE) < pparams.InactiveCellValThreshold);
+							if (ok) { result[x, y] = true; continue; }
+						}
+
 					}
 				}
 			}
@@ -234,11 +262,13 @@ namespace HexSolver
 			return result;
 		}
 
-		public List<Vec2d> GetHexPatternCenters(bool[,] pattern, int width, int height)
+		public List<Vec2d> GetHexPatternCenters(bool[,] pattern, int width, int height, out bool[,] errorPoints)
 		{
 			List<Vec2d> result = new List<Vec2d>();
 
 			bool[,] walked = new bool[width, height];
+
+			errorPoints = new bool[width, height];
 
 			for (int y = 0; y < height; y++)
 			{
@@ -254,9 +284,11 @@ namespace HexSolver
 						pos_stack.Push(new PointI { X = x, Y = y });
 						walked[x, y] = true;
 
+						List<PointI> currPointList = new List<PointI>();
 						while (pos_stack.Count > 0)
 						{
 							PointI pos = pos_stack.Pop();
+							currPointList.Add(pos);
 
 							int pX = pos.X;
 							int pY = pos.Y;
@@ -291,7 +323,30 @@ namespace HexSolver
 							}
 						}
 						if (sum_c >= MINIMUM_PATTERN_SIZE * MINIMUM_PATTERN_SIZE)
-							result.Add(new Vec2d(sum_x / sum_c, sum_y / sum_c));
+						{
+							var icenterx = (int)(sum_x / sum_c); 
+							var icentery = (int)(sum_y / sum_c);
+
+							var err = false;
+                            for (int rx = -PATTERN_ENFORCED_RAD; rx <= PATTERN_ENFORCED_RAD; rx++)
+                            {
+								for (int ry = -PATTERN_ENFORCED_RAD; ry <= PATTERN_ENFORCED_RAD; ry++)
+								{
+									if (icenterx + rx < 0) continue;
+									if (icentery + ry < 0) continue;
+									if (icenterx + rx >= width) continue;
+									if (icentery + ry >= height) continue;
+
+									if (!walked[icenterx + rx, icentery + ry]) { err = true; break;}
+								}
+								if (err) break;
+							}
+							
+							if (!err)
+								result.Add(new Vec2d(sum_x / sum_c, sum_y / sum_c));
+							else
+                                foreach (var p in currPointList) errorPoints[p.X, p.Y] = true;
+						}
 					}
 				}
 			}
@@ -532,7 +587,7 @@ namespace HexSolver
 			return Tuple.Create(resultAll, resultNumber, resultInner);
 		}
 
-		public HexGridProperties FindHexPattern(Bitmap shot)
+		public HexGridProperties FindHexPattern(Bitmap shot, HexPatternParameter pparams)
 		{
 			double CellRadius;
 			double CellGap;
@@ -548,8 +603,9 @@ namespace HexSolver
 
 			//##################################
 
-			bool[,] pattern = GetPattern(shot);
-			var centers = GetHexPatternCenters(pattern, shot.Width, shot.Height);
+			var counter = GetCounterArea(shot);
+			bool[,] pattern = GetPattern(shot, pparams, MathExt.Min(counter.Item1.bl.X - 10, counter.Item2.bl.X - 10, counter.Item3.bl.X - 10));
+			var centers = GetHexPatternCenters(pattern, shot.Width, shot.Height, out _);
 			var grid = GetHexPatternGrid(centers);
 			double hexHeight = GetHexPatternHeight(pattern, shot.Height, centers) - 2;
 			var distance = GetHexPatternDistance(grid);
@@ -588,10 +644,8 @@ namespace HexSolver
 			NoCellBar_TR_X = 175;
 			NoCellBar_TR_Y = 165;
 
-			var CounterArea_All = GetCounterArea(shot);
-
-			CounterArea = CounterArea_All.Item2;
-			CounterAreaInner = CounterArea_All.Item3;
+			CounterArea = counter.Item2;
+			CounterAreaInner = counter.Item3;
 
 			//##################################
 

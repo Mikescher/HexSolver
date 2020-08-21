@@ -10,6 +10,17 @@ namespace HexSolver
 		public HexOCR OCR { get; private set; }
 		public PatternOCR POCR { get; private set; }
 
+		public HexPatternParameter _patternParameter;
+		public HexPatternParameter PatternParameter
+		{
+			get { return _patternParameter; }
+			set
+			{
+				_patternParameter = value;
+				HexProperties = null;
+			}
+		}
+
 		private Bitmap _Screenshot = null;
 		public Bitmap Screenshot
 		{
@@ -24,7 +35,7 @@ namespace HexSolver
 		private HexGridProperties _HexProperties = null;
 		public HexGridProperties HexProperties
 		{
-			get { return _HexProperties ?? (_HexProperties = OCR.FindHexPattern(Screenshot)); }
+			get { return _HexProperties ?? (_HexProperties = OCR.FindHexPattern(Screenshot, PatternParameter)); }
 			set
 			{
 				if (value != null && Screenshot == null)
@@ -50,14 +61,16 @@ namespace HexSolver
 		public HexGrid FilteredHexagons
 		{
 			get { return _FilteredHexagons ?? (_FilteredHexagons = OCR.GetHexagons(AllHexagons)); }
-			private set
+			set
 			{
 				_FilteredHexagons = value;
 			}
 		}
 
-		public HexcellsSolver()
+		public HexcellsSolver(HexPatternParameter pparam)
 		{
+			_patternParameter = pparam;
+
 			Dictionary<string, Bitmap> refdic = new Dictionary<string, Bitmap>();
 			refdic.Add("-", Properties.Resources.pattern_dash);
 			refdic.Add("{", Properties.Resources.pattern_Open);

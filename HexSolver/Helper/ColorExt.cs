@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace MSHC.Helper
 {
 	static class ColorExt
 	{
+		private static readonly Dictionary<Color, Tuple<double, double, double>> HSVCache = new Dictionary<Color, Tuple<double, double, double>>();
+
 		/// <summary>
 		/// Get HSV Saturation
 		/// </summary>
@@ -73,6 +76,30 @@ namespace MSHC.Helper
 			return Math.Max(Math.Max(red, green), blue) * 100.0 / 255.0;
 		}
 
+		public static double GetHue(Color v)
+		{
+			if (HSVCache.TryGetValue(v, out var hsv)) return hsv.Item1;
+			return GetHue(v.R, v.G, v.B);
+		}
+
+		public static double GetSaturation(Color v)
+		{
+			if (HSVCache.TryGetValue(v, out var hsv)) return hsv.Item2;
+			return GetSaturation(v.R, v.G, v.B);
+		}
+
+		public static double GetValue(Color v)
+		{
+			if (HSVCache.TryGetValue(v, out var hsv)) return hsv.Item3;
+			return GetValue(v.R, v.G, v.B);
+		}
+
+		public static void Cache(Color v)
+        {
+			if (HSVCache.ContainsKey(v)) return;
+			HSVCache.Add(v, Tuple.Create(GetHue(v), GetSaturation(v), GetValue(v)));
+        }
+
 		public static double GetColorDistance(byte aR, byte aG, byte aB, byte bR, byte bG, byte bB)
 		{
 			return Math.Sqrt(Math.Pow(aR - bR, 2) + Math.Pow(aG - bG, 2) + Math.Pow(aB - bB, 2));
@@ -97,14 +124,14 @@ namespace MSHC.Helper
 
 		public static double GetHueDistance(byte aR, byte aG, byte aB, Color b)
 		{
-			double dist = Math.Abs(GetHue(aR, aG, aB) - GetHue(b.R, b.G, b.B));
+			double dist = Math.Abs(GetHue(aR, aG, aB) - GetHue(b));
 
 			return Math.Min(dist, 360 - dist);
 		}
 
 		public static double GetHueDistance(Color a, Color b)
 		{
-			double dist = Math.Abs(GetHue(a.R, a.G, a.B) - GetHue(b.R, b.G, b.B));
+			double dist = Math.Abs(GetHue(a) - GetHue(b));
 
 			return Math.Min(dist, 360 - dist);
 		}
@@ -118,14 +145,14 @@ namespace MSHC.Helper
 
 		public static double GetSaturationDistance(byte aR, byte aG, byte aB, Color b)
 		{
-			double dist = Math.Abs(GetSaturation(aR, aG, aB) - GetSaturation(b.R, b.G, b.B));
+			double dist = Math.Abs(GetSaturation(aR, aG, aB) - GetSaturation(b));
 
 			return Math.Min(dist, 100 - dist);
 		}
 
 		public static double GetSaturationDistance(Color a, Color b)
 		{
-			double dist = Math.Abs(GetSaturation(a.R, a.G, a.B) - GetSaturation(b.R, b.G, b.B));
+			double dist = Math.Abs(GetSaturation(a) - GetSaturation(b));
 
 			return Math.Min(dist, 100 - dist);
 		}
@@ -139,14 +166,14 @@ namespace MSHC.Helper
 
 		public static double GetValueDistance(byte aR, byte aG, byte aB, Color b)
 		{
-			double dist = Math.Abs(GetValue(aR, aG, aB) - GetValue(b.R, b.G, b.B));
+			double dist = Math.Abs(GetValue(aR, aG, aB) - GetValue(b));
 
 			return Math.Min(dist, 100 - dist);
 		}
 
 		public static double GetValueDistance(Color a, Color b)
 		{
-			double dist = Math.Abs(GetValue(a.R, a.G, a.B) - GetValue(b.R, b.G, b.B));
+			double dist = Math.Abs(GetValue(a.R, a.G, a.B) - GetValue(b));
 
 			return Math.Min(dist, 100 - dist);
 		}

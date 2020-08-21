@@ -34,7 +34,7 @@ namespace HexSolver
 
 			try
 			{
-				solver = new HexcellsSolver();
+				solver = new HexcellsSolver(GetUIPatternParameters());
 				renderer = new HexRenderer();
 
 				int shotid = 1;
@@ -240,6 +240,26 @@ namespace HexSolver
 			}
 		}
 
+		private void HexOCRValueShow(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+			if (skipUpdate)
+				return;
+
+			try
+			{
+				solver.HexProperties = GetUIHexGridProperties();
+				HexGrid all = solver.AllHexagons;
+
+				imgDisplay.Source = LoadBitmap(renderer.DisplayCells(solver.Screenshot, solver.HexProperties, all));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 		private void HexOCRValueSet(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
@@ -269,7 +289,7 @@ namespace HexSolver
 
 			try
 			{
-				imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR));
+				imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR, solver.PatternParameter));
 			}
 			catch (Exception e)
 			{
@@ -282,6 +302,21 @@ namespace HexSolver
 			try
 			{
 				SetUIHexGridProperties(solver.HexProperties);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void HexBinPatternValueChanged(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null) return;
+			try
+			{
+				solver.PatternParameter = GetUIPatternParameters();
+
+				imgDisplay.Source = LoadBitmap(renderer.DisplayBinPattern(solver.Screenshot, solver.OCR, solver.PatternParameter));
 			}
 			catch (Exception e)
 			{
@@ -332,6 +367,7 @@ namespace HexSolver
 
 			try
 			{
+				solver.FilteredHexagons = null;
 				imgDisplay.Source = LoadBitmap(renderer.DisplayOCR(solver.Screenshot, solver.FilteredHexagons));
 			}
 			catch (Exception e)
@@ -616,6 +652,28 @@ namespace HexSolver
 				.SetCounterInner_Width(dudCounterW.Value.Value)
 				.SetCounterInner_Height(dudCounterH.Value.Value)
 				.build();
+		}
+
+		private HexPatternParameter GetUIPatternParameters()
+        {
+			return new HexPatternParameter
+			(
+				dudBinUseActive.IsChecked.Value,
+				dudBinHueThresholdActive.Value.Value,
+				dudBinSatThresholdActive.Value.Value,
+				dudBinValThresholdActive.Value.Value,
+
+				dudBinUseInactive.IsChecked.Value,
+				dudBinHueThresholdInactive.Value.Value,
+				dudBinSatThresholdInactive.Value.Value,
+				dudBinValThresholdInactive.Value.Value,
+
+				dudBinUseHidden.IsChecked.Value,
+				dudBinHueThresholdHidden.Value.Value,
+				dudBinSatThresholdHidden.Value.Value,
+				dudBinValThresholdHidden.Value.Value
+			);
+
 		}
 
 		private void SetUIHexGridProperties(HexGridProperties p)

@@ -178,6 +178,8 @@ namespace HexSolver
 
 				foreach (var hex in grid)
 				{
+					if (hex.Value.Hint.IsError) throw new Exception("OCR failed for some cells");
+
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
 					if (hex.Value.Type == HexagonType.NOCELL)
@@ -283,7 +285,17 @@ namespace HexSolver
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
 
-					if (hex.Value.Hint.Type != CellHintType.NONE)
+					if (hex.Value.Hint.Type == CellHintType.NONE && hex.Value.Hint.OCRDistance > 0 && hex.Value.Hint.AltDisplayValue != null)
+					{
+						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 35.0);
+						int col = (int)(perc * 255);
+
+						g.FillPolygon(new SolidBrush(Color.FromArgb(col, 255 - col, 0)), points);
+
+						g.DrawString(hex.Value.Hint.AltDisplayValue, fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+						g.DrawString("" + (int)hex.Value.Hint.OCRDistance, fnt_small, fntBush1, hex.Value.Image.BoundingBox, fmt_down);
+					}
+					else if (hex.Value.Hint.Type != CellHintType.NONE)
 					{
 						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 35.0);
 						int col = (int)(perc * 255);
@@ -311,14 +323,14 @@ namespace HexSolver
 			return shot;
 		}
 
-		public Bitmap DisplayBinPattern(Bitmap shot, HexOCR ocr)
+		public Bitmap DisplayBinPattern(Bitmap shot, HexOCR ocr, HexPatternParameter pparams)
 		{
 			shot = new Bitmap(shot);
 
-			bool[,] pattern = ocr.GetPattern(shot);
-			var centers = ocr.GetHexPatternCenters(pattern, shot.Width, shot.Height);
-			var grid = ocr.GetHexPatternGrid(centers);
 			var counter = ocr.GetCounterArea(shot);
+			bool[,] pattern = ocr.GetPattern(shot, pparams, MathExt.Min(counter.Item1.bl.X - 10, counter.Item2.bl.X - 10, counter.Item3.bl.X - 10));
+			var centers = ocr.GetHexPatternCenters(pattern, shot.Width, shot.Height, out var errs);
+			var grid = ocr.GetHexPatternGrid(centers);
 
 			BitmapData srcData = shot.LockBits(new Rectangle(0, 0, shot.Width, shot.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -339,10 +351,36 @@ namespace HexSolver
 
 						bool on = pattern[x, y] || counter.Item1.Includes(x, y);
 
-						p[idx + 0] = (byte)(on ? 0 : 255);
-						p[idx + 1] = (byte)(on ? 0 : 255);
-						p[idx + 2] = (byte)(on ? 0 : 255);
-						p[idx + 3] = 255;
+						if (errs[x,y])
+						{
+							p[idx + 0] = 0;
+							p[idx + 1] = 0;
+							p[idx + 2] = 128;
+							p[idx + 3] = 255;
+						}
+						else if (pattern[x, y])
+						{
+							p[idx + 0] = 0;
+							p[idx + 1] = 0;
+							p[idx + 2] = 0;
+							p[idx + 3] = 255;
+						}
+						else if (counter.Item1.Includes(x, y))
+						{
+							p[idx + 0] = 128;
+							p[idx + 1] = 0;
+							p[idx + 2] = 0;
+							p[idx + 3] = 255;
+						}
+						else
+						{
+							p[idx + 0] = 255;
+							p[idx + 1] = 255;
+							p[idx + 2] = 255;
+							p[idx + 3] = 255;
+						}
+
+
 					}
 				}
 			}
