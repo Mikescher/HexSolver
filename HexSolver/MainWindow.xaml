@@ -26,6 +26,8 @@
                             <RowDefinition Height="24"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
                         <Button Content="[1] Recapture" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Padding="8 0" Click="OnCaptureClicked"     FontWeight="Bold"  />
@@ -34,6 +36,7 @@
                         <Button Content="Load Example" Grid.Row="2" Padding="8 0" Click="OnExampleLoadClicked"  Grid.ColumnSpan="3"/>
                         <xctk:IntegerUpDown Grid.Row="2" Grid.Column="4" Value="1" Minimum="1" x:Name="iudExample"/>
 
+                        <Button Content="Load from file" Grid.Row="4" Padding="8 0" Click="OnLoadFromFileClicked"  Grid.ColumnSpan="5"/>
                     </Grid>
                 </Border>
                 
@@ -52,12 +55,16 @@
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
-                        <CheckBox Content="Autosave OCR in ..\..\imgsave" Grid.Row="0" Grid.Column="0" Padding="8 0" Click="OnSaveOCRClicked" Grid.ColumnSpan="5" VerticalAlignment="Center" />
+                        <CheckBox Content="Autosave OCR in ..\..\imgsave" x:Name="CbxAutoSaveImgsave" Grid.Row="0" Grid.Column="0" Padding="8 0" Click="OnSaveOCRClicked" Grid.ColumnSpan="5" VerticalAlignment="Center" />
 
-                        <Button Content="Save current in ../../example" Grid.Row="2" Padding="8 0" Click="OnExampleSaveClicked" Grid.ColumnSpan="5" />
+                        <Button Content="Save current in ../../example" x:Name="BtnSaveExample" Grid.Row="2" Padding="8 0" Click="OnExampleSaveClicked" Grid.ColumnSpan="5" />
+                        
+                        <Button Content="Save current" Grid.Row="4" Padding="8 0" Click="OnCurrentSaveAsClicked" Grid.ColumnSpan="5" />
 
-                        <Button Content="CleanUp ../../imgsave directory" Grid.Row="4" Padding="8 0" Click="OnCleanImageSave" Grid.ColumnSpan="5" />
+                        <Button Content="CleanUp ../../imgsave directory" x:Name="BtnCleanupImgsave" Grid.Row="6" Padding="8 0" Click="OnCleanImageSave" Grid.ColumnSpan="5" />
                     </Grid>
                 </Border>
 

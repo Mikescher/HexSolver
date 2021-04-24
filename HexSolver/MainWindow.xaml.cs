@@ -32,6 +32,10 @@ namespace HexSolver
 
 			Title = "HexSolver " + App.HS_VERSION + " (github.com/Mikescher/HexSolver)";
 
+			CbxAutoSaveImgsave.IsEnabled = Directory.Exists(@"..\..\imgsave\");
+			BtnCleanupImgsave.IsEnabled  = Directory.Exists(@"..\..\imgsave\");
+			BtnSaveExample.IsEnabled     = Directory.Exists(@"..\..\example\");
+
 			try
 			{
 				solver = new HexcellsSolver(GetUIPatternParameters());
@@ -131,6 +135,39 @@ namespace HexSolver
 			}
 		}
 
+		private void OnLoadFromFileClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			try
+			{
+				var sfd = new OpenFileDialog() { Filter = "Image (*.png)|*.png" };
+				if (sfd.ShowDialog() == true)
+				{
+					if (!File.Exists(sfd.FileName))
+						return;
+
+					Image file = Image.FromFile(sfd.FileName);
+					Bitmap bmp = new Bitmap(file.Width, file.Height, PixelFormat.Format32bppArgb);
+					using (Graphics g = Graphics.FromImage(bmp))
+					{
+						g.DrawImageUnscaled(file, 0, 0);
+					}
+
+					imgDisplay.Source = LoadBitmap(solver.LoadScreenshot(bmp));
+
+					pnlExecute.IsEnabled = false;
+
+					MessageBox.Show("Loaded " + sfd.FileName);
+				}
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 		private void OnExampleSaveClicked(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)
@@ -148,6 +185,31 @@ namespace HexSolver
 				solver.Screenshot.Save(String.Format(@"..\..\example\shot{0:000}.png", i), ImageFormat.Png);
 
 				MessageBox.Show("Saved to " + String.Format(@"..\..\example\shot{0:000}.png", i));
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void OnCurrentSaveAsClicked(object sender, RoutedEventArgs eargs)
+		{
+			if (solver == null || renderer == null)
+				return;
+
+			if (!solver.IsScreenshotLoaded())
+				return;
+
+			try
+			{
+				var sfd = new SaveFileDialog() { DefaultExt = ".png", AddExtension = true, OverwritePrompt = true, Filter = "Image (*.png)|*.png", FileName = "hexsolver_out.png" };
+				if (sfd.ShowDialog() == true)
+				{
+					solver.Screenshot.Save(sfd.FileName, ImageFormat.Png);
+
+					MessageBox.Show("Saved to " + sfd.FileName);
+				}
+
 			}
 			catch (Exception e)
 			{
