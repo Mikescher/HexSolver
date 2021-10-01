@@ -695,6 +695,18 @@ namespace HexSolver
 			}
 		}
 
+		private void OnInvertMouseBtnsClicked(object sender, RoutedEventArgs eargs)
+		{
+			try
+			{
+				HexExecutor.MouseInverted = ((CheckBox)sender).IsChecked.Value;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString(), "Execption while executing", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 		private void OnExecuteSingle(object sender, RoutedEventArgs eargs)
 		{
 			if (solver == null || renderer == null)

@@ -15,6 +15,8 @@ namespace HexSolver
 
 	class HexExecutor
 	{
+		public static bool MouseInverted;
+
 		private System.Windows.Forms.Keys ABORT_KEY = System.Windows.Forms.Keys.Escape;
 
 		private const double MOUSE_MOVEMENT_TIME = 0.5;
@@ -64,7 +66,12 @@ namespace HexSolver
 				var solution_y = (int)solution.Cell.Image.OCRCenter.Y;
 
 				Solver.Cam.MoveMouseContinoous(solution_x, solution_y, MOUSE_MOVEMENT_TIME);
-				Solver.Cam.ClickMouseSimple(solution_x, solution_y, solution.Action == HexSolver.Solver.CellAction.ACTIVATE);
+				bool isLeftClick = solution.Action == CellAction.ACTIVATE;
+				if (MouseInverted)
+				{
+					isLeftClick = !isLeftClick;
+				}
+				Solver.Cam.ClickMouseSimple(solution_x, solution_y, isLeftClick);
 				Thread.Sleep(CLICK_SLEEP_TIME);
 
 				feedback.OnExecutorSolutionExecuted(solution);
@@ -147,7 +154,12 @@ namespace HexSolver
 				Solver.FilteredHexagons.HintList.RemoveSolution(solution);
 
 				Solver.Cam.MoveMouseContinoous(solution_x, solution_y, MOUSE_MOVEMENT_TIME);
-				Solver.Cam.ClickMouseSimple(solution_x, solution_y, solution.Action == HexSolver.Solver.CellAction.ACTIVATE);
+				bool isLeftClick = solution.Action == CellAction.ACTIVATE;
+				if (MouseInverted)
+				{
+					isLeftClick = !isLeftClick;
+				}
+				Solver.Cam.ClickMouseSimple(solution_x, solution_y, isLeftClick);
 				Thread.Sleep(CLICK_SLEEP_TIME);
 
 				if (Solver.Cam.IsKeyDownAsync(ABORT_KEY))
