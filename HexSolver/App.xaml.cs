@@ -7,6 +7,6 @@ namespace HexSolver
 	/// </summary>
 	public partial class App : Application
 	{
-		public const string HS_VERSION = "v1.3";
+		public const string HS_VERSION = "v1.4";
 	}
 }
