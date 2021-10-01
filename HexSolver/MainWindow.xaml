@@ -336,16 +336,19 @@
                             <RowDefinition Height="5"/>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="5"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="5"/>
                             <RowDefinition Height="24"/>
                             <RowDefinition Height="35"/>
                             <RowDefinition Height="20"/>
                         </Grid.RowDefinitions>
 
-                        <Button Content="Execute (Single)" Grid.Row="0" Click="OnExecuteSingle"/>
-                        <Button Content="Execute (Set)" Grid.Row="2" Click="OnExecuteMulti"/>
-                        <Button Content="[6] Execute (All)" Grid.Row="4" Click="OnExecuteAll" FontWeight="Bold"/>
-                        <Label Content="(Hold ESC to abort)" Grid.Row="5" VerticalAlignment="Top" HorizontalAlignment="Center" FontStyle="Italic"/>
-                        <ProgressBar Grid.Row="6" Name="pbarExecute"/>
+                        <CheckBox Content="Invert Mouse Buttons" x:Name="CbxInvertMouseBtns" Grid.Row="0" Grid.Column="0" Padding="8 0" Click="OnInvertMouseBtnsClicked" Grid.ColumnSpan="5" VerticalAlignment="Center" />
+                        <Button Content="Execute (Single)" Grid.Row="2" Click="OnExecuteSingle"/>
+                        <Button Content="Execute (Set)" Grid.Row="4" Click="OnExecuteMulti"/>
+                        <Button Content="[6] Execute (All)" Grid.Row="6" Click="OnExecuteAll" FontWeight="Bold"/>
+                        <Label Content="(Hold ESC to abort)" Grid.Row="7" VerticalAlignment="Top" HorizontalAlignment="Center" FontStyle="Italic"/>
+                        <ProgressBar Grid.Row="8" Name="pbarExecute"/>
                     </Grid>
                 </Border>
             </StackPanel>
