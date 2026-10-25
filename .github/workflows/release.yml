@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v3
+      - uses: nuget/setup-nuget@v4
+
+      - name: Restore packages
+        run: nuget restore HexSolver/packages.config -PackagesDirectory HexSolver/packages
+
+      - name: Build HexSolver
+        run: msbuild HexSolver/HexSolver.csproj -p:Configuration=Release -p:TargetFrameworkVersion=v4.5.2
+
+      - name: Package and release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "v0.0.$env:GITHUB_RUN_NUMBER"
+          $archive = "HexSolver-$tag.zip"
+          Compress-Archive -Path HexSolver/bin/Release/* -DestinationPath $archive
+          gh release create $tag $archive --target $env:GITHUB_SHA --title $tag --generate-notes

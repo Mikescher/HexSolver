@@ -178,11 +178,11 @@ namespace HexSolver
 
 				foreach (var hex in grid)
 				{
-					if (hex.Value.Hint.IsError) throw new Exception("OCR failed for some cells");
-
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
-					if (hex.Value.Type == HexagonType.NOCELL)
+					if (hex.Value.Hint.IsError)
+						g.FillPolygon(new SolidBrush(Color.Magenta), points);
+					else if (hex.Value.Type == HexagonType.NOCELL)
 						g.FillPolygon(new SolidBrush(Color.Gainsboro), points);
 					else
 						g.FillPolygon(new SolidBrush(Color.SlateGray), points);
@@ -285,14 +285,11 @@ namespace HexSolver
 					var points = Enumerable.Range(0, 7).Select(p => hex.Value.GetEdge(p)).Select(p => new Point((int)p.X, (int)p.Y)).ToArray();
 
 
-					if (hex.Value.Hint.Type == CellHintType.NONE && hex.Value.Hint.OCRDistance > 0 && hex.Value.Hint.AltDisplayValue != null)
+					if (hex.Value.Hint.IsError)
 					{
-						double perc = Math.Min(1.0, hex.Value.Hint.OCRDistance / 35.0);
-						int col = (int)(perc * 255);
+						g.FillPolygon(new SolidBrush(Color.Magenta), points);
 
-						g.FillPolygon(new SolidBrush(Color.FromArgb(col, 255 - col, 0)), points);
-
-						g.DrawString(hex.Value.Hint.AltDisplayValue, fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
+						g.DrawString(hex.Value.Hint.AltDisplayValue ?? "?", fnt, fntBush1, hex.Value.Image.BoundingBox, fmt);
 						g.DrawString("" + (int)hex.Value.Hint.OCRDistance, fnt_small, fntBush1, hex.Value.Image.BoundingBox, fmt_down);
 					}
 					else if (hex.Value.Hint.Type != CellHintType.NONE)

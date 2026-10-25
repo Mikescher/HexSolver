@@ -538,7 +538,7 @@ namespace SimplePatternOCR
 
 									bool valid = nx < img.Width - 1 && nx > 0 && ny > 0 && ny < img.Height - 1;
 
-									double treshold = (nx == 0) ? FCB_TRESHOLD_Y : FCB_TRESHOLD_X;
+									double treshold = (off.X == 0) ? FCB_TRESHOLD_Y : FCB_TRESHOLD_X;
 
 									if (valid && grid[nx, ny] == 0 && ((pget(nx, ny) - cme) < treshold || allPoints.Count == 1) && pget(nx, ny) > FCB_TRESHOLD_FLOOD)
 									{
@@ -553,14 +553,7 @@ namespace SimplePatternOCR
 							var boxrect = new RectangleI(minX, minY, maxX - minX + 1, maxY - minY + 1);
 
 							var box = boxes.FirstOrDefault(q =>
-								boxrect.X < q.Item2.X_Max && boxrect.X > q.Item2.X ||
-								boxrect.X_Max < q.Item2.X_Max && boxrect.X_Max > q.Item2.X ||
-								boxrect.X_Mid < q.Item2.X_Max && boxrect.X_Mid > q.Item2.X ||
-
-								q.Item2.X < boxrect.X_Max && q.Item2.X > boxrect.X ||
-								q.Item2.X_Max < boxrect.X_Max && q.Item2.X_Max > boxrect.X ||
-								q.Item2.X_Mid < boxrect.X_Max && q.Item2.X_Mid > boxrect.X
-								);
+								Math.Min(boxrect.X_Max, q.Item2.X_Max) - Math.Max(boxrect.X, q.Item2.X) > 1);
 
 							if (box != null)
 							{

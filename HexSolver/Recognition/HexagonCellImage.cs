@@ -29,10 +29,12 @@ namespace HexSolver
 		public double OCRRadius { get; private set; }
 		public double OCRHeight { get; private set; }
 		public Bitmap OCRImage { get; private set; }
+		public Color AverageColor { get; private set; }
 		public Rectangle BoundingBox { get; private set; }
 		public readonly PatternOCR PatternOCR;
 
 		private HexagonType? _Type = null;
+		private bool _DarkNoCell;
 		public HexagonType Type
 		{
 			get
@@ -90,7 +92,7 @@ namespace HexSolver
 			return result;
 		}
 
-		private Color GetAverageColor(Vec2d OCRCenter, double OCRRadius, Bitmap OCRImage, Rectangle BoundingBox)
+		private Color GetAverageColor(Vec2d OCRCenter, double OCRRadius, Bitmap OCRImage, Rectangle BoundingBox, out bool darkNoCell)
 		{
 			BitmapData srcData = OCRImage.LockBits(new Rectangle(0, 0, OCRImage.Width, OCRImage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 			IntPtr Scan0 = srcData.Scan0;
@@ -99,7 +101,8 @@ namespace HexSolver
 			int acR = 0;
 			int acG = 0;
 			int acB = 0;
-			double acS = 0;
+			int backgroundPixels = 0;
+			int sampledPixels = 0;
 
 			unsafe
 			{
@@ -119,20 +122,25 @@ namespace HexSolver
 							acB += p[idx + 0];
 							acG += p[idx + 1];
 							acR += p[idx + 2];
-							acS += 255;
+							sampledPixels++;
+							if (p[idx + 0] < 55 && p[idx + 1] < 55 && p[idx + 2] < 55) backgroundPixels++;
 						}
 					}
 				}
 			}
 
 			OCRImage.UnlockBits(srcData);
+			// The dark board background is darker than the interior of a revealed cell.
+			darkNoCell = backgroundPixels * 2 >= sampledPixels;
 
-			return Color.FromArgb((int)(255 * acR / acS), (int)(255 * acG / acS), (int)(255 * acB / acS));
+			return Color.FromArgb((int)(acR / (double)sampledPixels), (int)(acG / (double)sampledPixels), (int)(acB / (double)sampledPixels));
 		}
 
 		private HexagonType GetHexagonType()
 		{
-			Color avg = GetAverageColor(OCRCenter, OCRRadius, OCRImage, BoundingBox);
+			Color avg = AverageColor = GetAverageColor(OCRCenter, OCRRadius, OCRImage, BoundingBox, out _DarkNoCell);
+			if (_DarkNoCell)
+				return HexagonType.NOCELL;
 
 			double[] distance = COLOR_CELLS.Select(p => ColorExt.GetColorDistance(p.R, p.G, p.B, avg)).ToArray();
 
@@ -154,6 +162,7 @@ namespace HexSolver
 		{
 			Bitmap img = OCRImage.Clone(GetBoundingBox(), PixelFormat.Format32bppArgb);
 			double hexheight = OCRRadius * (Math.Sin(MathExt.ToRadians(60)) / Math.Sin(MathExt.ToRadians(90)));
+			double textInset = OCRRadius * 0.15;
 			activePixel = 0;
 
 			BitmapData srcData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
@@ -173,6 +182,7 @@ namespace HexSolver
 						double px = Math.Abs(x - img.Width / 2);
 						double py = Math.Abs(y - img.Height / 2);
 						double pd = Math.Sqrt(px * px + py * py);
+						bool nearBorder = py >= hexheight - textInset || py + 2 * (px - OCRRadius + textInset) >= 0;
 
 						if (py < hexheight && py + 2 * (px - OCRRadius) < 0)
 						{
@@ -190,7 +200,7 @@ namespace HexSolver
 								case HexagonType.ACTIVE:
 									{
 										double s_value = ColorExt.GetSaturation(p[idx + 2], p[idx + 1], p[idx + 0]);
-										if (s_value >= 80 || pd > (OCRHeight - 1))
+										if (s_value >= 80 || pd > (OCRHeight - 1) || nearBorder)
 										{
 											// TRANSPARENT
 										}
@@ -210,7 +220,7 @@ namespace HexSolver
 									{
 										int grayness = (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3;
 
-										if (grayness < 128 || pd > (OCRHeight - 1))
+										if (grayness < 128 || pd > (OCRHeight - 1) || nearBorder)
 										{
 											// TRANSPARENT
 										}
@@ -228,6 +238,19 @@ namespace HexSolver
 
 								case HexagonType.NOCELL:
 									{
+										if (_DarkNoCell)
+										{
+											int minChannel = Math.Min(p[idx + 0], Math.Min(p[idx + 1], p[idx + 2]));
+											int maxChannel = Math.Max(p[idx + 0], Math.Max(p[idx + 1], p[idx + 2]));
+											if (minChannel > 140 && maxChannel - minChannel < 30 && !nearBorder && px < OCRRadius * 0.6)
+											{
+												activePixel++;
+												repl_R = repl_G = repl_B = (byte)(255 - (p[idx + 2] + p[idx + 1] + p[idx + 0]) / 3);
+												repl_A = 255;
+											}
+											break;
+										}
+
 										double c_distance = ColorExt.GetColorDistance(p[idx + 2], p[idx + 1], p[idx + 0], COLOR_CELL_NOCELL);
 										double hsv_value = ColorExt.GetValue(p[idx + 2], p[idx + 1], p[idx + 0]);
 										if (c_distance < 32 || hsv_value > 75)
@@ -412,7 +435,7 @@ namespace HexSolver
 
 				if (col == CellHintArea.NONE)
 				{
-					throw new Exception("OCR failed (Can't find column)");
+					throw new Exception(String.Format("OCR failed at screen {0:0}, {1:0}: could not find the clue's column direction ({2} OCR pixels).", OCRCenter.X, OCRCenter.Y, activePixel));
 				}
 
 				if (col == CellHintArea.COLUMN_LEFT)
@@ -437,7 +460,7 @@ namespace HexSolver
 				if (Regex.IsMatch(txt, @"^-[0-9]+$")) // special case (pOCR fail)
 					return new CellHint(CellHintType.NONCONSECUTIVE, col, int.Parse(txt.Substring(1, txt.Length - 1)), errDistance);
 
-				return new CellHint(CellHintType.NONE, CellHintArea.NONE, 0, 999999);
+				return new CellHint(CellHintType.NONE, CellHintArea.NONE, 0, 999999, txt);
 			}
 
 			throw new Exception("WTF - Type ==" + Type);
